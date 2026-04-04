@@ -4,25 +4,28 @@
       <AppLink
         name="profile"
         :params="{ username: props.article.author.username }"
+        data-testid="article-author-link"
       >
-        <img :alt="props.article.author.username" :src="article.author.image">
+        <img :alt="props.article.author.username" :src="article.author.image" data-testid="article-author-img">
       </AppLink>
       <div class="info">
         <AppLink
           class="author"
           name="profile"
           :params="{ username: props.article.author.username }"
+          data-testid="article-author-name"
         >
           {{ article.author.username }}
         </AppLink>
-        <span class="date">{{ new Date(article.createdAt).toDateString() }}</span>
+        <span class="date" data-testid="article-date">{{ new Date(article.createdAt).toDateString() }}</span>
       </div>
       <button
         class="btn btn-sm pull-xs-right"
         :class="[article.favorited ? 'btn-primary' : 'btn-outline-primary']"
         :aria-label="article.favorited ? 'Unfavorite article' : 'Favorite article'"
         :disabled="favoriteProcessGoing"
-        @click="() => favoriteArticle()"
+      @click="() => favoriteArticle()"
+      data-testid="article-favorite-btn"
       >
         <i class="ion-heart" /> {{ article.favoritesCount }}
       </button>
@@ -32,15 +35,17 @@
       class="preview-link"
       name="article"
       :params="{ slug: props.article.slug }"
+      data-testid="article-link"
     >
-      <h1>{{ article.title }}</h1>
+      <h1 data-testid="article-title">{{ article.title }}</h1>
       <p data-testid="article-description">{{ article.description }}</p>
-      <span>Read more...</span>
-      <ul class="tag-list">
+      <span data-testid="article-read-more">Read more...</span>
+      <ul class="tag-list" data-testid="article-tag-list">
         <li
           v-for="tag in article.tagList"
           :key="tag"
           class="tag-default tag-pill tag-outline"
+          data-testid="article-tag-item"
         >
           {{ tag }}
         </li>

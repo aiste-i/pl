@@ -1,27 +1,45 @@
 import { defineConfig, devices } from '@playwright/test';
+import { getSelectedAppAdapter } from './src/apps';
+
+const adapter = getSelectedAppAdapter();
 
 export default defineConfig({
   testDir: './tests',
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: 'list',
+  testMatch: adapter.testMatch,
+  outputDir: `test-results/${adapter.id}/playwright-artifacts`,
   use: {
     trace: 'on-first-retry',
-    baseURL: 'http://localhost:7002',
+    screenshot: 'only-on-failure',
+    baseURL: adapter.baseURL,
+    navigationTimeout: 15_000,
+    actionTimeout: 10_000,
   },
   projects: [
     {
-      name: 'chromium',
+      name: `${adapter.id}-chromium`,
+      metadata: {
+        appId: adapter.id,
+        appDisplayName: adapter.displayName,
+      },
       use: { ...devices['Desktop Chrome'] },
     },
   ],
   webServer: {
-    command: 'npm run serve --prefix apps/react',
-    url: 'http://localhost:7002',
+    command: adapter.startCommand,
+    cwd: adapter.rootDir,
+    url: adapter.healthUrl,
+    env: {
+      ...process.env,
+      ...(adapter.env ?? {}),
+    },
     reuseExistingServer: !process.env.CI,
     stdout: 'pipe',
     stderr: 'pipe',
+    timeout: 180_000,
   },
 });

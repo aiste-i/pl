@@ -54,6 +54,27 @@ export class OracleLocator {
         });
     }
 
+    async assertContainsText(text: string | RegExp, options?: { timeout?: number }) {
+        return this.context.runAssertion(async () => {
+            const { expect } = await import('@playwright/test');
+            await expect(this.locator).toContainText(text as any, options);
+        });
+    }
+
+    async assertText(text: string | RegExp, options?: { timeout?: number }) {
+        return this.context.runAssertion(async () => {
+            const { expect } = await import('@playwright/test');
+            await expect(this.locator).toHaveText(text as any, options);
+        });
+    }
+
+    async assertCount(count: number, options?: { timeout?: number }) {
+        return this.context.runAssertion(async () => {
+            const { expect } = await import('@playwright/test');
+            await expect(this.locator).toHaveCount(count, options);
+        });
+    }
+
     get raw(): Locator {
         return this.locator;
     }

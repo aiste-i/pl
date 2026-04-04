@@ -2,6 +2,7 @@ import { Page, Locator } from 'playwright';
 import { MutationMode } from './MutationMode';
 import { MutationRecord } from './MutationRecord';
 import { DomOperator } from './operators/dom/DomOperator';
+import { OracleSafety } from './utils/OracleSafety';
 
 export class WebMutator {
     mutationMode: MutationMode;
@@ -15,6 +16,10 @@ export class WebMutator {
             const target = page.locator(selector).first();
             if (await target.count() === 0) {
                 return MutationRecord.fromError(`Element not found for selector: ${selector}`);
+            }
+
+            if (await OracleSafety.isProtected(target)) {
+                return MutationRecord.fromError(`Mutation skipped: target is oracle-protected for selector ${selector}`);
             }
 
             const record = new MutationRecord(true);

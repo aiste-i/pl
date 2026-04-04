@@ -1,0 +1,2227 @@
+[
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.favoriteButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for article.favoriteButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.favoriteButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for article.favoriteButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.favoriteButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for article.favoriteButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.favoriteButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for article.favoriteButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.previewDescription",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Live Angular article preview description cannot be resolved reliably from an allowed semantic-first entry point without crossing into DOM-shaped fallback logic.",
+    "excludedFromAggregateComparison": true,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts",
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.previewDescription",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for home.previewDescription in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.previewDescription",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for home.previewDescription in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.previewDescription",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for home.previewDescription in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "comments.deleteButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Comment delete control is icon-only in the live Angular DOM and does not expose a stable semantic-first handle without CSS/XPath fallback.",
+    "excludedFromAggregateComparison": true,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts",
+      "tests/realworld/error-handling.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "comments.deleteButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for comments.deleteButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "comments.deleteButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for comments.deleteButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "comments.deleteButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for comments.deleteButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.title",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Live Angular article page does not expose a stable semantic-first entry point that resolves the article title under the family-purity rules.",
+    "excludedFromAggregateComparison": true,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.title",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for article.title in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.title",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for article.title in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.title",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for article.title in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.paginationButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for home.paginationButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.paginationButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for home.paginationButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.paginationButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for home.paginationButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.paginationButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for home.paginationButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.paginationItem",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for home.paginationItem in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.paginationItem",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for home.paginationItem in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.paginationItem",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for home.paginationItem in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "home.paginationItem",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for home.paginationItem in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "profile.followButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for profile.followButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "profile.followButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for profile.followButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "profile.followButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for profile.followButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "profile.followButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for profile.followButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "profile.unfollowButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for profile.unfollowButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "profile.unfollowButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for profile.unfollowButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "profile.unfollowButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for profile.unfollowButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "profile.unfollowButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for profile.unfollowButton in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.body",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for article.body in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.body",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for article.body in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.body",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for article.body in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "article.body",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for article.body in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "comments.card",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for comments.card in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "comments.card",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for comments.card in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "angular-realworld-example-app",
+    "logicalKey": "comments.card",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for comments.card in angular-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.favoriteButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for article.favoriteButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.favoriteButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for article.favoriteButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.favoriteButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for article.favoriteButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.favoriteButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for article.favoriteButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.previewDescription",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for home.previewDescription in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.previewDescription",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for home.previewDescription in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.previewDescription",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for home.previewDescription in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.previewDescription",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for home.previewDescription in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "comments.deleteButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for comments.deleteButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "comments.deleteButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for comments.deleteButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "comments.deleteButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for comments.deleteButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "comments.deleteButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for comments.deleteButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.title",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for article.title in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.title",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for article.title in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.title",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for article.title in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.title",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for article.title in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.paginationButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for home.paginationButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.paginationButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for home.paginationButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.paginationButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for home.paginationButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.paginationButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for home.paginationButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.paginationItem",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for home.paginationItem in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.paginationItem",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for home.paginationItem in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.paginationItem",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for home.paginationItem in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "home.paginationItem",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for home.paginationItem in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "profile.followButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for profile.followButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "profile.followButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for profile.followButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "profile.followButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for profile.followButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "profile.followButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for profile.followButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "profile.unfollowButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for profile.unfollowButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "profile.unfollowButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for profile.unfollowButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "profile.unfollowButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for profile.unfollowButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "profile.unfollowButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for profile.unfollowButton in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.body",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for article.body in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.body",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for article.body in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.body",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for article.body in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "article.body",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for article.body in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "comments.card",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for comments.card in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "comments.card",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for comments.card in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "realworld",
+    "logicalKey": "comments.card",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for comments.card in realworld.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.favoriteButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for article.favoriteButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.favoriteButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for article.favoriteButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.favoriteButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for article.favoriteButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.favoriteButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for article.favoriteButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.previewDescription",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for home.previewDescription in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.previewDescription",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for home.previewDescription in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.previewDescription",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for home.previewDescription in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.previewDescription",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for home.previewDescription in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "comments.deleteButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for comments.deleteButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "comments.deleteButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for comments.deleteButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "comments.deleteButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for comments.deleteButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "comments.deleteButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for comments.deleteButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.title",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for article.title in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.title",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for article.title in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.title",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for article.title in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.title",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for article.title in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.paginationButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for home.paginationButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.paginationButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for home.paginationButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.paginationButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for home.paginationButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.paginationButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for home.paginationButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.paginationItem",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for home.paginationItem in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.paginationItem",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for home.paginationItem in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.paginationItem",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for home.paginationItem in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "home.paginationItem",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for home.paginationItem in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/navigation.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "profile.followButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for profile.followButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "profile.followButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for profile.followButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "profile.followButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for profile.followButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "profile.followButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for profile.followButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "profile.unfollowButton",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for profile.unfollowButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "profile.unfollowButton",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for profile.unfollowButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "profile.unfollowButton",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for profile.unfollowButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "profile.unfollowButton",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for profile.unfollowButton in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/social.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.body",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for article.body in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.body",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for article.body in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.body",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for article.body in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "article.body",
+    "family": "oracle",
+    "supported": false,
+    "reason": "Missing oracle locator implementation for article.body in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "comments.card",
+    "family": "semantic-first",
+    "supported": false,
+    "reason": "Missing semantic-first locator implementation for comments.card in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "comments.card",
+    "family": "css",
+    "supported": false,
+    "reason": "Missing css locator implementation for comments.card in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  },
+  {
+    "app": "vue3-realworld-example-app",
+    "logicalKey": "comments.card",
+    "family": "xpath",
+    "supported": false,
+    "reason": "Missing xpath locator implementation for comments.card in vue3-realworld-example-app.",
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": false,
+    "activeInCorpus": false,
+    "activeScenarioIds": [],
+    "specHints": [
+      "tests/realworld/xss-security.spec.ts"
+    ],
+    "sourceKind": null,
+    "purity": null,
+    "semanticEntryPoint": null,
+    "isException": false,
+    "selector": null
+  }
+]

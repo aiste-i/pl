@@ -11,10 +11,10 @@
 </script>
 
 {#if pages > 1}
-	<nav>
-		<ul class="pagination">
+	<nav data-testid="pagination-nav">
+		<ul class="pagination" data-testid="pagination-list">
 			{#each range as n}
-				<li class="page-item" class:active={n == p}><a class="page-link" href={href(n)}>{n}</a></li>
+				<li class="page-item" class:active={n == p} data-testid="pagination-item"><a class="page-link" href={href(n)} data-testid="pagination-link">{n}</a></li>
 			{/each}
 		</ul>
 	</nav>

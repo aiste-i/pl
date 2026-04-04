@@ -1,0 +1,170 @@
+{
+  "generatedFrom": "tests/realworld",
+  "files": [
+    {
+      "testFile": "tests/realworld/auth.spec.ts",
+      "flows": ["registration", "login", "logout", "protected-route-guard"],
+      "logicalKeys": [
+        "nav.loginLink",
+        "nav.registerLink",
+        "nav.profileLink",
+        "nav.editorLink",
+        "auth.usernameInput",
+        "auth.emailInput",
+        "auth.passwordInput",
+        "auth.submitButton",
+        "auth.errorList",
+        "settings.logoutButton"
+      ]
+    },
+    {
+      "testFile": "tests/realworld/navigation.spec.ts",
+      "flows": ["main-navigation", "tag-filtering", "feed-switching", "pagination", "profile-tabs"],
+      "logicalKeys": [
+        "nav.brandLink",
+        "nav.loginLink",
+        "nav.registerLink",
+        "nav.editorLink",
+        "nav.settingsLink",
+        "nav.profileLink",
+        "nav.globalFeedTab",
+        "nav.yourFeedTab",
+        "nav.tagFeedTab",
+        "home.tagList",
+        "home.tagItem",
+        "home.articlePreview",
+        "home.firstArticlePreview",
+        "home.previewTitle",
+        "home.previewDescription",
+        "home.previewAuthor",
+        "home.previewTag",
+        "home.paginationButton",
+        "profile.favoritedPostsTab"
+      ]
+    },
+    {
+      "testFile": "tests/realworld/articles.spec.ts",
+      "flows": ["create-edit-delete-article", "favorite-unfavorite", "article-preview"],
+      "logicalKeys": [
+        "editor.titleInput",
+        "editor.descriptionInput",
+        "editor.bodyInput",
+        "editor.tagInput",
+        "editor.tagRemoveButtons",
+        "editor.publishButton",
+        "editor.errorList",
+        "article.page",
+        "article.title",
+        "article.content",
+        "article.tag",
+        "article.favoriteButton",
+        "article.unfavoriteButton",
+        "article.deleteButton",
+        "article.editButton",
+        "home.articlePreview",
+        "home.firstArticlePreview",
+        "home.previewTitle",
+        "home.previewDescription",
+        "home.previewAuthor",
+        "home.previewTag"
+      ]
+    },
+    {
+      "testFile": "tests/realworld/comments.spec.ts",
+      "flows": ["add-delete-comment", "comment-auth", "comment-visibility"],
+      "logicalKeys": [
+        "comments.form",
+        "comments.textarea",
+        "comments.submitButton",
+        "comments.card",
+        "comments.firstCard",
+        "comments.deleteButton",
+        "comments.authMessage",
+        "comments.loginLink",
+        "comments.errorList"
+      ]
+    },
+    {
+      "testFile": "tests/realworld/settings.spec.ts",
+      "flows": ["settings-update", "settings-persistence"],
+      "logicalKeys": [
+        "settings.page",
+        "settings.imageInput",
+        "settings.usernameInput",
+        "settings.bioInput",
+        "settings.emailInput",
+        "settings.passwordInput",
+        "settings.submitButton",
+        "settings.logoutButton",
+        "settings.errorList",
+        "profile.userInfo"
+      ]
+    },
+    {
+      "testFile": "tests/realworld/social.spec.ts",
+      "flows": ["follow-unfollow", "profile-views", "favorited-feed"],
+      "logicalKeys": [
+        "profile.page",
+        "profile.userInfo",
+        "profile.username",
+        "profile.followButton",
+        "profile.unfollowButton",
+        "profile.editButton",
+        "profile.favoritedPostsTab",
+        "profile.articleList",
+        "article.followButton",
+        "home.firstArticlePreview"
+      ]
+    },
+    {
+      "testFile": "tests/realworld/url-navigation.spec.ts",
+      "flows": ["feed-url-navigation", "tag-url-navigation", "pagination-url-navigation"],
+      "logicalKeys": [
+        "nav.globalFeedTab",
+        "nav.yourFeedTab",
+        "nav.tagFeedTab",
+        "home.tagList",
+        "home.firstTag",
+        "home.emptyFeedMessage",
+        "home.paginationButton",
+        "home.paginationItem",
+        "home.articlePreviewList"
+      ]
+    },
+    {
+      "testFile": "tests/realworld/error-handling.spec.ts",
+      "flows": ["form-errors", "network-errors", "rendering-fallbacks"],
+      "logicalKeys": [
+        "feedback.errorList",
+        "feedback.connectingText",
+        "nav.navbar",
+        "settings.submitButton",
+        "article.page",
+        "profile.page",
+        "comments.errorList"
+      ]
+    },
+    {
+      "testFile": "tests/realworld/user-fetch-errors.spec.ts",
+      "flows": ["auth-init-failures", "unavailable-mode"],
+      "logicalKeys": [
+        "nav.navbar",
+        "nav.loginLink",
+        "nav.registerLink",
+        "feedback.connectingText",
+        "home.firstArticlePreview"
+      ]
+    },
+    {
+      "testFile": "tests/realworld/xss-security.spec.ts",
+      "flows": ["profile-image-xss", "article-body-xss", "description-xss"],
+      "logicalKeys": [
+        "profile.page",
+        "profile.userInfo",
+        "home.firstArticlePreview",
+        "article.page",
+        "article.content"
+      ]
+    }
+  ]
+}

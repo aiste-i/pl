@@ -1,15 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-/**
- * Benchmark Aggregation Script
- * Processes JSON result files into CSV summaries for thesis reporting.
- */
-
 interface AggregatedRun {
     runId: string;
     applicationId: string;
+    corpusId: string;
     scenarioId: string;
+    activeScenarioId: string;
+    activeScenarioCategory: string;
+    sourceSpec: string;
     locatorFamily: string;
     semanticEntryPoint: string;
     phase: 'baseline' | 'mutated';
@@ -18,10 +17,27 @@ interface AggregatedRun {
     changeId: string;
     changeCategory: string;
     changeOperator: string;
+    quotaBucket: string;
+    comparisonEligible: boolean;
+    comparisonExclusionReason: string;
     durationMs: number;
+    accessibilityScanStatus: 'completed' | 'failed' | 'skipped';
     totalViolations: number;
     criticalViolations: number;
     impactedNodes: number;
+}
+
+interface UnsupportedRow {
+    app: string;
+    logicalKey: string;
+    family: string;
+    supported: boolean;
+    reason: string | null;
+    excludedFromAggregateComparison: boolean;
+    aggregateComparisonEligible: boolean;
+    activeInCorpus?: boolean;
+    activeScenarioIds?: string[];
+    specHints: string[];
 }
 
 const CATEGORY_MAPPING: Record<string, string> = {
@@ -35,18 +51,18 @@ const CATEGORY_MAPPING: Record<string, string> = {
     'AttributeDelete': 'structural',
     'AttributeReplace': 'structural',
     'AttributeMutator': 'structural',
-    'SemanticToDiv': 'structural',
-    'ReplaceImageWithDiv': 'structural',
-    'ReplaceAnchorWithSpan': 'structural',
-    'ReplaceHeadingWithP': 'structural',
-    'ReplaceThWithTd': 'structural',
+    'SemanticToDiv': 'accessibility-semantic',
+    'ReplaceImageWithDiv': 'accessibility-semantic',
+    'ReplaceAnchorWithSpan': 'accessibility-semantic',
+    'ReplaceHeadingWithP': 'accessibility-semantic',
+    'ReplaceThWithTd': 'accessibility-semantic',
     'TextDelete': 'content',
     'TextInsert': 'content',
     'TextNodeMutator': 'content',
     'TextReplace': 'content',
-    'ChangeImageAlt': 'content',
-    'RemoveImageAlt': 'content',
-    'ChangeButtonLabel': 'content',
+    'ChangeImageAlt': 'accessibility-semantic',
+    'RemoveImageAlt': 'accessibility-semantic',
+    'ChangeButtonLabel': 'accessibility-semantic',
     'ActionableNodeMutator': 'accessibility-semantic',
     'DuplicateId': 'accessibility-semantic',
     'RemoveInputNames': 'accessibility-semantic',
@@ -59,49 +75,6 @@ const CATEGORY_MAPPING: Record<string, string> = {
 function getCategory(operator: string, existingCategory?: string): string {
     if (existingCategory) return existingCategory;
     return CATEGORY_MAPPING[operator] || 'unknown';
-}
-
-function loadResults(inputDir: string): AggregatedRun[] {
-    const runs: AggregatedRun[] = [];
-    const files = getAllFiles(inputDir).filter(f => f.endsWith('.json') && !f.includes('axe.json'));
-
-    for (const file of files) {
-        try {
-            const content = JSON.parse(fs.readFileSync(file, 'utf8'));
-            
-            // Validate required fields
-            if (!content.runId || !content.locatorFamily || !content.phase) {
-                console.warn(`Skipping malformed record: ${file}`);
-                continue;
-            }
-
-            // Skip invalid runs from main metrics
-            if (content.runStatus === 'invalid') continue;
-
-            const run: AggregatedRun = {
-                runId: content.runId,
-                applicationId: content.applicationId || 'unknown',
-                scenarioId: content.scenarioId || 'unknown',
-                locatorFamily: content.locatorFamily,
-                semanticEntryPoint: content.semanticEntryPoint || 'none',
-                phase: content.phase,
-                runStatus: content.runStatus,
-                failureClass: content.failureClass || 'none',
-                changeId: content.changeId || 'none',
-                changeOperator: content.changeOperator || 'none',
-                changeCategory: getCategory(content.changeOperator, content.changeCategory),
-                durationMs: content.durationMs || 0,
-                totalViolations: content.accessibility?.totalViolations || 0,
-                criticalViolations: content.accessibility?.criticalCount || 0,
-                impactedNodes: content.accessibility?.impactedNodeCount || 0
-            };
-
-            runs.push(run);
-        } catch (e) {
-            console.error(`Failed to parse ${file}:`, e);
-        }
-    }
-    return runs;
 }
 
 function getAllFiles(dir: string): string[] {
@@ -119,10 +92,58 @@ function getAllFiles(dir: string): string[] {
     return results;
 }
 
+function loadResults(inputDir: string): AggregatedRun[] {
+    const runs: AggregatedRun[] = [];
+    const files = getAllFiles(inputDir).filter(f => f.endsWith('.json') && !f.includes('axe.json'));
+
+    for (const file of files) {
+        try {
+            const content = JSON.parse(fs.readFileSync(file, 'utf8'));
+            if (!content.runId || !content.locatorFamily || !content.phase) {
+                console.warn(`Skipping malformed record: ${file}`);
+                continue;
+            }
+            if (!content.corpusId || !content.activeScenarioId) {
+                console.warn(`Skipping legacy non-corpus benchmark record: ${file}`);
+                continue;
+            }
+
+            runs.push({
+                runId: content.runId,
+                applicationId: content.applicationId || 'unknown',
+                corpusId: content.corpusId,
+                scenarioId: content.scenarioId || 'unknown',
+                activeScenarioId: content.activeScenarioId,
+                activeScenarioCategory: content.activeScenarioCategory || 'unknown',
+                sourceSpec: content.sourceSpec || 'unknown',
+                locatorFamily: content.locatorFamily,
+                semanticEntryPoint: content.semanticEntryPoint || 'none',
+                phase: content.phase,
+                runStatus: content.runStatus,
+                failureClass: content.failureClass || 'none',
+                changeId: content.changeId || 'none',
+                changeOperator: content.changeOperator || 'none',
+                changeCategory: getCategory(content.changeOperator, content.changeCategory),
+                quotaBucket: content.quotaBucket || getCategory(content.changeOperator, content.changeCategory),
+                comparisonEligible: content.comparisonEligible !== false,
+                comparisonExclusionReason: content.comparisonExclusionReason || 'none',
+                durationMs: content.durationMs || 0,
+                accessibilityScanStatus: content.accessibility?.scanStatus || 'skipped',
+                totalViolations: content.accessibility?.totalViolations || 0,
+                criticalViolations: content.accessibility?.criticalCount || 0,
+                impactedNodes: content.accessibility?.impactedNodeCount || 0,
+            });
+        } catch (e) {
+            console.error(`Failed to parse ${file}:`, e);
+        }
+    }
+    return runs;
+}
+
 function writeCsv(filePath: string, data: any[]) {
     if (data.length === 0) return;
     const headers = Object.keys(data[0]).join(',');
-    const rows = data.map(row => 
+    const rows = data.map(row =>
         Object.values(row).map(val => {
             if (typeof val === 'string' && val.includes(',')) return `"${val}"`;
             return val;
@@ -131,91 +152,107 @@ function writeCsv(filePath: string, data: any[]) {
     fs.writeFileSync(filePath, [headers, ...rows].join('\n'));
 }
 
+function mean(values: number[]): number {
+    return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+}
+
 function aggregate(runs: AggregatedRun[], outputDir: string) {
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
-    // 1. benchmark_runs.csv
     writeCsv(path.join(outputDir, 'benchmark_runs.csv'), runs);
 
     const mutated = runs.filter(r => r.phase === 'mutated');
     const baseline = runs.filter(r => r.phase === 'baseline');
     const families = Array.from(new Set(runs.map(r => r.locatorFamily)));
+    const appsInRuns = Array.from(new Set(runs.map(run => run.applicationId)));
+    const corpusIds = Array.from(new Set(runs.map(run => run.corpusId)));
+    const activeScenarioIds = Array.from(new Set(runs.map(run => run.activeScenarioId))).sort();
 
-    // 2. summary_by_family.csv
+    const unsupportedPath = path.join(process.cwd(), 'reports', 'realworld-locator-unsupported.json');
+    let unsupportedRows: UnsupportedRow[] = [];
+    if (fs.existsSync(unsupportedPath)) {
+        unsupportedRows = JSON.parse(fs.readFileSync(unsupportedPath, 'utf8')).filter((row: UnsupportedRow) => appsInRuns.includes(row.app));
+    }
+
+    if (unsupportedRows.length > 0) {
+        writeCsv(path.join(outputDir, 'excluded_unsupported.csv'), unsupportedRows);
+        fs.writeFileSync(path.join(outputDir, 'excluded_unsupported.json'), JSON.stringify(unsupportedRows, null, 2));
+    }
+
     const summaryByFamily = families.map(family => {
         const familyRuns = runs.filter(r => r.locatorFamily === family);
         const familyMutated = familyRuns.filter(r => r.phase === 'mutated');
-        const familyBaseline = familyRuns.filter(r => r.phase === 'baseline');
         const failedMutated = familyMutated.filter(r => r.runStatus === 'failed');
-        
+        const comparableMutated = familyMutated.filter(r => r.comparisonEligible);
         const durations = familyMutated.map(r => r.durationMs).sort((a, b) => a - b);
-        const meanDuration = durations.reduce((a, b) => a + b, 0) / durations.length || 0;
-        const medianDuration = durations[Math.floor(durations.length / 2)] || 0;
 
         return {
             family,
             totalRuns: familyRuns.length,
             mutatedRuns: familyMutated.length,
+            comparableMutatedRuns: comparableMutated.length,
             failedMutatedRuns: failedMutated.length,
+            failedComparableMutatedRuns: comparableMutated.filter(r => r.runStatus === 'failed').length,
             failureRateMutated: (failedMutated.length / familyMutated.length || 0).toFixed(4),
-            baselinePassRate: (familyBaseline.filter(r => r.runStatus === 'passed').length / familyBaseline.length || 0).toFixed(4),
-            meanDurationMs: meanDuration.toFixed(2),
-            medianDurationMs: medianDuration.toFixed(2)
+            failureRateComparableMutated: (comparableMutated.filter(r => r.runStatus === 'failed').length / comparableMutated.length || 0).toFixed(4),
+            baselinePassRate: (familyRuns.filter(r => r.phase === 'baseline' && r.runStatus === 'passed').length / familyRuns.filter(r => r.phase === 'baseline').length || 0).toFixed(4),
+            meanDurationMs: mean(durations).toFixed(2),
+            medianDurationMs: (durations[Math.floor(durations.length / 2)] || 0).toFixed(2),
         };
     });
     writeCsv(path.join(outputDir, 'summary_by_family.csv'), summaryByFamily);
 
-    // 3. summary_by_family_and_category.csv
     const categories = Array.from(new Set(mutated.map(r => r.changeCategory)));
     const summaryByFamilyCategory = [];
     for (const family of families) {
         for (const category of categories) {
             const cellRuns = mutated.filter(r => r.locatorFamily === family && r.changeCategory === category);
             if (cellRuns.length === 0) continue;
-            const failed = cellRuns.filter(r => r.runStatus === 'failed');
+            const comparable = cellRuns.filter(r => r.comparisonEligible);
+            const failedComparable = comparable.filter(r => r.runStatus === 'failed');
             summaryByFamilyCategory.push({
                 family,
                 category,
                 totalMutated: cellRuns.length,
-                failedMutated: failed.length,
-                failureRate: (failed.length / cellRuns.length).toFixed(4),
-                meanDuration: (cellRuns.reduce((a, b) => a + b.durationMs, 0) / cellRuns.length).toFixed(2),
-                meanViolations: (cellRuns.reduce((a, b) => a + b.totalViolations, 0) / cellRuns.length).toFixed(2)
+                comparableMutated: comparable.length,
+                failedComparableMutated: failedComparable.length,
+                failureRateComparable: (failedComparable.length / comparable.length || 0).toFixed(4),
+                meanDuration: mean(cellRuns.map(r => r.durationMs)).toFixed(2),
+                meanViolationsComparable: mean(comparable.map(r => r.totalViolations)).toFixed(2),
             });
         }
     }
     writeCsv(path.join(outputDir, 'summary_by_family_and_category.csv'), summaryByFamilyCategory);
 
-    // 4. summary_by_family_and_operator.csv
     const operators = Array.from(new Set(mutated.map(r => r.changeOperator)));
     const summaryByFamilyOperator = [];
     for (const family of families) {
         for (const operator of operators) {
             const cellRuns = mutated.filter(r => r.locatorFamily === family && r.changeOperator === operator);
             if (cellRuns.length === 0) continue;
-            const failed = cellRuns.filter(r => r.runStatus === 'failed');
+            const comparable = cellRuns.filter(r => r.comparisonEligible);
             summaryByFamilyOperator.push({
                 family,
                 operator,
                 totalMutated: cellRuns.length,
-                failedMutated: failed.length,
-                failureRate: (failed.length / cellRuns.length).toFixed(4)
+                comparableMutated: comparable.length,
+                failedComparableMutated: comparable.filter(r => r.runStatus === 'failed').length,
+                failureRateComparable: (comparable.filter(r => r.runStatus === 'failed').length / comparable.length || 0).toFixed(4),
             });
         }
     }
     writeCsv(path.join(outputDir, 'summary_by_family_and_operator.csv'), summaryByFamilyOperator);
 
-    // 5. failure_distribution.csv
     const failureClasses = Array.from(new Set(mutated.filter(r => r.runStatus === 'failed').map(r => r.failureClass)));
     const failureDist = [];
     for (const family of families) {
         const familyFailed = mutated.filter(r => r.locatorFamily === family && r.runStatus === 'failed');
         if (familyFailed.length === 0) continue;
-        for (const fClass of failureClasses) {
-            const count = familyFailed.filter(r => r.failureClass === fClass).length;
+        for (const failureClass of failureClasses) {
+            const count = familyFailed.filter(r => r.failureClass === failureClass).length;
             failureDist.push({
                 family,
-                failureClass: fClass,
+                failureClass,
                 count,
                 proportion: (count / familyFailed.length).toFixed(4)
             });
@@ -223,27 +260,123 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     }
     writeCsv(path.join(outputDir, 'failure_distribution.csv'), failureDist);
 
-    // 6. accessibility_summary.csv
-    const a11ySummary = families.map(family => {
-        const familyMutated = mutated.filter(r => r.locatorFamily === family);
-        const familyBaseline = baseline.filter(r => r.locatorFamily === family);
+    const appSummary = appsInRuns.map(app => {
+        const appRuns = runs.filter(run => run.applicationId === app);
+        const mutatedRuns = appRuns.filter(run => run.phase === 'mutated');
         return {
-            family,
-            meanViolationsBaseline: (familyBaseline.reduce((a, b) => a + b.totalViolations, 0) / familyBaseline.length || 0).toFixed(2),
-            meanViolationsMutated: (familyMutated.reduce((a, b) => a + b.totalViolations, 0) / familyMutated.length || 0).toFixed(2),
-            meanCriticalMutated: (familyMutated.reduce((a, b) => a + b.criticalViolations, 0) / familyMutated.length || 0).toFixed(2),
-            meanImpactedNodesMutated: (familyMutated.reduce((a, b) => a + b.impactedNodes, 0) / familyMutated.length || 0).toFixed(2)
+            applicationId: app,
+            corpusId: Array.from(new Set(appRuns.map(run => run.corpusId))).join('|'),
+            totalRuns: appRuns.length,
+            mutatedRuns: mutatedRuns.length,
+            failedRuns: appRuns.filter(run => run.runStatus === 'failed').length,
+            invalidRuns: appRuns.filter(run => run.runStatus === 'invalid').length,
+            unsupportedExclusions: unsupportedRows.filter(row => row.app === app && row.activeInCorpus !== false).length,
         };
     });
-    writeCsv(path.join(outputDir, 'accessibility_summary.csv'), a11ySummary);
+    writeCsv(path.join(outputDir, 'summary_by_app.csv'), appSummary);
 
-    // 7. aggregate_report.json
+    const exclusionSummary = [
+        ...unsupportedRows.map(row => ({
+            exclusionType: 'unsupported-coverage',
+            app: row.app,
+            family: row.family,
+            logicalKey: row.logicalKey,
+            reason: row.reason,
+            activeInCorpus: row.activeInCorpus ?? false,
+        })),
+        ...mutated
+            .filter(run => !run.comparisonEligible)
+            .map(run => ({
+                exclusionType: 'run-level',
+                app: run.applicationId,
+                family: run.locatorFamily,
+                logicalKey: run.changeId,
+                reason: run.comparisonExclusionReason,
+                activeInCorpus: true,
+            })),
+    ];
+    writeCsv(path.join(outputDir, 'exclusion_summary.csv'), exclusionSummary);
+
+    const comparisonDenominators = families.map(family => {
+        const familyMutated = mutated.filter(run => run.locatorFamily === family);
+        const comparableMutated = familyMutated.filter(run => run.comparisonEligible);
+        return {
+            family,
+            totalMutatedRuns: familyMutated.length,
+            comparableMutatedRuns: comparableMutated.length,
+            excludedMutatedRuns: familyMutated.length - comparableMutated.length,
+            invalidMutatedRuns: familyMutated.filter(run => run.runStatus === 'invalid').length,
+        };
+    });
+    writeCsv(path.join(outputDir, 'comparison_denominators.csv'), comparisonDenominators);
+
+    const accessibilityScanStatusSummary = families.map(family => {
+        const familyRuns = runs.filter(run => run.locatorFamily === family);
+        return {
+            family,
+            completedScans: familyRuns.filter(run => run.accessibilityScanStatus === 'completed').length,
+            failedScans: familyRuns.filter(run => run.accessibilityScanStatus === 'failed').length,
+            skippedScans: familyRuns.filter(run => run.accessibilityScanStatus === 'skipped').length,
+        };
+    });
+    writeCsv(path.join(outputDir, 'accessibility_scan_status_summary.csv'), accessibilityScanStatusSummary);
+
+    const accessibilitySummaryCompletedOnly = families.map(family => {
+        const completedBaseline = baseline.filter(run => run.locatorFamily === family && run.accessibilityScanStatus === 'completed');
+        const completedMutated = mutated.filter(run => run.locatorFamily === family && run.accessibilityScanStatus === 'completed');
+        return {
+            family,
+            completedBaselineScans: completedBaseline.length,
+            completedMutatedScans: completedMutated.length,
+            meanViolationsBaselineCompletedOnly: mean(completedBaseline.map(run => run.totalViolations)).toFixed(2),
+            meanViolationsMutatedCompletedOnly: mean(completedMutated.map(run => run.totalViolations)).toFixed(2),
+            meanCriticalMutatedCompletedOnly: mean(completedMutated.map(run => run.criticalViolations)).toFixed(2),
+            meanImpactedNodesMutatedCompletedOnly: mean(completedMutated.map(run => run.impactedNodes)).toFixed(2),
+        };
+    });
+    writeCsv(path.join(outputDir, 'accessibility_summary_completed_only.csv'), accessibilitySummaryCompletedOnly);
+
+    const accessibilitySummaryLowerBound = families.map(family => {
+        const familyBaseline = baseline.filter(run => run.locatorFamily === family);
+        const familyMutated = mutated.filter(run => run.locatorFamily === family);
+        return {
+            family,
+            label: 'lower-bound-includes-failed-and-skipped-as-zero',
+            meanViolationsBaseline: mean(familyBaseline.map(run => run.totalViolations)).toFixed(2),
+            meanViolationsMutated: mean(familyMutated.map(run => run.totalViolations)).toFixed(2),
+            meanCriticalMutated: mean(familyMutated.map(run => run.criticalViolations)).toFixed(2),
+            meanImpactedNodesMutated: mean(familyMutated.map(run => run.impactedNodes)).toFixed(2),
+        };
+    });
+    writeCsv(path.join(outputDir, 'accessibility_summary_lower_bound.csv'), accessibilitySummaryLowerBound);
+
     const report = {
         generatedAt: new Date().toISOString(),
+        corpusId: corpusIds.length === 1 ? corpusIds[0] : corpusIds,
+        activeScenarioIds,
+        applications: appSummary,
         summaryByFamily,
         summaryByFamilyCategory,
+        summaryByFamilyOperator,
         failureDistribution: failureDist,
-        accessibility: a11ySummary
+        comparisonDenominators,
+        exclusions: exclusionSummary,
+        accessibility: {
+            scanStatusSummary: accessibilityScanStatusSummary,
+            completedOnly: accessibilitySummaryCompletedOnly,
+            lowerBound: accessibilitySummaryLowerBound,
+        },
+        operatorCounts: operators.map(operator => ({
+            operator,
+            totalMutated: mutated.filter(run => run.changeOperator === operator).length,
+            comparableMutated: mutated.filter(run => run.changeOperator === operator && run.comparisonEligible).length,
+        })),
+        categoryCounts: categories.map(category => ({
+            category,
+            totalMutated: mutated.filter(run => run.changeCategory === category).length,
+            comparableMutated: mutated.filter(run => run.changeCategory === category && run.comparisonEligible).length,
+        })),
+        excludedUnsupported: unsupportedRows,
     };
     fs.writeFileSync(path.join(outputDir, 'aggregate_report.json'), JSON.stringify(report, null, 2));
 

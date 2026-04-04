@@ -1,30 +1,109 @@
-# Playwright UI Mutation Framework
+# Playwright RealWorld Mutation Benchmark
 
-This project allows for mutation testing of UI elements in a Playwright environment, specifically focusing on accessibility and semantic locator stress.
+This repository benchmarks Playwright locator-family robustness across three RealWorld applications:
 
-## Available Scripts
+- `angular-realworld-example-app`
+- `realworld`
+- `vue3-realworld-example-app`
 
-### 1. Baseline Run
-Runs the standard test suite without any mutations or target collection.
+The benchmark comparison model is fixed to:
+
+- `semantic-first`
+- `css`
+- `xpath`
+
+Oracle locators stay separate and use `data-testid` only.
+
+## Current Executable Scope
+
+The repository now runs an end-to-end benchmark pipeline for the current benchmark-active shared corpus:
+
+- corpus id: `realworld-active`
+- executable entry spec: `tests/realworld/benchmark-active.spec.ts`
+- active source spec intent: `tests/realworld/health.spec.ts`
+
+This is an honest scope boundary. The full `tests/realworld` directory is not yet fully benchmark-active. Excluded specs are tracked in:
+
+- `src/benchmark/realworld-corpus.ts`
+- `reports/realworld-benchmark-corpus.json`
+
+## App Selection
+
+Select the benchmark subject with `APP_ID`.
+
+Examples:
+
 ```bash
-npm run test:baseline
+cross-env APP_ID=angular-realworld-example-app npx playwright test tests/realworld/benchmark-active.spec.ts
+cross-env APP_ID=realworld npx playwright test tests/realworld/benchmark-active.spec.ts
+cross-env APP_ID=vue3-realworld-example-app npx playwright test tests/realworld/benchmark-active.spec.ts
 ```
 
-### 2. Prepare Mutation Scenarios
-Runs the baseline tests while collecting reachable DOM elements, then generates and samples mutation scenarios (saved to `test-results/todomvc/scenarios.json`).
+The app registry under `src/apps/*` defines:
+
+- startup command
+- base URL / health URL
+- result-path scoping
+- route/path helpers for shared RealWorld tests
+- per-app locator and oracle factories
+
+## Result Layout
+
+Artifacts are separated by app and corpus:
+
+- `test-results/<app-id>/realworld-active/benchmark-runs`
+- `test-results/<app-id>/realworld-active/accessibility-artifacts`
+- `test-results/<app-id>/realworld-active/reachable-targets.json`
+- `test-results/<app-id>/realworld-active/scenarios.json`
+- `test-results/<app-id>/realworld-active/aggregate`
+
+## Coverage And Exclusions
+
+The benchmark keeps locator support and unsupported coverage explicit:
+
+- `reports/realworld-locator-support-matrix.json`
+- `reports/realworld-locator-unsupported.json`
+- `reports/realworld-pipeline-verification.json`
+
+Known unsupported family cases, such as the current Angular `semantic-first` gaps, stay visible in raw reports and aggregate outputs and are excluded from fair family-comparison denominators rather than hidden behind fallback logic.
+
+## Scripts
+
+Run one app:
+
 ```bash
-npm run mutate:prepare
+npm run benchmark:baseline:app --appid=angular-realworld-example-app
+npm run benchmark:collect:app --appid=realworld
+npm run benchmark:generate:app --appid=vue3-realworld-example-app --budget=3 --seed=12345
+npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=3 --seed=12345
+npm run benchmark:mutate:app --appid=realworld --limit=1
+npm run benchmark:aggregate:app --appid=vue3-realworld-example-app
 ```
 
-### 3. Mutated Run
-Runs the test suite with the generated mutation scenarios injected. Each scenario is applied before the test logic starts to check if the test can still pass (detecting the mutation).
+Run all apps:
+
 ```bash
-npm run test:mutate
+npm run benchmark:baseline:all
+npm run benchmark:aggregate:all
 ```
 
-## How it Works
+## Verification Artifacts
 
-1.  **Baseline Collection:** The `COLLECT_TARGETS=true` environment variable triggers `baseFixture.ts` to use `MutantGenerator` to harvest all reachable targets (buttons, inputs, links, headings, etc.) after each test.
-2.  **Scenario Generation:** `generate-scenarios.ts` takes the collected targets and applies all registered `DomOperators` to them to see which mutations are applicable, then samples them based on a budget.
-3.  **Mutation Injection:** When `test:mutate` is run, it loads `scenarios.json`. The `TodoMVC.spec.ts` dynamically creates `test.describe` blocks for each scenario. The `baseFixture.ts` applies the chosen mutation to the page *before* the test logic executes.
-`n## Aggregation`n`nAfter running the benchmark tests, you can aggregate the results into CSV summaries for analysis:`n`n```bash`nnpx ts-node src/murun/runner/aggregate.ts <input_results_dir> <output_dir>`n````n`nExample:`n```bash`nnpx ts-node src/murun/runner/aggregate.ts test-results/default/benchmark-runs/ reports/`n````n`nThis will generate:`n- benchmark_runs.csv: Flat list of all valid runs.`n- summary_by_family.csv: Aggregated metrics per locator family.`n- summary_by_family_and_category.csv: Aggregated metrics per family and change category.`n- failure_distribution.csv: Distribution of failure classes.`n- accessibility_summary.csv: Axe-core violation summaries.`n- aggregate_report.json: Machine-readable summary.
+Machine-readable proof of the currently working pipeline lives in:
+
+- `reports/realworld-benchmark-corpus.json`
+- `reports/realworld-pipeline-verification.json`
+
+These reports document:
+
+- active corpus membership
+- excluded RealWorld specs and why they are excluded
+- app-by-app baseline / collect / generate / mutate / aggregate status
+- artifact locations
+- known unsupported and excluded comparison cases
+
+## Notes
+
+- Application-source edits are limited to non-behavioral test hooks such as `data-testid`.
+- Route differences are handled in the benchmark adapter layer, not by rewriting app behavior.
+- The legacy TodoMVC pilot wiring remains available only as a compatibility adapter and is no longer the main RealWorld execution path.

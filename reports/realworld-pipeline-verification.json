@@ -1,0 +1,231 @@
+{
+  "generatedAt": "2026-03-31T15:15:00.000Z",
+  "corpusId": "realworld-active",
+  "entrySpec": "tests/realworld/benchmark-active.spec.ts",
+  "commands": {
+    "baselineApp": "npm run benchmark:baseline:app --appid=<app-id>",
+    "baselineAll": "npm run benchmark:baseline:all",
+    "collectApp": "npm run benchmark:collect:app --appid=<app-id>",
+    "generateApp": "npm run benchmark:generate:app --appid=<app-id> --budget=3 --seed=12345",
+    "prepareApp": "npm run benchmark:prepare:app --appid=<app-id> --budget=3 --seed=12345",
+    "mutateApp": "npm run benchmark:mutate:app --appid=<app-id> --limit=1",
+    "aggregateApp": "npm run benchmark:aggregate:app --appid=<app-id>",
+    "aggregateAll": "npm run benchmark:aggregate:all"
+  },
+  "applications": [
+    {
+      "applicationId": "angular-realworld-example-app",
+      "baseline": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/angular-realworld-example-app/realworld-active/benchmark-runs",
+          "test-results/angular-realworld-example-app/realworld-active/accessibility-artifacts"
+        ]
+      },
+      "collect": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/angular-realworld-example-app/realworld-active/reachable-targets.json"
+        ],
+        "fixesApplied": [
+          "Reachable-target collection stopped excluding benchmarkable ancestors merely because they contained data-testid descendants."
+        ]
+      },
+      "generate": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/angular-realworld-example-app/realworld-active/scenarios.json"
+        ],
+        "parameters": {
+          "budget": 3,
+          "seed": 12345
+        },
+        "fixesApplied": [
+          "Scenario generation runs through ts-node --transpile-only so legacy unrelated compile errors do not block benchmark execution."
+        ]
+      },
+      "mutate": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/angular-realworld-example-app/realworld-active/benchmark-runs"
+        ],
+        "parameters": {
+          "limit": 1
+        },
+        "observedOperators": [
+          "StyleSize"
+        ]
+      },
+      "aggregate": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/angular-realworld-example-app/realworld-active/aggregate"
+        ]
+      },
+      "unsupportedExclusions": [
+        {
+          "logicalKey": "home.previewDescription",
+          "family": "semantic-first"
+        },
+        {
+          "logicalKey": "article.title",
+          "family": "semantic-first"
+        },
+        {
+          "logicalKey": "comments.deleteButton",
+          "family": "semantic-first"
+        }
+      ]
+    },
+    {
+      "applicationId": "realworld",
+      "baseline": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/realworld/realworld-active/benchmark-runs",
+          "test-results/realworld/realworld-active/accessibility-artifacts"
+        ]
+      },
+      "collect": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/realworld/realworld-active/reachable-targets.json"
+        ]
+      },
+      "generate": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/realworld/realworld-active/scenarios.json"
+        ],
+        "parameters": {
+          "budget": 3,
+          "seed": 12345
+        }
+      },
+      "mutate": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/realworld/realworld-active/benchmark-runs"
+        ],
+        "parameters": {
+          "limit": 1
+        },
+        "observedOperators": [
+          "StyleSize"
+        ]
+      },
+      "aggregate": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/realworld/realworld-active/aggregate"
+        ]
+      },
+      "unsupportedExclusions": []
+    },
+    {
+      "applicationId": "vue3-realworld-example-app",
+      "baseline": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/vue3-realworld-example-app/realworld-active/benchmark-runs",
+          "test-results/vue3-realworld-example-app/realworld-active/accessibility-artifacts"
+        ]
+      },
+      "collect": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/vue3-realworld-example-app/realworld-active/reachable-targets.json"
+        ],
+        "fixesApplied": [
+          "Collector stabilization on auth pages now waits for the shared page title heading instead of app-specific field timing."
+        ]
+      },
+      "generate": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/vue3-realworld-example-app/realworld-active/scenarios.json"
+        ],
+        "parameters": {
+          "budget": 3,
+          "seed": 12345
+        }
+      },
+      "mutate": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/vue3-realworld-example-app/realworld-active/benchmark-runs"
+        ],
+        "parameters": {
+          "limit": 1
+        },
+        "observedOperators": [
+          "StyleSize"
+        ]
+      },
+      "aggregate": {
+        "status": "passed",
+        "artifacts": [
+          "test-results/vue3-realworld-example-app/realworld-active/aggregate"
+        ]
+      },
+      "unsupportedExclusions": []
+    }
+  ],
+  "sharedOutputsConfirmed": [
+    "test-results/angular-realworld-example-app/realworld-active",
+    "test-results/realworld/realworld-active",
+    "test-results/vue3-realworld-example-app/realworld-active"
+  ],
+  "sampleArtifacts": {
+    "baselineRun": "test-results/angular-realworld-example-app/realworld-active/benchmark-runs/realworld_benchmark_active_spec_ts_realworld_active_baseline_xpath_app_angu_03bc5435c7_605331b8-bb84-46dc-961e-9af64b6e4e27.json",
+    "accessibilityArtifact": "test-results/angular-realworld-example-app/realworld-active/accessibility-artifacts/realworld_benchmark_active_spec_ts_realworld_active_baseline_xpath_app_angu_03bc5435c7_605331b8-bb84-46dc-961e-9af64b6e4e27_axe.json",
+    "reachableTargets": "test-results/angular-realworld-example-app/realworld-active/reachable-targets.json",
+    "generatedScenarios": "test-results/angular-realworld-example-app/realworld-active/scenarios.json",
+    "aggregateReport": "test-results/angular-realworld-example-app/realworld-active/aggregate/aggregate_report.json"
+  },
+  "metadataVerification": {
+    "baselineRunFields": [
+      "runId",
+      "applicationId",
+      "scenarioId",
+      "locatorFamily",
+      "phase",
+      "durationMs",
+      "runStatus",
+      "failureClass",
+      "failureStage",
+      "oracleIntegrityOk",
+      "instrumentationPathUsed",
+      "accessibility"
+    ],
+    "accessibilityFields": [
+      "scanAttempted",
+      "scanStatus",
+      "artifactPath",
+      "totalViolations",
+      "violationIds",
+      "impactedNodeCount",
+      "criticalCount",
+      "seriousCount",
+      "moderateCount",
+      "minorCount",
+      "applicationId",
+      "scenarioId",
+      "phase"
+    ],
+    "aggregateFields": [
+      "generatedAt",
+      "applications",
+      "summaryByFamily",
+      "summaryByFamilyCategory",
+      "failureDistribution",
+      "accessibility",
+      "excludedUnsupported"
+    ]
+  },
+  "notes": [
+    "End-to-end execution is verified for the benchmark-active shared corpus only.",
+    "Unsupported Angular semantic-first coverage remains visible in excludedUnsupported aggregate outputs and is excluded from fair family-comparison denominators.",
+    "The package scripts work with npm_config_appid, npm_config_budget, npm_config_seed, and npm_config_limit, though npm may still print CLI warnings for those flags in some environments."
+  ]
+}

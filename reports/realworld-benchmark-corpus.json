@@ -1,0 +1,74 @@
+{
+  "corpusId": "realworld-active",
+  "generatedAt": "2026-03-31T15:15:00.000Z",
+  "entrySpec": "tests/realworld/benchmark-active.spec.ts",
+  "activeSourceSpecs": [
+    {
+      "path": "tests/realworld/health.spec.ts",
+      "status": "active",
+      "reason": "Fully benchmark-fixture-driven, app-agnostic, and free of benchmark selector bypasses for the current executable corpus."
+    }
+  ],
+  "excludedSpecs": [
+    {
+      "path": "tests/realworld/articles.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Still depends on partially migrated benchmark interactions and currently intersects with documented unsupported Angular semantic-first coverage."
+    },
+    {
+      "path": "tests/realworld/auth.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Shared scenario migration is incomplete and the spec does not yet qualify as a strict benchmark-fixture-driven active-corpus member."
+    },
+    {
+      "path": "tests/realworld/comments.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Still intersects with documented unsupported Angular semantic-first comment-delete coverage and has not been fully stabilized for the strict active corpus."
+    },
+    {
+      "path": "tests/realworld/error-handling.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Scenario is not fully migrated onto the benchmark-active shared fixture path."
+    },
+    {
+      "path": "tests/realworld/navigation.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Scenario is not fully migrated onto the benchmark-active shared fixture path."
+    },
+    {
+      "path": "tests/realworld/null-fields.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Scenario is not fully migrated onto the benchmark-active shared fixture path."
+    },
+    {
+      "path": "tests/realworld/settings.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Scenario is not fully migrated onto the benchmark-active shared fixture path."
+    },
+    {
+      "path": "tests/realworld/social.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Scenario is not fully migrated onto the benchmark-active shared fixture path."
+    },
+    {
+      "path": "tests/realworld/url-navigation.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Scenario is not fully migrated onto the benchmark-active shared fixture path."
+    },
+    {
+      "path": "tests/realworld/user-fetch-errors.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Scenario is not fully migrated onto the benchmark-active shared fixture path."
+    },
+    {
+      "path": "tests/realworld/xss-security.spec.ts",
+      "status": "excluded-temporary-migration-debt",
+      "reason": "Scenario is not fully migrated onto the benchmark-active shared fixture path."
+    }
+  ],
+  "policy": {
+    "activeCorpusSelection": "strict-migrated-only",
+    "unsupportedHandling": "visible-in-records-and-aggregate-exclusion-reports",
+    "claimsBoundary": "End-to-end execution currently applies to the benchmark-active shared corpus, not to the entire tests/realworld directory."
+  }
+}

@@ -4,8 +4,15 @@ import { Api, ContentType } from 'src/services/api'
 
 export const limit = 10
 
+function normalizeApiBase(rawHost: string): string {
+  const trimmed = rawHost.trim().replace(/\/+$/, '')
+  if (trimmed.endsWith('/api'))
+    return trimmed
+  return `${trimmed}/api`
+}
+
 export const api = new Api({
-  baseUrl: `${CONFIG.API_HOST}/api`,
+  baseUrl: normalizeApiBase(CONFIG.API_HOST),
   securityWorker: token => token ? { headers: { Authorization: `Token ${String(token)}` } } : {},
   baseApiParams: {
     headers: {
