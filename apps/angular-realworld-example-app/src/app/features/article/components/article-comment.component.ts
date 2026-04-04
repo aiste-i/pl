@@ -11,28 +11,38 @@ import { DefaultImagePipe } from '../../../shared/pipes/default-image.pipe';
   selector: 'app-article-comment',
   template: `
     @if (comment) {
-      <div class="card" data-testid="comment-card">
-        <div class="card-block" data-testid="comment-block">
-          <p class="card-text" data-testid="comment-text">
-            {{ comment.body }}
-          </p>
-        </div>
-        <div class="card-footer" data-testid="comment-footer">
-          <a class="comment-author" [routerLink]="['/profile', comment.author.username]" data-testid="comment-author-link">
-            <img [src]="comment.author.image | defaultImage" class="comment-author-img" data-testid="comment-author-img" />
-          </a>
-          &nbsp;
-          <a class="comment-author" [routerLink]="['/profile', comment.author.username]" data-testid="comment-author-name">
-            {{ comment.author.username }}
-          </a>
-          <span class="date-posted" data-testid="comment-date">
-            {{ comment.createdAt | date: 'longDate' }}
-          </span>
-          @if (canModify$ | async) {
-            <span class="mod-options" data-testid="comment-mod-options">
-              <i class="ion-trash-a" (click)="delete.emit(true)" data-testid="comment-delete-button"></i>
+      <div data-testid="comment-card">
+        <div class="card" [attr.data-testid]="'comment-card-' + comment.id">
+          <div class="card-block" data-testid="comment-block">
+            <p class="card-text" data-testid="comment-text">
+              {{ comment.body }}
+            </p>
+          </div>
+          <div class="card-footer" data-testid="comment-footer">
+            <a class="comment-author" [routerLink]="['/profile', comment.author.username]" data-testid="comment-author-link">
+              <img [src]="comment.author.image | defaultImage" class="comment-author-img" data-testid="comment-author-img" />
+            </a>
+            &nbsp;
+            <a class="comment-author" [routerLink]="['/profile', comment.author.username]" data-testid="comment-author-name">
+              {{ comment.author.username }}
+            </a>
+            <span class="date-posted" data-testid="comment-date">
+              {{ comment.createdAt | date: 'longDate' }}
             </span>
-          }
+            @if (canModify$ | async) {
+              <span class="mod-options" data-testid="comment-mod-options">
+                <button
+                  type="button"
+                  class="btn btn-link p-0"
+                  aria-label="Delete comment"
+                  (click)="delete.emit(true)"
+                  data-testid="comment-delete-button"
+                >
+                  <i class="ion-trash-a"></i>
+                </button>
+              </span>
+            }
+          </div>
         </div>
       </div>
     }

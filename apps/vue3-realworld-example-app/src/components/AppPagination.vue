@@ -6,14 +6,14 @@
         :key="pageNumber"
         class="page-item"
         :class="[{ active: isActive(pageNumber) }]"
-        data-testid="pagination-item"
+        :data-testid="`pagination-item-${pageNumber}`"
       >
         <a
           class="page-link"
           :aria-label="`Go to page ${pageNumber}`"
           href="javascript:"
           @click="onPageChange(pageNumber)"
-          data-testid="pagination-link"
+          :data-testid="`pagination-link-${pageNumber}`"
         >{{ pageNumber }}</a>
       </li>
     </ul>

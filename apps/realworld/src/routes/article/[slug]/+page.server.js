@@ -1,5 +1,5 @@
 import * as api from '$lib/api.js';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
 
@@ -57,11 +57,9 @@ export const actions = {
 		const favorited = data.get('favorited') !== 'on';
 
 		if (favorited) {
-			api.post(`articles/${params.slug}/favorite`, null, locals.user.token);
+			await api.post(`articles/${params.slug}/favorite`, null, locals.user.token);
 		} else {
-			api.del(`articles/${params.slug}/favorite`, locals.user.token);
+			await api.del(`articles/${params.slug}/favorite`, locals.user.token);
 		}
-
-		redirect(307, request.headers.get('referer') ?? `/article/${params.slug}`);
 	}
 };

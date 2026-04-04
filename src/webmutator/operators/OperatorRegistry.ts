@@ -20,9 +20,11 @@ export class OperatorRegistry {
             case 'SubtreeMove': return new dom.SubtreeMove();
             case 'SubtreeSwap': return new dom.SubtreeSwap();
             case 'ReverseChildrenOrder': return new dom.ReverseChildrenOrder();
+            case 'SwapAdjacentSiblings': return new dom.SwapAdjacentSiblings();
             case 'TagMutator': return new dom.TagMutator();
             case 'ContainerNodeMutator': return new dom.ContainerNodeMutator();
             case 'ActionableNodeMutator': return new dom.ActionableNodeMutator();
+            case 'ToggleCssClass': return new dom.ToggleCssClass();
             case 'ChangeImageAlt': return new dom.ChangeImageAlt();
             case 'RemoveImageAlt': return new dom.RemoveImageAlt();
             case 'ReplaceImageWithDiv': return new dom.ReplaceImageWithDiv();
@@ -34,6 +36,7 @@ export class OperatorRegistry {
             case 'DuplicateId': return new dom.DuplicateId();
             case 'SemanticToDiv': return new dom.SemanticToDiv();
             case 'ChangeAriaLabel': return new dom.ChangeAriaLabel();
+            case 'ToggleAriaExpanded': return new dom.ToggleAriaExpanded();
             default:
                 throw new Error(`Unknown operator type: ${type}`);
         }

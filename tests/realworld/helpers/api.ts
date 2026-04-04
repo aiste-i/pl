@@ -15,6 +15,13 @@ export interface ApiUser {
   token: string;
 }
 
+export interface PublicArticleSummary {
+  slug: string;
+  title: string;
+  description: string;
+  authorUsername: string;
+}
+
 export async function registerUserObjectViaAPI(request: APIRequestContext, user: UserCredentials): Promise<ApiUser> {
   const response = await request.post(`${API_BASE}/users`, {
     data: {
@@ -80,7 +87,9 @@ export async function createArticleViaAPI(
     throw new Error(`Failed to create article: ${response.status()}`);
   }
   const data = await response.json();
-  return data.article.slug;
+  const slug = data.article.slug;
+  await waitForArticleViaAPI(request, slug);
+  return slug;
 }
 
 export async function updateUserViaAPI(
@@ -99,6 +108,168 @@ export async function updateUserViaAPI(
   if (!response.ok()) {
     throw new Error(`Failed to update user: ${response.status()}`);
   }
+}
+
+export async function createCommentViaAPI(
+  request: APIRequestContext,
+  token: string,
+  articleSlug: string,
+  body: string,
+): Promise<number> {
+  const response = await request.post(`${API_BASE}/articles/${articleSlug}/comments`, {
+    headers: {
+      Authorization: `Token ${token}`,
+    },
+    data: {
+      comment: {
+        body,
+      },
+    },
+  });
+  if (!response.ok()) {
+    throw new Error(`Failed to create comment: ${response.status()}`);
+  }
+  const data = await response.json();
+  const commentId = data.comment.id;
+  await waitForCommentViaAPI(request, articleSlug, commentId, token);
+  return commentId;
+}
+
+export async function waitForArticleViaAPI(
+  request: APIRequestContext,
+  articleSlug: string,
+  options: { timeoutMs?: number; intervalMs?: number } = {},
+): Promise<void> {
+  const timeoutMs = options.timeoutMs ?? 10_000;
+  const intervalMs = options.intervalMs ?? 250;
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    const response = await request.get(`${API_BASE}/articles/${articleSlug}`);
+    if (response.ok()) {
+      return;
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error(`Timed out waiting for article "${articleSlug}" to become available via API`);
+}
+
+export async function waitForCommentViaAPI(
+  request: APIRequestContext,
+  articleSlug: string,
+  commentId: number,
+  token?: string,
+  options: { timeoutMs?: number; intervalMs?: number } = {},
+): Promise<void> {
+  const timeoutMs = options.timeoutMs ?? 10_000;
+  const intervalMs = options.intervalMs ?? 250;
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    const response = await request.get(`${API_BASE}/articles/${articleSlug}/comments`, {
+      headers: token ? {
+        Authorization: `Token ${token}`,
+      } : undefined,
+    });
+    if (response.ok()) {
+      const data = await response.json();
+      if (data.comments?.some((comment: { id?: number }) => comment.id === commentId)) {
+        return;
+      }
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error(`Timed out waiting for comment ${commentId} on article "${articleSlug}" to become available via API`);
+}
+
+export async function waitForProfileViaAPI(
+  request: APIRequestContext,
+  username: string,
+  options: { timeoutMs?: number; intervalMs?: number } = {},
+): Promise<void> {
+  const timeoutMs = options.timeoutMs ?? 10_000;
+  const intervalMs = options.intervalMs ?? 250;
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    const response = await request.get(`${API_BASE}/profiles/${username}`);
+    if (response.ok()) {
+      return;
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error(`Timed out waiting for profile "${username}" to become available via API`);
+}
+
+export async function getFirstPublicArticleSummary(request: APIRequestContext): Promise<PublicArticleSummary> {
+  const response = await request.get(`${API_BASE}/articles?limit=1&offset=0`);
+  if (!response.ok()) {
+    throw new Error(`Failed to fetch public articles: ${response.status()}`);
+  }
+
+  const data = await response.json();
+  const article = data.articles?.[0];
+  if (!article?.slug || !article?.title || !article?.author?.username) {
+    throw new Error('Public articles feed did not return a usable article');
+  }
+
+  return {
+    slug: article.slug,
+    title: article.title,
+    description: article.description ?? '',
+    authorUsername: article.author.username,
+  };
+}
+
+export async function waitForAuthorArticleCountViaAPI(
+  request: APIRequestContext,
+  username: string,
+  minimumCount: number,
+  options: { timeoutMs?: number; intervalMs?: number } = {},
+): Promise<void> {
+  const timeoutMs = options.timeoutMs ?? 10_000;
+  const intervalMs = options.intervalMs ?? 250;
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    const response = await request.get(`${API_BASE}/articles?author=${encodeURIComponent(username)}&limit=1&offset=0`);
+    if (response.ok()) {
+      const data = await response.json();
+      if ((data.articlesCount ?? 0) >= minimumCount) {
+        return;
+      }
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error(`Timed out waiting for author "${username}" to reach ${minimumCount} visible articles via API`);
+}
+
+export async function waitForTagArticleCountViaAPI(
+  request: APIRequestContext,
+  tag: string,
+  minimumCount: number,
+  options: { timeoutMs?: number; intervalMs?: number } = {},
+): Promise<void> {
+  const timeoutMs = options.timeoutMs ?? 10_000;
+  const intervalMs = options.intervalMs ?? 250;
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    const response = await request.get(`${API_BASE}/articles?tag=${encodeURIComponent(tag)}&limit=1&offset=0`);
+    if (response.ok()) {
+      const data = await response.json();
+      if ((data.articlesCount ?? 0) >= minimumCount) {
+        return;
+      }
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error(`Timed out waiting for tag "${tag}" to reach ${minimumCount} visible articles via API`);
 }
 
 export async function createManyArticles(

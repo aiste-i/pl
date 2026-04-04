@@ -3,7 +3,7 @@ import { AppAdapter, BootstrapUser } from './types';
 import { getAngularRealWorldLocators, getAngularRealWorldOracle } from '../locators/apps/angular-realworld.locators';
 import { angularRealWorldPaths } from './angular-realworld-example-app.routes';
 
-const ANGULAR_PORT = process.env.ANGULAR_REALWORLD_PORT || '4210';
+const ANGULAR_PORT = process.env.ANGULAR_REALWORLD_PORT || '4300';
 const ANGULAR_BASE_URL = `http://127.0.0.1:${ANGULAR_PORT}`;
 
 async function bootstrapAuthenticatedSession(page: Page, user: BootstrapUser): Promise<void> {

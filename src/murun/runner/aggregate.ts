@@ -47,6 +47,7 @@ const CATEGORY_MAPPING: Record<string, string> = {
     'SubtreeMove': 'structural',
     'SubtreeSwap': 'structural',
     'ReverseChildrenOrder': 'structural',
+    'SwapAdjacentSiblings': 'structural',
     'TagMutator': 'structural',
     'ContainerNodeMutator': 'structural',
     'AttributeAdd': 'structural',
@@ -68,11 +69,13 @@ const CATEGORY_MAPPING: Record<string, string> = {
     'ActionableNodeMutator': 'accessibility-semantic',
     'DuplicateId': 'accessibility-semantic',
     'ChangeAriaLabel': 'accessibility-semantic',
+    'ToggleAriaExpanded': 'accessibility-semantic',
     'RemoveInputNames': 'accessibility-semantic',
     'StyleVisibility': 'visibility',
     'StylePosition': 'visibility',
     'StyleSize': 'visibility',
-    'StyleColor': 'visibility'
+    'StyleColor': 'visibility',
+    'ToggleCssClass': 'visibility'
 };
 
 function getCategory(operator: string, existingCategory?: string): string {

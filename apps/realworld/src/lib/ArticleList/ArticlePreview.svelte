@@ -2,6 +2,14 @@
 	import { enhance } from '$app/forms';
 
 	const { article, user } = $props();
+
+	let favorited = $state(false);
+	let favoritesCount = $state(0);
+
+	$effect(() => {
+		favorited = article.favorited;
+		favoritesCount = article.favoritesCount;
+	});
 </script>
 
 <div class="article-preview" data-testid="article-preview">
@@ -21,12 +29,12 @@
 				action="/article/{article.slug}?/toggleFavorite"
 				use:enhance={({ form }) => {
 					// optimistic UI
-					if (article.favorited) {
-						article.favorited = false;
-						article.favoritesCount -= 1;
+					if (favorited) {
+						favorited = false;
+						favoritesCount -= 1;
 					} else {
-						article.favorited = true;
-						article.favoritesCount += 1;
+						favorited = true;
+						favoritesCount += 1;
 					}
 
 					const button = form.querySelector('button');
@@ -34,16 +42,27 @@
 
 					return ({ result, update }) => {
 						button.disabled = false;
-						if (result.type === 'error') update();
+						if (result.type === 'error') {
+							favorited = article.favorited;
+							favoritesCount = article.favoritesCount;
+							update();
+						} else {
+							article.favorited = favorited;
+							article.favoritesCount = favoritesCount;
+						}
 					};
 				}}
 				class="pull-xs-right"
 				data-testid="article-favorite-form"
 			>
-				<input hidden type="checkbox" name="favorited" checked={article.favorited} />
-				<button class="btn btn-sm {article.favorited ? 'btn-primary' : 'btn-outline-primary'}" data-testid="article-favorite-btn">
+				<input hidden type="checkbox" name="favorited" checked={favorited} />
+				<button
+					class="btn btn-sm {favorited ? 'btn-primary' : 'btn-outline-primary'}"
+					aria-label={favorited ? 'Unfavorite article' : 'Favorite article'}
+					data-testid={favorited ? 'article-unfavorite-btn' : 'article-favorite-btn'}
+				>
 					<i class="ion-heart"></i>
-					{article.favoritesCount}
+					{favoritesCount}
 				</button>
 			</form>
 		{/if}

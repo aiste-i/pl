@@ -25,6 +25,10 @@ export class BenchmarkedLocator {
         return this.context.runAction(() => this.locator.press(key, options), this.locator);
     }
 
+    async waitFor(options?: Parameters<Locator['waitFor']>[0]) {
+        return this.context.runAction(() => this.locator.waitFor(options), this.locator);
+    }
+
     get raw(): Locator {
         return this.locator;
     }

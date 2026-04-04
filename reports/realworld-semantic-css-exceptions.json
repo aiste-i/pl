@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "appId": "angular-realworld-example-app",
+    "logicalKey": "home.previewDescription",
+    "reason": "Article preview descriptions render as plain paragraph text without a stable semantic-only entry point in Angular.",
+    "cssSelector": "a.preview-link > p",
+    "activeInCorpus": true,
+    "affectsFairComparisonWording": true
+  },
+  {
+    "appId": "realworld",
+    "logicalKey": "home.previewDescription",
+    "reason": "Svelte article preview descriptions render as plain paragraph text without a stable semantic-only entry point.",
+    "cssSelector": "a.preview-link > p",
+    "activeInCorpus": true,
+    "affectsFairComparisonWording": true
+  },
+  {
+    "appId": "vue3-realworld-example-app",
+    "logicalKey": "home.previewDescription",
+    "reason": "Vue article preview descriptions render as plain paragraph text without a stable semantic-only entry point.",
+    "cssSelector": "a.preview-link > p",
+    "activeInCorpus": true,
+    "affectsFairComparisonWording": true
+  }
+]

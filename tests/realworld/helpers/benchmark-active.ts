@@ -41,10 +41,15 @@ export async function openTaggedFeed(
   page: Page,
   oracle: any,
   tag: string,
-  options: { expectedPage?: number } = {},
+  options: { expectedPage?: number; expectedPaginationButton?: number | null } = {},
 ): Promise<void> {
   await page.goto(appPaths.tag(tag, options.expectedPage), { waitUntil: 'load' });
-  await oracle.home.paginationButton(2).assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
+  const expectedPaginationButton = options.expectedPaginationButton === undefined ? 2 : options.expectedPaginationButton;
+  if (expectedPaginationButton === null) {
+    await oracle.home.firstArticlePreview().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
+    return;
+  }
+  await oracle.home.paginationButton(expectedPaginationButton).assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
 }
 
 export async function openFirstArticleFromFeed(page: Page, locators: any, oracle: any): Promise<void> {
@@ -61,14 +66,99 @@ export async function favoriteOpenedArticle(page: Page, locators: any, oracle: a
   await oracle.article.unfavoriteButton().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
 }
 
+export async function openArticleBySlug(
+  page: Page,
+  oracle: any,
+  slug: string,
+): Promise<void> {
+  await page.goto(appPaths.article(slug), { waitUntil: 'load' });
+  await oracle.article.page().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
+}
+
+export async function verifyPreviewDescription(
+  locators: any,
+  oracle: any,
+  expectedDescription: string | RegExp,
+): Promise<void> {
+  const previewRoot = oracle.home.firstArticlePreview().raw;
+  await locators.home.previewDescription(previewRoot).waitFor({
+    state: 'visible',
+    timeout: getActiveBenchmarkTimeoutMs(),
+  });
+  await oracle.home.previewDescription(previewRoot).assertContainsText(expectedDescription, {
+    timeout: getActiveBenchmarkTimeoutMs(),
+  });
+}
+
+export async function verifyOpenedArticleTitle(
+  locators: any,
+  oracle: any,
+  expectedTitle: string,
+): Promise<void> {
+  await locators.article.title().waitFor({
+    state: 'visible',
+    timeout: getActiveBenchmarkTimeoutMs(),
+  });
+  await oracle.article.title().assertContainsText(expectedTitle, {
+    timeout: getActiveBenchmarkTimeoutMs(),
+  });
+}
+
+export async function getStableCommentCount(
+  oracle: any,
+  options: { timeoutMs?: number; intervalMs?: number; stableSamples?: number } = {},
+): Promise<number> {
+  const timeoutMs = options.timeoutMs ?? getActiveBenchmarkTimeoutMs();
+  const intervalMs = options.intervalMs ?? 100;
+  const stableSamples = options.stableSamples ?? 3;
+  const deadline = Date.now() + timeoutMs;
+
+  let lastCount = -1;
+  let stableCount = 0;
+
+  while (Date.now() < deadline) {
+    const currentCount = await oracle.comments.cards().raw.count();
+    if (currentCount === lastCount) {
+      stableCount += 1;
+      if (stableCount >= stableSamples) {
+        return currentCount;
+      }
+    } else {
+      lastCount = currentCount;
+      stableCount = 1;
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+
+  return lastCount;
+}
+
 export async function addCommentToOpenedArticle(
   locators: any,
   oracle: any,
   commentText: string,
 ): Promise<void> {
+  const initialCommentCount = await getStableCommentCount(oracle);
   await locators.comments.textarea().fill(commentText);
   await locators.comments.submitButton().click();
-  await oracle.comments.card(commentText).assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
+  await expect
+    .poll(() => oracle.comments.cards().raw.count(), {
+      timeout: getActiveBenchmarkTimeoutMs(),
+    })
+    .toBeGreaterThan(initialCommentCount);
+}
+
+export async function deleteOwnCommentFromOpenedArticle(
+  locators: any,
+  oracle: any,
+  expectedCommentCountAfterDelete: number,
+): Promise<void> {
+  const commentCards = oracle.comments.cards();
+  const commentCard = commentCards.raw.first();
+  await locators.comments.deleteButton(commentCard).click();
+  await commentCards.assertCount(expectedCommentCountAfterDelete, {
+    timeout: getActiveBenchmarkTimeoutMs(),
+  });
 }
 
 export async function updateBioFromSettings(

@@ -12,6 +12,7 @@ import {
 } from '../../src/locators/apps/shared-realworld';
 
 const ORACLE_FAMILY = 'oracle';
+const ORACLE_TEST_ID_CHAIN = /^getByTestId\('[^']+'\)(\.getByTestId\('[^']+'\))*$/;
 
 function getRawLocatorTree(appId: (typeof REALWORLD_APP_IDS)[number], family: (typeof STRATEGIES)[number] | typeof ORACLE_FAMILY) {
   const adapter = getAppAdapter(appId);
@@ -67,7 +68,7 @@ test('active logical locator functions expose complete metadata for benchmark fa
         } else if (family === 'oracle') {
           expect(meta.sourceKind).toBe('oracle');
           expect(meta.purity).toBe('oracle');
-          expect(meta.selector).toMatch(/^getByTestId\('/);
+          expect(meta.selector).toMatch(ORACLE_TEST_ID_CHAIN);
         } else {
           expect(meta.sourceKind).toBe(family);
           expect(meta.purity).toBe(family);
@@ -94,7 +95,7 @@ test('implemented css and xpath locator selectors never use data-testid, and ora
 
         if (family === ORACLE_FAMILY) {
           expect(meta.rootKind).toBe('getByTestId');
-          expect(meta.selector).toMatch(/^getByTestId\('/);
+          expect(meta.selector).toMatch(ORACLE_TEST_ID_CHAIN);
         }
       }
     }

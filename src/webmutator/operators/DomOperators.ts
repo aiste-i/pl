@@ -20,9 +20,11 @@ export class DomOperators {
             new dom.SubtreeMove(),
             new dom.SubtreeSwap(),
             new dom.ReverseChildrenOrder(),
+            new dom.SwapAdjacentSiblings(),
             new dom.TagMutator(),
             new dom.ContainerNodeMutator(),
             new dom.ActionableNodeMutator(),
+            new dom.ToggleCssClass(),
             new dom.ChangeImageAlt(),
             new dom.RemoveImageAlt(),
             new dom.ReplaceImageWithDiv(),
@@ -33,7 +35,8 @@ export class DomOperators {
             new dom.ReplaceThWithTd(),
             new dom.DuplicateId(),
             new dom.SemanticToDiv(),
-            new dom.ChangeAriaLabel()
+            new dom.ChangeAriaLabel(),
+            new dom.ToggleAriaExpanded()
         ];
     }
 }

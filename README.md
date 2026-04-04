@@ -14,6 +14,10 @@ The benchmark comparison model is fixed to:
 
 Oracle locators stay separate and use `data-testid` only.
 
+Semantic-first exceptions that require a CSS-backed locator are tracked separately in:
+
+- `reports/realworld-semantic-css-exceptions.json`
+
 ## Current Executable Scope
 
 The repository now runs an end-to-end benchmark pipeline for the current benchmark-active shared corpus:
@@ -80,8 +84,12 @@ The active corpus now includes:
 - sign in
 - open global feed
 - open first article from feed
+- favorite an article from detail
+- verify preview description visibility
 - paginate a tagged feed
+- delete own comment
 - add a comment
+- assert article title visibility
 - follow and unfollow a profile
 - update user bio
 
@@ -129,6 +137,6 @@ These reports document:
 
 ## Notes
 
-- Application-source edits are limited to non-behavioral test hooks such as `data-testid`.
+- Application-source edits are limited to benchmark-enabling parity work and oracle hooks, not benchmark-specific mutations.
 - Route differences are handled in the benchmark adapter layer, not by rewriting app behavior.
 - The legacy TodoMVC pilot wiring remains available only as a compatibility adapter and is no longer the main RealWorld execution path.

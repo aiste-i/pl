@@ -2,7 +2,7 @@ import { CONFIG } from 'src/config'
 import type { GenericErrorModel, HttpResponse } from 'src/services/api'
 import { Api, ContentType } from 'src/services/api'
 
-export const limit = 10
+export const limit = 2
 
 function normalizeApiBase(rawHost: string): string {
   const trimmed = rawHost.trim().replace(/\/+$/, '')

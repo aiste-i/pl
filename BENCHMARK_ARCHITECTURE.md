@@ -46,6 +46,21 @@ Temporary exclusions are tracked in both:
 
 This keeps the executable benchmark scope explicit while preserving a methodological boundary around non-locator security checks such as `tests/realworld/xss-security.spec.ts`.
 
+The current active corpus covers:
+
+- home load
+- sign in
+- open global feed
+- open first article from feed
+- favorite an article from detail
+- verify preview description visibility
+- paginate a tagged feed
+- delete own comment
+- add a comment
+- assert article title visibility
+- follow and unfollow a profile
+- update user bio
+
 ## Artifact Scoping
 
 All outputs are app-scoped and corpus-scoped under `test-results/<app-id>/<corpus-id>/...` so baseline runs, target collection, scenario generation, mutated runs, and aggregation stay reproducible and isolated.
@@ -59,10 +74,11 @@ For the current active corpus, the concrete layout is:
 - `test-results/<app-id>/realworld-active/aggregate`
 
 Aggregate outputs include excluded unsupported coverage so unsupported family/app combinations remain visible while staying out of fair family-comparison denominators.
+Semantic-first CSS-backed exceptions are reported independently in `reports/realworld-semantic-css-exceptions.json` so unsupported gaps and explicit exceptions do not get conflated.
 
 ## Compatibility Rule
 
-The benchmark treats the RealWorld apps as benchmark subjects. Application edits are restricted to non-behavioral hooks such as missing `data-testid` attributes required by oracle factories.
+The benchmark treats the RealWorld apps as benchmark subjects. Application edits are restricted to cross-app parity and benchmark-enabling affordances, plus oracle hooks such as `data-testid`, rather than mutation-specific tuning.
 
 ## Execution Flow
 

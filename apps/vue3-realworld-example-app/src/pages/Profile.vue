@@ -39,9 +39,10 @@
               <button
                 v-if="showFollow"
                 class="btn btn-sm btn-outline-secondary action-btn"
+                :aria-label="profile.following ? 'Unfollow user' : 'Follow user'"
                 :disabled="followProcessGoing"
                 @click="toggleFollow"
-                data-testid="profile-follow-btn"
+                :data-testid="profile.following ? 'profile-unfollow-btn' : 'profile-follow-btn'"
               >
                 <i class="ion-plus-round space" />
                 {{ profile.following ? "Unfollow" : "Follow" }} {{ profile.username }}

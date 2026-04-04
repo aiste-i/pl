@@ -951,18 +951,20 @@
     "app": "angular-realworld-example-app",
     "logicalKey": "article.favoriteButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for article.favoriteButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -970,153 +972,167 @@
     "app": "angular-realworld-example-app",
     "logicalKey": "article.favoriteButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for article.favoriteButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".article-page .article-meta button"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "article.favoriteButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for article.favoriteButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"article-meta\")]//button)[1]"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "article.favoriteButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for article.favoriteButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('article-favorite-btn')"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "home.previewDescription",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Live Angular article preview description cannot be resolved reliably from an allowed semantic-first entry point without crossing into DOM-shaped fallback logic.",
-    "excludedFromAggregateComparison": true,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
-    "specHints": [
-      "tests/realworld/articles.spec.ts",
-      "tests/realworld/navigation.spec.ts"
+    "supported": true,
+    "reason": null,
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "specHints": [
+      "tests/realworld/articles.spec.ts"
+    ],
+    "sourceKind": "semantic-css-exception",
+    "purity": "css",
     "semanticEntryPoint": null,
-    "isException": false,
-    "selector": null
+    "isException": true,
+    "selector": "a.preview-link > p"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "home.previewDescription",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for home.previewDescription in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "a.preview-link > p"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "home.previewDescription",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for home.previewDescription in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".//a[contains(@class,\"preview-link\")]/p[1]"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "home.previewDescription",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for home.previewDescription in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('article-description')"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "comments.deleteButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Comment delete control is icon-only in the live Angular DOM and does not expose a stable semantic-first handle without CSS/XPath fallback.",
-    "excludedFromAggregateComparison": true,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
-    "specHints": [
-      "tests/realworld/comments.spec.ts",
-      "tests/realworld/error-handling.spec.ts"
+    "supported": true,
+    "reason": null,
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "specHints": [
+      "tests/realworld/comments.spec.ts"
+    ],
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -1124,75 +1140,83 @@
     "app": "angular-realworld-example-app",
     "logicalKey": "comments.deleteButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for comments.deleteButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "button[aria-label=\"Delete comment\"]"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "comments.deleteButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for comments.deleteButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".//button[@aria-label=\"Delete comment\"]"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "comments.deleteButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for comments.deleteButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('comment-delete-button')"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "article.title",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Live Angular article page does not expose a stable semantic-first entry point that resolves the article title under the family-purity rules.",
-    "excludedFromAggregateComparison": true,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "supported": true,
+    "reason": null,
+    "excludedFromAggregateComparison": false,
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -1200,58 +1224,64 @@
     "app": "angular-realworld-example-app",
     "logicalKey": "article.title",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for article.title in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".article-page .banner h1"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "article.title",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for article.title in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1)[1]"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "article.title",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for article.title in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('article-title')"
   },
   {
     "app": "angular-realworld-example-app",
@@ -2693,18 +2723,20 @@
     "app": "realworld",
     "logicalKey": "article.favoriteButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for article.favoriteButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -2712,151 +2744,167 @@
     "app": "realworld",
     "logicalKey": "article.favoriteButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for article.favoriteButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".article-page .article-meta button"
   },
   {
     "app": "realworld",
     "logicalKey": "article.favoriteButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for article.favoriteButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"article-meta\")]//button)[1]"
   },
   {
     "app": "realworld",
     "logicalKey": "article.favoriteButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for article.favoriteButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('article-favorite-btn')"
   },
   {
     "app": "realworld",
     "logicalKey": "home.previewDescription",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for home.previewDescription in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "semantic-css-exception",
+    "purity": "css",
     "semanticEntryPoint": null,
-    "isException": false,
-    "selector": null
+    "isException": true,
+    "selector": "a.preview-link > p"
   },
   {
     "app": "realworld",
     "logicalKey": "home.previewDescription",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for home.previewDescription in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "a.preview-link > p"
   },
   {
     "app": "realworld",
     "logicalKey": "home.previewDescription",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for home.previewDescription in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".//a[contains(@class,\"preview-link\")]/p[1]"
   },
   {
     "app": "realworld",
     "logicalKey": "home.previewDescription",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for home.previewDescription in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('article-description')"
   },
   {
     "app": "realworld",
     "logicalKey": "comments.deleteButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for comments.deleteButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -2864,75 +2912,83 @@
     "app": "realworld",
     "logicalKey": "comments.deleteButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for comments.deleteButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "button[aria-label=\"Delete comment\"]"
   },
   {
     "app": "realworld",
     "logicalKey": "comments.deleteButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for comments.deleteButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".//button[@aria-label=\"Delete comment\"]"
   },
   {
     "app": "realworld",
     "logicalKey": "comments.deleteButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for comments.deleteButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('comment-delete-button')"
   },
   {
     "app": "realworld",
     "logicalKey": "article.title",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for article.title in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -2940,58 +2996,64 @@
     "app": "realworld",
     "logicalKey": "article.title",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for article.title in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".article-page .banner h1"
   },
   {
     "app": "realworld",
     "logicalKey": "article.title",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for article.title in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1)[1]"
   },
   {
     "app": "realworld",
     "logicalKey": "article.title",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for article.title in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('article-title')"
   },
   {
     "app": "realworld",
@@ -4433,18 +4495,20 @@
     "app": "vue3-realworld-example-app",
     "logicalKey": "article.favoriteButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for article.favoriteButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -4452,151 +4516,167 @@
     "app": "vue3-realworld-example-app",
     "logicalKey": "article.favoriteButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for article.favoriteButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".article-meta button.btn"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "article.favoriteButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for article.favoriteButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"article-meta\")]//button[contains(@class,\"btn\")])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "article.favoriteButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for article.favoriteButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.favorite-from-detail"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('article-favorite-btn')"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.previewDescription",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for home.previewDescription in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "semantic-css-exception",
+    "purity": "css",
     "semanticEntryPoint": null,
-    "isException": false,
-    "selector": null
+    "isException": true,
+    "selector": "a.preview-link > p"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.previewDescription",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for home.previewDescription in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "a.preview-link > p"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.previewDescription",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for home.previewDescription in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".//a[contains(@class,\"preview-link\")]/p[1]"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.previewDescription",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for home.previewDescription in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.preview-description-visibility"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('article-description')"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "comments.deleteButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for comments.deleteButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -4604,75 +4684,83 @@
     "app": "vue3-realworld-example-app",
     "logicalKey": "comments.deleteButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for comments.deleteButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "[role=\"button\"][aria-label=\"Delete comment\"]"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "comments.deleteButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for comments.deleteButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".//*[@role=\"button\" and @aria-label=\"Delete comment\"]"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "comments.deleteButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for comments.deleteButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "comments.delete-own"
+    ],
     "specHints": [
       "tests/realworld/comments.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('comment-delete-button')"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "article.title",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for article.title in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -4680,58 +4768,64 @@
     "app": "vue3-realworld-example-app",
     "logicalKey": "article.title",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for article.title in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".article-page .banner h1"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "article.title",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for article.title in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1)[1]"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "article.title",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for article.title in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "article.assert-title"
+    ],
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('article-title')"
   },
   {
     "app": "vue3-realworld-example-app",

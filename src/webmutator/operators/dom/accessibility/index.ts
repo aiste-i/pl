@@ -10,3 +10,4 @@ export * from './ReplaceThWithTd';
 export * from './DuplicateId';
 export * from './SemanticToDiv';
 export * from './ChangeAriaLabel';
+export * from './ToggleAriaExpanded';

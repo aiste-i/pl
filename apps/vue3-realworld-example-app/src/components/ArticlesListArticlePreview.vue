@@ -24,8 +24,8 @@
         :class="[article.favorited ? 'btn-primary' : 'btn-outline-primary']"
         :aria-label="article.favorited ? 'Unfavorite article' : 'Favorite article'"
         :disabled="favoriteProcessGoing"
-      @click="() => favoriteArticle()"
-      data-testid="article-favorite-btn"
+        @click="() => favoriteArticle()"
+        :data-testid="article.favorited ? 'article-unfavorite-btn' : 'article-favorite-btn'"
       >
         <i class="ion-heart" /> {{ article.favoritesCount }}
       </button>

@@ -27,8 +27,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
         'btn-outline-secondary': !profile.following,
         'btn-secondary': profile.following,
       }"
+      [attr.aria-label]="profile.following ? 'Unfollow user' : 'Follow user'"
+      [attr.data-testid]="profile.following ? unfollowTestId : followTestId"
       (click)="toggleFollowing()"
-      data-testid="article-follow-btn"
     >
       <i class="ion-plus-round"></i>
       &nbsp;
@@ -40,6 +41,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class FollowButtonComponent {
   @Input() profile!: Profile;
+  @Input() followTestId = 'profile-follow-btn';
+  @Input() unfollowTestId = 'profile-unfollow-btn';
   @Output() toggle = new EventEmitter<Profile>();
   isSubmitting = signal(false);
   destroyRef = inject(DestroyRef);

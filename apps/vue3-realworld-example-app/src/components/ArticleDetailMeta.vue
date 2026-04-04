@@ -39,7 +39,7 @@
       :aria-label="article.favorited ? 'Unfavorite article' : 'Favorite article'"
       :disabled="favoriteProcessGoing"
       @click="favoriteArticle"
-      data-testid="article-favorite-btn"
+      :data-testid="article.favorited ? 'article-unfavorite-btn' : 'article-favorite-btn'"
     >
       <i class="ion-heart space" />
       {{ article.favorited ? 'Unfavorite' : 'Favorite' }} Article

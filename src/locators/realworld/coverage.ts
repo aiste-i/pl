@@ -53,32 +53,7 @@ export interface SemanticCssExceptionRow {
   affectsFairComparisonWording: boolean;
 }
 
-export const COVERAGE_OVERRIDES: CoverageOverride[] = [
-  {
-    app: 'angular-realworld-example-app',
-    logicalKey: 'article.title',
-    family: 'semantic-first',
-    reason: 'Live Angular article page does not expose a stable semantic-first entry point that resolves the article title under the family-purity rules.',
-    excludedFromAggregateComparison: true,
-    specHints: ['tests/realworld/articles.spec.ts'],
-  },
-  {
-    app: 'angular-realworld-example-app',
-    logicalKey: 'home.previewDescription',
-    family: 'semantic-first',
-    reason: 'Live Angular article preview description cannot be resolved reliably from an allowed semantic-first entry point without crossing into DOM-shaped fallback logic.',
-    excludedFromAggregateComparison: true,
-    specHints: ['tests/realworld/articles.spec.ts', 'tests/realworld/navigation.spec.ts'],
-  },
-  {
-    app: 'angular-realworld-example-app',
-    logicalKey: 'comments.deleteButton',
-    family: 'semantic-first',
-    reason: 'Comment delete control is icon-only in the live Angular DOM and does not expose a stable semantic-first handle without CSS/XPath fallback.',
-    excludedFromAggregateComparison: true,
-    specHints: ['tests/realworld/comments.spec.ts', 'tests/realworld/error-handling.spec.ts'],
-  },
-];
+export const COVERAGE_OVERRIDES: CoverageOverride[] = [];
 
 function collectReferencedLogicalKeys(): Map<string, { activeScenarioIds: Set<string>; sourceSpecs: Set<string>; activeInCorpus: boolean }> {
   const byKey = new Map<string, { activeScenarioIds: Set<string>; sourceSpecs: Set<string>; activeInCorpus: boolean }>();
