@@ -89,6 +89,40 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
         css: css({ ...meta('home.firstReadMoreLink'), selector: '.article-preview:first-of-type a.preview-link' }),
         xpath: xpath({ ...meta('home.firstReadMoreLink'), selector: '(//div[contains(@class,"article-preview")])[1]//a[contains(@class,"preview-link")]' }),
       }),
+      paginationButton: chooseStrategy(strategy, {
+        'semantic-first': semanticNative(
+          { ...meta('home.paginationButton'), semanticEntryPoint: 'getByRole' },
+          (page: Page, pageNumber: number) => markSemantic(page.getByRole('link', { name: new RegExp(`^${pageNumber}$`) }).first(), 'getByRole'),
+        ),
+        css: css(
+          { ...meta('home.paginationButton'), selector: '.pagination a.page-link' },
+          (page: Page, pageNumber: number) => page.locator('.pagination a.page-link', { hasText: new RegExp(`^${pageNumber}$`) }).first(),
+        ),
+        xpath: xpath(
+          { ...meta('home.paginationButton'), selector: '(//ul[contains(@class,"pagination")]//a[contains(@class,"page-link")])[1]' },
+          (page: Page, pageNumber: number) =>
+            page.locator(`xpath=(//ul[contains(@class,"pagination")]//a[contains(@class,"page-link") and normalize-space()="${pageNumber}"])[1]`),
+        ),
+      }),
+      paginationItem: chooseStrategy(strategy, {
+        'semantic-first': semanticNative(
+          { ...meta('home.paginationItem'), semanticEntryPoint: 'getByRole' },
+          (page: Page, pageNumber: number) =>
+            markSemantic(
+              page.getByRole('listitem').filter({ has: page.getByRole('link', { name: new RegExp(`^${pageNumber}$`) }) }).first(),
+              'getByRole',
+            ),
+        ),
+        css: css(
+          { ...meta('home.paginationItem'), selector: '.pagination li.page-item' },
+          (page: Page, pageNumber: number) => page.locator('.pagination li.page-item', { hasText: new RegExp(`^${pageNumber}$`) }).first(),
+        ),
+        xpath: xpath(
+          { ...meta('home.paginationItem'), selector: '(//ul[contains(@class,"pagination")]//li[contains(@class,"page-item")])[1]' },
+          (page: Page, pageNumber: number) =>
+            page.locator(`xpath=(//ul[contains(@class,"pagination")]//li[contains(@class,"page-item") and .//a[normalize-space()="${pageNumber}"]])[1]`),
+        ),
+      }),
     },
     comments: {
       textarea: chooseStrategy(strategy, {
@@ -106,6 +140,36 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
         ),
         css: css({ ...meta('comments.submitButton'), selector: 'form.comment-form button[type="submit"]' }),
         xpath: xpath({ ...meta('comments.submitButton'), selector: '(//form[contains(@class,"comment-form")]//button[@type="submit"])[1]' }),
+      }),
+    },
+    profile: {
+      followButton: chooseStrategy(strategy, {
+        'semantic-first': semanticNative(
+          { ...meta('profile.followButton'), semanticEntryPoint: 'getByRole' },
+          (page: Page) => markSemantic(page.getByRole('button', { name: /^follow/i }).first(), 'getByRole'),
+        ),
+        css: css(
+          { ...meta('profile.followButton'), selector: '.profile-page .user-info button.btn' },
+          (page: Page) => page.locator('.profile-page .user-info button.btn', { hasText: /^Follow/i }).first(),
+        ),
+        xpath: xpath(
+          { ...meta('profile.followButton'), selector: '(//div[contains(@class,"user-info")]//button)[1]' },
+          (page: Page) => page.locator('xpath=(//div[contains(@class,"user-info")]//button[starts-with(normalize-space(),"Follow")])[1]'),
+        ),
+      }),
+      unfollowButton: chooseStrategy(strategy, {
+        'semantic-first': semanticNative(
+          { ...meta('profile.unfollowButton'), semanticEntryPoint: 'getByRole' },
+          (page: Page) => markSemantic(page.getByRole('button', { name: /^unfollow/i }).first(), 'getByRole'),
+        ),
+        css: css(
+          { ...meta('profile.unfollowButton'), selector: '.profile-page .user-info button.btn' },
+          (page: Page) => page.locator('.profile-page .user-info button.btn', { hasText: /^Unfollow/i }).first(),
+        ),
+        xpath: xpath(
+          { ...meta('profile.unfollowButton'), selector: '(//div[contains(@class,"user-info")]//button)[1]' },
+          (page: Page) => page.locator('xpath=(//div[contains(@class,"user-info")]//button[starts-with(normalize-space(),"Unfollow")])[1]'),
+        ),
       }),
     },
     settings: {
@@ -152,6 +216,14 @@ export function getReactRealWorldOracle() {
         { ...meta('home.firstReadMoreLink'), selector: "getByTestId('article-read-more')" },
         (page: Page) => page.getByTestId('article-read-more').first(),
       ),
+      paginationButton: oracle(
+        { ...meta('home.paginationButton'), selector: "getByTestId('pagination-link')" },
+        (page: Page, pageNumber: number) => page.getByTestId('pagination-link').filter({ hasText: new RegExp(`^${pageNumber}$`) }).first(),
+      ),
+      paginationItem: oracle(
+        { ...meta('home.paginationItem'), selector: "getByTestId('pagination-item')" },
+        (page: Page, pageNumber: number) => page.getByTestId('pagination-item').filter({ hasText: new RegExp(`^${pageNumber}$`) }).first(),
+      ),
     },
     article: {
       page: oracleTestId(meta('article.page'), 'article-page'),
@@ -165,7 +237,16 @@ export function getReactRealWorldOracle() {
       ),
     },
     profile: {
+      page: oracleTestId(meta('profile.page'), 'profile-page'),
       bio: oracleTestId(meta('profile.bio'), 'profile-bio'),
+      followButton: oracle(
+        { ...meta('profile.followButton'), selector: "getByTestId('profile-follow-btn')" },
+        (page: Page) => page.getByTestId('profile-follow-btn').filter({ hasText: /^Follow/i }).first(),
+      ),
+      unfollowButton: oracle(
+        { ...meta('profile.unfollowButton'), selector: "getByTestId('profile-follow-btn')" },
+        (page: Page) => page.getByTestId('profile-follow-btn').filter({ hasText: /^Unfollow/i }).first(),
+      ),
     },
     settings: {
       page: oracleTestId(meta('settings.page'), 'settings-page'),

@@ -4,6 +4,7 @@ import * as path from 'path';
 interface AggregatedRun {
     runId: string;
     applicationId: string;
+    browserName: string;
     corpusId: string;
     scenarioId: string;
     activeScenarioId: string;
@@ -45,6 +46,7 @@ const CATEGORY_MAPPING: Record<string, string> = {
     'SubtreeInsert': 'structural',
     'SubtreeMove': 'structural',
     'SubtreeSwap': 'structural',
+    'ReverseChildrenOrder': 'structural',
     'TagMutator': 'structural',
     'ContainerNodeMutator': 'structural',
     'AttributeAdd': 'structural',
@@ -65,6 +67,7 @@ const CATEGORY_MAPPING: Record<string, string> = {
     'ChangeButtonLabel': 'accessibility-semantic',
     'ActionableNodeMutator': 'accessibility-semantic',
     'DuplicateId': 'accessibility-semantic',
+    'ChangeAriaLabel': 'accessibility-semantic',
     'RemoveInputNames': 'accessibility-semantic',
     'StyleVisibility': 'visibility',
     'StylePosition': 'visibility',
@@ -111,6 +114,7 @@ function loadResults(inputDir: string): AggregatedRun[] {
             runs.push({
                 runId: content.runId,
                 applicationId: content.applicationId || 'unknown',
+                browserName: content.browserName || 'unknown',
                 corpusId: content.corpusId,
                 scenarioId: content.scenarioId || 'unknown',
                 activeScenarioId: content.activeScenarioId,
@@ -275,6 +279,18 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     });
     writeCsv(path.join(outputDir, 'summary_by_app.csv'), appSummary);
 
+    const browserSummary = Array.from(new Set(runs.map(run => run.browserName))).sort().map(browserName => {
+        const browserRuns = runs.filter(run => run.browserName === browserName);
+        return {
+            browserName,
+            totalRuns: browserRuns.length,
+            baselineRuns: browserRuns.filter(run => run.phase === 'baseline').length,
+            mutatedRuns: browserRuns.filter(run => run.phase === 'mutated').length,
+            failedRuns: browserRuns.filter(run => run.runStatus === 'failed').length,
+        };
+    });
+    writeCsv(path.join(outputDir, 'summary_by_browser.csv'), browserSummary);
+
     const exclusionSummary = [
         ...unsupportedRows.map(row => ({
             exclusionType: 'unsupported-coverage',
@@ -355,6 +371,7 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         corpusId: corpusIds.length === 1 ? corpusIds[0] : corpusIds,
         activeScenarioIds,
         applications: appSummary,
+        browsers: browserSummary,
         summaryByFamily,
         summaryByFamilyCategory,
         summaryByFamilyOperator,

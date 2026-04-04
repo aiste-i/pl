@@ -2,6 +2,33 @@ import { defineConfig, devices } from '@playwright/test';
 import { getSelectedAppAdapter } from './src/apps';
 
 const adapter = getSelectedAppAdapter();
+const enableWebServer = process.env.SKIP_WEB_SERVER !== '1';
+const requestedBrowsers = (process.env.PLAYWRIGHT_BROWSERS || 'chromium,firefox,webkit')
+  .split(',')
+  .map(value => value.trim().toLowerCase())
+  .filter(Boolean);
+
+const browserProjects = requestedBrowsers.map(browserName => {
+  const deviceName =
+    browserName === 'firefox'
+      ? 'Desktop Firefox'
+      : browserName === 'webkit'
+        ? 'Desktop Safari'
+        : 'Desktop Chrome';
+
+  return {
+    name: `${adapter.id}-${browserName}`,
+    metadata: {
+      appId: adapter.id,
+      appDisplayName: adapter.displayName,
+      browserName,
+    },
+    use: {
+      ...devices[deviceName],
+      browserName: browserName as 'chromium' | 'firefox' | 'webkit',
+    },
+  };
+});
 
 export default defineConfig({
   testDir: './tests',
@@ -19,27 +46,20 @@ export default defineConfig({
     navigationTimeout: 15_000,
     actionTimeout: 10_000,
   },
-  projects: [
-    {
-      name: `${adapter.id}-chromium`,
-      metadata: {
-        appId: adapter.id,
-        appDisplayName: adapter.displayName,
-      },
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
-  webServer: {
-    command: adapter.startCommand,
-    cwd: adapter.rootDir,
-    url: adapter.healthUrl,
-    env: {
-      ...process.env,
-      ...(adapter.env ?? {}),
-    },
-    reuseExistingServer: !process.env.CI,
-    stdout: 'pipe',
-    stderr: 'pipe',
-    timeout: 180_000,
-  },
+  projects: browserProjects,
+  webServer: enableWebServer
+    ? {
+        command: adapter.startCommand,
+        cwd: adapter.rootDir,
+        url: adapter.healthUrl,
+        env: {
+          ...process.env,
+          ...(adapter.env ?? {}),
+        },
+        reuseExistingServer: !process.env.CI,
+        stdout: 'pipe',
+        stderr: 'pipe',
+        timeout: 180_000,
+      }
+    : undefined,
 });

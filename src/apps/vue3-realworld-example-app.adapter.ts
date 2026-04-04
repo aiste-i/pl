@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 import { AppAdapter, BootstrapUser } from './types';
 import { getVue3RealWorldLocators, getVue3RealWorldOracle } from '../locators/apps/vue3-realworld.locators';
+import { vue3RealWorldPaths } from './vue3-realworld-example-app.routes';
 
 async function bootstrapAuthenticatedSession(page: Page, user: BootstrapUser): Promise<void> {
   await page.goto('http://127.0.0.1:4173', { waitUntil: 'load' });
@@ -21,21 +22,7 @@ export const vue3RealWorldAdapter: AppAdapter = {
   env: {
     VITE_API_HOST: 'https://api.realworld.show',
   },
-  paths: {
-    home: () => '/#/',
-    login: () => '/#/login',
-    register: () => '/#/register',
-    settings: () => '/#/settings',
-    editor: (slug?: string) => (slug ? `/#/article/${slug}/edit` : '/#/article/create'),
-    article: (slug: string) => `/#/article/${slug}`,
-    profile: (username: string) => `/#/profile/${username}`,
-    profileFavorites: (username: string) => `/#/profile/${username}/favorites`,
-    tag: (tag: string, page?: number) => {
-      const path = `/#/tag/${tag}`;
-      return page && page > 1 ? `${path}?page=${page}` : path;
-    },
-    followingFeed: () => '/#/my-feeds',
-  },
+  paths: vue3RealWorldPaths,
   getLocators: getVue3RealWorldLocators,
   getOracle: getVue3RealWorldOracle,
   bootstrapAuthenticatedSession,

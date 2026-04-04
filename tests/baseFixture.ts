@@ -46,6 +46,7 @@ export interface AccessibilitySummary {
   // Metadata linkage duplicated here for unambiguous joins if files are separated
   runId: string;
   applicationId: string;
+  browserName: string;
   scenarioId: string;
   phase: 'baseline' | 'mutated';
   stabilization: StabilizationMetadata;
@@ -54,6 +55,7 @@ export interface AccessibilitySummary {
 export interface BenchmarkResult {
   runId: string;
   applicationId: string;
+  browserName: string;
   corpusId?: string;
   scenarioId: string;
   activeScenarioId?: string;
@@ -299,6 +301,7 @@ export const test = base.extend<TestOptions & {
 
   page: async ({ page, locatorStrategy, mutation, benchmarkResult, appAdapter }, use, testInfo) => {
     const appName = appAdapter.id;
+    const browserName = (testInfo.project.use as { browserName?: string }).browserName || testInfo.project.metadata.browserName || 'chromium';
 
     const scenarioId = testInfo.titlePath.join(' > ');
     const runId = uuidv4();
@@ -309,6 +312,7 @@ export const test = base.extend<TestOptions & {
     Object.assign(benchmarkResult, {
         runId: runId,
         applicationId: appName,
+        browserName,
         corpusId: getBenchmarkCorpusId(),
         scenarioId: scenarioId,
         activeScenarioId: undefined,
@@ -338,6 +342,7 @@ export const test = base.extend<TestOptions & {
             minorCount: 0,
             runId: runId,
             applicationId: appName,
+            browserName,
             scenarioId: scenarioId,
             phase: phase,
             stabilization: {

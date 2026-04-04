@@ -7,9 +7,12 @@ import {
 import { appPaths } from './helpers/app';
 import {
   addCommentToOpenedArticle,
+  followAndUnfollowProfile,
   getActiveBenchmarkTimeoutMs,
   openFirstArticleFromFeed,
   openGlobalFeed,
+  openTaggedFeed,
+  paginateTaggedFeed,
   signInWithValidCredentials,
   updateBioFromSettings,
   visitHome,
@@ -18,6 +21,7 @@ import {
   provisionAuthenticatedUser,
   provisionAuthCredentials,
 } from './helpers/setup-infrastructure';
+import { createManyArticles } from './helpers/api';
 
 export interface ActiveScenarioFixtures {
   page: Page;
@@ -106,6 +110,24 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
     },
   },
   {
+    ...ensureScenarioEntry('navigation.pagination'),
+    async run({ page, request, locators, oracle, applyDeferredMutation }) {
+      const provisioned = await provisionAuthCredentials(request);
+      const tag = `benchmark-pagination-${Date.now()}`;
+      await createManyArticles(request, provisioned.user.token, 12, tag);
+      await openTaggedFeed(page, oracle, tag);
+      await applyDeferredMutation('navigation.pagination', 'tag-feed-before-pagination');
+      await paginateTaggedFeed(locators, oracle, 2);
+    },
+    async collect({ page, request, oracle, collectCheckpoint }) {
+      const provisioned = await provisionAuthCredentials(request);
+      const tag = `benchmark-pagination-${Date.now()}`;
+      await createManyArticles(request, provisioned.user.token, 12, tag);
+      await openTaggedFeed(page, oracle, tag);
+      await collectCheckpoint('tag-feed-before-pagination');
+    },
+  },
+  {
     ...ensureScenarioEntry('comments.add-on-article'),
     async run({ page, request, appAdapter, locators, oracle, applyDeferredMutation }) {
       await provisionAuthenticatedUser(page, request, appAdapter);
@@ -117,6 +139,24 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
       await provisionAuthenticatedUser(page, request, appAdapter);
       await openFirstArticleFromFeed(page, locators, oracle);
       await collectCheckpoint('article-detail-before-comment');
+    },
+  },
+  {
+    ...ensureScenarioEntry('social.follow-unfollow'),
+    async run({ page, request, appAdapter, locators, oracle, applyDeferredMutation }) {
+      await provisionAuthenticatedUser(page, request, appAdapter);
+      await page.goto(appPaths.profile('johndoe'), { waitUntil: 'load' });
+      await oracle.profile.page().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
+      await oracle.profile.followButton().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
+      await applyDeferredMutation('social.follow-unfollow', 'profile-before-follow-toggle');
+      await followAndUnfollowProfile(locators, oracle);
+    },
+    async collect({ page, request, appAdapter, oracle, collectCheckpoint }) {
+      await provisionAuthenticatedUser(page, request, appAdapter);
+      await page.goto(appPaths.profile('johndoe'), { waitUntil: 'load' });
+      await oracle.profile.page().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
+      await oracle.profile.followButton().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
+      await collectCheckpoint('profile-before-follow-toggle');
     },
   },
   {

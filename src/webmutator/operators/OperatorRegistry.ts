@@ -19,6 +19,7 @@ export class OperatorRegistry {
             case 'SubtreeInsert': return new dom.SubtreeInsert();
             case 'SubtreeMove': return new dom.SubtreeMove();
             case 'SubtreeSwap': return new dom.SubtreeSwap();
+            case 'ReverseChildrenOrder': return new dom.ReverseChildrenOrder();
             case 'TagMutator': return new dom.TagMutator();
             case 'ContainerNodeMutator': return new dom.ContainerNodeMutator();
             case 'ActionableNodeMutator': return new dom.ActionableNodeMutator();
@@ -32,6 +33,7 @@ export class OperatorRegistry {
             case 'ReplaceThWithTd': return new dom.ReplaceThWithTd();
             case 'DuplicateId': return new dom.DuplicateId();
             case 'SemanticToDiv': return new dom.SemanticToDiv();
+            case 'ChangeAriaLabel': return new dom.ChangeAriaLabel();
             default:
                 throw new Error(`Unknown operator type: ${type}`);
         }

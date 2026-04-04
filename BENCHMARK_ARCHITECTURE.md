@@ -28,6 +28,12 @@ The current end-to-end pipeline runs against the benchmark-active corpus `realwo
 Current active shared source intent:
 
 - `tests/realworld/health.spec.ts`
+- `tests/realworld/auth.spec.ts`
+- `tests/realworld/articles.spec.ts`
+- `tests/realworld/comments.spec.ts`
+- `tests/realworld/navigation.spec.ts`
+- `tests/realworld/settings.spec.ts`
+- `tests/realworld/social.spec.ts`
 
 Current executable entrypoint:
 
@@ -38,7 +44,7 @@ Temporary exclusions are tracked in both:
 - `src/benchmark/realworld-corpus.ts`
 - `reports/realworld-benchmark-corpus.json`
 
-This keeps the executable benchmark scope explicit while the remaining shared RealWorld specs are still migration debt.
+This keeps the executable benchmark scope explicit while preserving a methodological boundary around non-locator security checks such as `tests/realworld/xss-security.spec.ts`.
 
 ## Artifact Scoping
 
@@ -68,4 +74,4 @@ For each selected app, the current pipeline is:
 4. Re-run the benchmark-active corpus with mutations applied
 5. Aggregate benchmark-run outputs into family/app summaries
 
-The package scripts in `package.json` wire this flow for one app or all three apps.
+The package scripts in `package.json` wire this flow for one app or all three apps. Browser coverage is controlled through `PLAYWRIGHT_BROWSERS`, which defaults to `chromium,firefox,webkit`.

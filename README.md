@@ -20,9 +20,16 @@ The repository now runs an end-to-end benchmark pipeline for the current benchma
 
 - corpus id: `realworld-active`
 - executable entry spec: `tests/realworld/benchmark-active.spec.ts`
-- active source spec intent: `tests/realworld/health.spec.ts`
+- active source spec intent:
+  - `tests/realworld/health.spec.ts`
+  - `tests/realworld/auth.spec.ts`
+  - `tests/realworld/articles.spec.ts`
+  - `tests/realworld/comments.spec.ts`
+  - `tests/realworld/navigation.spec.ts`
+  - `tests/realworld/settings.spec.ts`
+  - `tests/realworld/social.spec.ts`
 
-This is an honest scope boundary. The full `tests/realworld` directory is not yet fully benchmark-active. Excluded specs are tracked in:
+This is an honest scope boundary. Security-oriented XSS coverage remains explicitly excluded on methodological grounds because it probes sanitization guarantees rather than locator robustness. Excluded specs are tracked in:
 
 - `src/benchmark/realworld-corpus.ts`
 - `reports/realworld-benchmark-corpus.json`
@@ -67,6 +74,17 @@ The benchmark keeps locator support and unsupported coverage explicit:
 
 Known unsupported family cases, such as the current Angular `semantic-first` gaps, stay visible in raw reports and aggregate outputs and are excluded from fair family-comparison denominators rather than hidden behind fallback logic.
 
+The active corpus now includes:
+
+- home load
+- sign in
+- open global feed
+- open first article from feed
+- paginate a tagged feed
+- add a comment
+- follow and unfollow a profile
+- update user bio
+
 ## Scripts
 
 Run one app:
@@ -85,6 +103,13 @@ Run all apps:
 ```bash
 npm run benchmark:baseline:all
 npm run benchmark:aggregate:all
+```
+
+Select browser coverage with `PLAYWRIGHT_BROWSERS` when needed:
+
+```bash
+PLAYWRIGHT_BROWSERS=chromium npm run benchmark:baseline:all
+PLAYWRIGHT_BROWSERS=chromium,firefox,webkit npm run benchmark:baseline:all
 ```
 
 ## Verification Artifacts

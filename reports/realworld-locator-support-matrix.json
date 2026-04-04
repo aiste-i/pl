@@ -1257,18 +1257,20 @@
     "app": "angular-realworld-example-app",
     "logicalKey": "home.paginationButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for home.paginationButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -1276,75 +1278,83 @@
     "app": "angular-realworld-example-app",
     "logicalKey": "home.paginationButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for home.paginationButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".pagination button.page-link"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "home.paginationButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for home.paginationButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//ul[contains(@class,\"pagination\")]//button[contains(@class,\"page-link\")])[1]"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "home.paginationButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for home.paginationButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('pagination-link')"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "home.paginationItem",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for home.paginationItem in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -1352,75 +1362,83 @@
     "app": "angular-realworld-example-app",
     "logicalKey": "home.paginationItem",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for home.paginationItem in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".pagination li.page-item"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "home.paginationItem",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for home.paginationItem in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//ul[contains(@class,\"pagination\")]//li[contains(@class,\"page-item\")])[1]"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "home.paginationItem",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for home.paginationItem in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('pagination-item')"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "profile.followButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for profile.followButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -1428,75 +1446,83 @@
     "app": "angular-realworld-example-app",
     "logicalKey": "profile.followButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for profile.followButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".profile-page .user-info button.btn"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "profile.followButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for profile.followButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "profile.followButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for profile.followButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('profile-follow-btn')"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "profile.unfollowButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for profile.unfollowButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -1504,58 +1530,64 @@
     "app": "angular-realworld-example-app",
     "logicalKey": "profile.unfollowButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for profile.unfollowButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".profile-page .user-info button.btn"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "profile.unfollowButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for profile.unfollowButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
   },
   {
     "app": "angular-realworld-example-app",
     "logicalKey": "profile.unfollowButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for profile.unfollowButton in angular-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('profile-follow-btn')"
   },
   {
     "app": "angular-realworld-example-app",
@@ -2965,18 +2997,20 @@
     "app": "realworld",
     "logicalKey": "home.paginationButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for home.paginationButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -2984,75 +3018,83 @@
     "app": "realworld",
     "logicalKey": "home.paginationButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for home.paginationButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".pagination a.page-link"
   },
   {
     "app": "realworld",
     "logicalKey": "home.paginationButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for home.paginationButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//ul[contains(@class,\"pagination\")]//a[contains(@class,\"page-link\")])[1]"
   },
   {
     "app": "realworld",
     "logicalKey": "home.paginationButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for home.paginationButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('pagination-link')"
   },
   {
     "app": "realworld",
     "logicalKey": "home.paginationItem",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for home.paginationItem in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -3060,75 +3102,83 @@
     "app": "realworld",
     "logicalKey": "home.paginationItem",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for home.paginationItem in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".pagination li.page-item"
   },
   {
     "app": "realworld",
     "logicalKey": "home.paginationItem",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for home.paginationItem in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//ul[contains(@class,\"pagination\")]//li[contains(@class,\"page-item\")])[1]"
   },
   {
     "app": "realworld",
     "logicalKey": "home.paginationItem",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for home.paginationItem in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('pagination-item')"
   },
   {
     "app": "realworld",
     "logicalKey": "profile.followButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for profile.followButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -3136,75 +3186,83 @@
     "app": "realworld",
     "logicalKey": "profile.followButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for profile.followButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".profile-page .user-info button.btn"
   },
   {
     "app": "realworld",
     "logicalKey": "profile.followButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for profile.followButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
   },
   {
     "app": "realworld",
     "logicalKey": "profile.followButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for profile.followButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('profile-follow-btn')"
   },
   {
     "app": "realworld",
     "logicalKey": "profile.unfollowButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for profile.unfollowButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -3212,58 +3270,64 @@
     "app": "realworld",
     "logicalKey": "profile.unfollowButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for profile.unfollowButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".profile-page .user-info button.btn"
   },
   {
     "app": "realworld",
     "logicalKey": "profile.unfollowButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for profile.unfollowButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
   },
   {
     "app": "realworld",
     "logicalKey": "profile.unfollowButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for profile.unfollowButton in realworld.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('profile-follow-btn')"
   },
   {
     "app": "realworld",
@@ -4673,18 +4737,20 @@
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.paginationButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for home.paginationButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -4692,75 +4758,83 @@
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.paginationButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for home.paginationButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".pagination a.page-link"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.paginationButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for home.paginationButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//ul[contains(@class,\"pagination\")]//a[contains(@class,\"page-link\")])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.paginationButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for home.paginationButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('pagination-link')"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.paginationItem",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for home.paginationItem in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -4768,75 +4842,83 @@
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.paginationItem",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for home.paginationItem in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".pagination li.page-item"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.paginationItem",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for home.paginationItem in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//ul[contains(@class,\"pagination\")]//li[contains(@class,\"page-item\")])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "home.paginationItem",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for home.paginationItem in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "navigation.pagination"
+    ],
     "specHints": [
       "tests/realworld/navigation.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('pagination-item')"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "profile.followButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for profile.followButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -4844,75 +4926,83 @@
     "app": "vue3-realworld-example-app",
     "logicalKey": "profile.followButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for profile.followButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".profile-page .user-info button.btn"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "profile.followButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for profile.followButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "profile.followButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for profile.followButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('profile-follow-btn')"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "profile.unfollowButton",
     "family": "semantic-first",
-    "supported": false,
-    "reason": "Missing semantic-first locator implementation for profile.unfollowButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
-    "semanticEntryPoint": null,
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
     "isException": false,
     "selector": null
   },
@@ -4920,58 +5010,64 @@
     "app": "vue3-realworld-example-app",
     "logicalKey": "profile.unfollowButton",
     "family": "css",
-    "supported": false,
-    "reason": "Missing css locator implementation for profile.unfollowButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "css",
+    "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": ".profile-page .user-info button.btn"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "profile.unfollowButton",
     "family": "xpath",
-    "supported": false,
-    "reason": "Missing xpath locator implementation for profile.unfollowButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "xpath",
+    "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
   },
   {
     "app": "vue3-realworld-example-app",
     "logicalKey": "profile.unfollowButton",
     "family": "oracle",
-    "supported": false,
-    "reason": "Missing oracle locator implementation for profile.unfollowButton in vue3-realworld-example-app.",
+    "supported": true,
+    "reason": null,
     "excludedFromAggregateComparison": false,
-    "aggregateComparisonEligible": false,
-    "activeInCorpus": false,
-    "activeScenarioIds": [],
+    "aggregateComparisonEligible": true,
+    "activeInCorpus": true,
+    "activeScenarioIds": [
+      "social.follow-unfollow"
+    ],
     "specHints": [
       "tests/realworld/social.spec.ts"
     ],
-    "sourceKind": null,
-    "purity": null,
+    "sourceKind": "oracle",
+    "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": null
+    "selector": "getByTestId('profile-follow-btn')"
   },
   {
     "app": "vue3-realworld-example-app",

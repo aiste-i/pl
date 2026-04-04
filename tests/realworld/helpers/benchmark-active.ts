@@ -37,6 +37,16 @@ export async function openGlobalFeed(page: Page, locators: any, oracle: any): Pr
   await oracle.home.firstReadMoreLink().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
 }
 
+export async function openTaggedFeed(
+  page: Page,
+  oracle: any,
+  tag: string,
+  options: { expectedPage?: number } = {},
+): Promise<void> {
+  await page.goto(appPaths.tag(tag, options.expectedPage), { waitUntil: 'load' });
+  await oracle.home.paginationButton(2).assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
+}
+
 export async function openFirstArticleFromFeed(page: Page, locators: any, oracle: any): Promise<void> {
   await openGlobalFeed(page, locators, oracle);
   await Promise.all([
@@ -86,4 +96,23 @@ export async function updateBioFromSettings(
   if (options.profileUsername) {
     await expect(page).toHaveURL(new RegExp(options.profileUsername.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
+}
+
+export async function paginateTaggedFeed(
+  locators: any,
+  oracle: any,
+  pageNumber: number,
+): Promise<void> {
+  await locators.home.paginationButton(pageNumber).click();
+  await oracle.home.paginationItem(pageNumber).assertClass(/active/, { timeout: getActiveBenchmarkTimeoutMs() });
+}
+
+export async function followAndUnfollowProfile(
+  locators: any,
+  oracle: any,
+): Promise<void> {
+  await locators.profile.followButton().click();
+  await oracle.profile.unfollowButton().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
+  await locators.profile.unfollowButton().click();
+  await oracle.profile.followButton().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
 }

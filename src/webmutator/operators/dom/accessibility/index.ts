@@ -9,3 +9,4 @@ export * from './ReplaceHeadingWithP';
 export * from './ReplaceThWithTd';
 export * from './DuplicateId';
 export * from './SemanticToDiv';
+export * from './ChangeAriaLabel';

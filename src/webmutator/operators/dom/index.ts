@@ -15,6 +15,7 @@ export * from './SubtreeDelete';
 export * from './SubtreeInsert';
 export * from './SubtreeMove';
 export * from './SubtreeSwap';
+export * from './ReverseChildrenOrder';
 export * from './TagMutator';
 export * from './ContainerNodeMutator';
 export * from './ActionableNodeMutator';
