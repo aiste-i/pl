@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npx playwright test",
+    "install:apps": "node scripts/install-app-deps.js",
     "lint": "npx ts-node --transpile-only scripts/benchmark-lint.ts",
     "typecheck": "npx tsc --noEmit",
     "validate:realworld": "cross-env PLAYWRIGHT_BROWSERS=chromium npx playwright test tests/realworld-validation",

@@ -19,6 +19,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install app dependencies
+        run: npm run install:apps
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox webkit
 
