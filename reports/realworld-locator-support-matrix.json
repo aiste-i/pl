@@ -987,7 +987,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".article-page .article-meta button"
+    "selector": ".article-page .banner button[aria-label=\"Favorite article\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1008,7 +1008,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"article-meta\")]//button)[1]"
+    "selector": "//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//button[@aria-label=\"Favorite article\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1092,7 +1092,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".//a[contains(@class,\"preview-link\")]/p[1]"
+    "selector": "(.//a[contains(@class,\"preview-link\")]//p)[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1323,7 +1323,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".pagination button.page-link"
+    "selector": ".pagination button.page-link[aria-label]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1344,7 +1344,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//ul[contains(@class,\"pagination\")]//button[contains(@class,\"page-link\")])[1]"
+    "selector": "//ul[contains(@class,\"pagination\")]//button[@aria-label=\"Go to page N\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1365,7 +1365,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('pagination-link')"
+    "selector": "getByTestId('pagination-link-${pageNumber}')"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1428,7 +1428,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//ul[contains(@class,\"pagination\")]//li[contains(@class,\"page-item\")])[1]"
+    "selector": "//ul[contains(@class,\"pagination\")]//li[contains(@class,\"page-item\") and .//button[@aria-label=\"Go to page N\"]]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1449,7 +1449,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('pagination-item')"
+    "selector": "getByTestId('pagination-item-${pageNumber}')"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1491,7 +1491,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button.btn"
+    "selector": ".profile-page .user-info button[aria-label=\"Follow user\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1512,7 +1512,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
+    "selector": "//div[contains(@class,\"user-info\")]//button[@aria-label=\"Follow user\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1575,7 +1575,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button.btn"
+    "selector": ".profile-page .user-info button[aria-label=\"Unfollow user\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1596,7 +1596,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
+    "selector": "//div[contains(@class,\"user-info\")]//button[@aria-label=\"Unfollow user\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1617,7 +1617,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('profile-follow-btn')"
+    "selector": "getByTestId('profile-unfollow-btn')"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1769,7 +1769,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('comment-card')"
+    "selector": "getByTestId('comment-card-${commentId}')"
   },
   {
     "app": "realworld",
@@ -2239,7 +2239,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".feed-toggle .nav-item:first-child > a.nav-link"
+    "selector": ".feed-toggle a.nav-link[href=\"/?tab=all\"]"
   },
   {
     "app": "realworld",
@@ -2264,7 +2264,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"feed-toggle\")]//li[contains(@class,\"nav-item\")])[1]//a[contains(@class,\"nav-link\")]"
+    "selector": "(//div[contains(@class,\"feed-toggle\")]//a[contains(@class,\"nav-link\") and @href=\"/?tab=all\"])[1]"
   },
   {
     "app": "realworld",
@@ -2759,7 +2759,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".article-page .article-meta button"
+    "selector": ".article-page button[aria-label=\"Favorite article\"]"
   },
   {
     "app": "realworld",
@@ -2780,7 +2780,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"article-meta\")]//button)[1]"
+    "selector": "//div[contains(@class,\"article-page\")]//button[@aria-label=\"Favorite article\"]"
   },
   {
     "app": "realworld",
@@ -2864,7 +2864,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".//a[contains(@class,\"preview-link\")]/p[1]"
+    "selector": "(.//a[contains(@class,\"preview-link\")]//p)[1]"
   },
   {
     "app": "realworld",
@@ -3095,7 +3095,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".pagination a.page-link"
+    "selector": ".pagination a.page-link[aria-label]"
   },
   {
     "app": "realworld",
@@ -3116,7 +3116,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//ul[contains(@class,\"pagination\")]//a[contains(@class,\"page-link\")])[1]"
+    "selector": "//ul[contains(@class,\"pagination\")]//a[@aria-label=\"Go to page N\"]"
   },
   {
     "app": "realworld",
@@ -3137,7 +3137,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('pagination-link')"
+    "selector": "getByTestId('pagination-link-${pageNumber}')"
   },
   {
     "app": "realworld",
@@ -3200,7 +3200,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//ul[contains(@class,\"pagination\")]//li[contains(@class,\"page-item\")])[1]"
+    "selector": "//ul[contains(@class,\"pagination\")]//li[contains(@class,\"page-item\") and .//a[@aria-label=\"Go to page N\"]]"
   },
   {
     "app": "realworld",
@@ -3221,7 +3221,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('pagination-item')"
+    "selector": "getByTestId('pagination-item-${pageNumber}')"
   },
   {
     "app": "realworld",
@@ -3263,7 +3263,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button.btn"
+    "selector": ".profile-page .user-info button[aria-label=\"Follow user\"]"
   },
   {
     "app": "realworld",
@@ -3284,7 +3284,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
+    "selector": "//div[contains(@class,\"user-info\")]//button[@aria-label=\"Follow user\"]"
   },
   {
     "app": "realworld",
@@ -3347,7 +3347,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button.btn"
+    "selector": ".profile-page .user-info button[aria-label=\"Unfollow user\"]"
   },
   {
     "app": "realworld",
@@ -3368,7 +3368,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
+    "selector": "//div[contains(@class,\"user-info\")]//button[@aria-label=\"Unfollow user\"]"
   },
   {
     "app": "realworld",
@@ -3389,7 +3389,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('profile-follow-btn')"
+    "selector": "getByTestId('profile-unfollow-btn')"
   },
   {
     "app": "realworld",
@@ -3541,7 +3541,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('comment-card')"
+    "selector": "getByTestId('comment-card-${commentId}')"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4531,7 +4531,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".article-meta button.btn"
+    "selector": ".banner .article-meta button[aria-label=\"Favorite article\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4552,7 +4552,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"article-meta\")]//button[contains(@class,\"btn\")])[1]"
+    "selector": "//div[contains(@class,\"banner\")]//div[contains(@class,\"article-meta\")]//button[@aria-label=\"Favorite article\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4573,7 +4573,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('article-favorite-btn')"
+    "selector": "getByTestId('article-meta-top').getByTestId('article-favorite-btn')"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4636,7 +4636,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".//a[contains(@class,\"preview-link\")]/p[1]"
+    "selector": "(.//a[contains(@class,\"preview-link\")]//p)[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4888,7 +4888,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//ul[contains(@class,\"pagination\")]//a[contains(@class,\"page-link\")])[1]"
+    "selector": "//ul[contains(@class,\"pagination\")]//a[@aria-label=\"Go to page N\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4909,7 +4909,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('pagination-link')"
+    "selector": "getByTestId('pagination-link-${pageNumber}')"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4972,7 +4972,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//ul[contains(@class,\"pagination\")]//li[contains(@class,\"page-item\")])[1]"
+    "selector": "//ul[contains(@class,\"pagination\")]//li[contains(@class,\"page-item\") and .//a[@aria-label=\"Go to page N\"]]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4993,7 +4993,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('pagination-item')"
+    "selector": "getByTestId('pagination-item-${pageNumber}')"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -5035,7 +5035,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button.btn"
+    "selector": ".profile-page .user-info button[aria-label=\"Follow user\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -5056,7 +5056,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
+    "selector": "//div[contains(@class,\"user-info\")]//button[@aria-label=\"Follow user\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -5119,7 +5119,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button.btn"
+    "selector": ".profile-page .user-info button[aria-label=\"Unfollow user\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -5140,7 +5140,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"user-info\")]//button)[1]"
+    "selector": "//div[contains(@class,\"user-info\")]//button[@aria-label=\"Unfollow user\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -5161,7 +5161,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('profile-follow-btn')"
+    "selector": "getByTestId('profile-unfollow-btn')"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -5313,6 +5313,6 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('comment-card')"
+    "selector": "getByTestId('comment-card-${commentId}')"
   }
 ]

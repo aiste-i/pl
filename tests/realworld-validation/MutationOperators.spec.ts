@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { MutationRecord } from '../../src/webmutator/MutationRecord';
 import { DomOperators } from '../../src/webmutator/operators/DomOperators';
 import { OperatorRegistry } from '../../src/webmutator/operators/OperatorRegistry';
+import { getBenchmarkOperatorCatalog, getOperatorCatalog } from '../../src/webmutator/operators/catalog';
 import { SwapAdjacentSiblings } from '../../src/webmutator/operators/dom/SwapAdjacentSiblings';
 import { ToggleCssClass } from '../../src/webmutator/operators/dom/ToggleCssClass';
 import { ToggleAriaExpanded } from '../../src/webmutator/operators/dom/accessibility/ToggleAriaExpanded';
@@ -14,6 +15,19 @@ test('dom operator list includes the expanded RealWorld benchmark stressors', as
   expect(operatorNames).toContain('ChangeAriaLabel');
   expect(operatorNames).toContain('ToggleAriaExpanded');
   expect(operatorNames).toContain('ToggleCssClass');
+});
+
+test('operator catalog makes in-scope and excluded-by-design coverage explicit', async () => {
+  const benchmarkOperators = getBenchmarkOperatorCatalog().map(entry => entry.type);
+  const fullCatalog = getOperatorCatalog();
+
+  expect(benchmarkOperators).toContain('ToggleAriaExpanded');
+  expect(benchmarkOperators).not.toContain('DistortMutator');
+  expect(benchmarkOperators).not.toContain('MaskMutator');
+
+  const excludedVisualOperators = fullCatalog.filter(entry => entry.benchmarkScope === 'excluded-by-design');
+  expect(excludedVisualOperators.map(entry => entry.type).sort()).toEqual(['DistortMutator', 'MaskMutator']);
+  expect(excludedVisualOperators.every(entry => entry.excludedReason)).toBe(true);
 });
 
 test('operator registry can recreate the expanded operator set', async () => {

@@ -1,93 +1,172 @@
 # Benchmark Architecture
 
-## Core Pieces
+## Core Modules
 
-- `src/apps/*`: app registry and per-app adapters
-- `playwright.config.ts`: resolves `APP_ID` and starts the selected benchmark subject
-- `tests/baseFixture.ts`: app-aware benchmark fixture, result writing, mutation application, accessibility scan linkage
-- `src/locators/apps/*`: per-app locator and oracle factories
-- `src/locators/realworld/*`: shared logical locator contract and coverage metadata
-- `src/benchmark/realworld-corpus.ts`: benchmark-active corpus definition
-- `tests/realworld/*`: shared RealWorld flow corpus
-- `tests/realworld/benchmark-active.spec.ts`: current executable benchmark-active corpus entrypoint
+- `src/apps/*`: app registry, route adapters, startup wiring, per-app benchmark metadata
+- `src/benchmark/realworld-corpus.ts`: thesis-active corpus definition and source-spec disposition matrix
+- `src/locators/apps/*`: per-app implementations for `semantic-first`, `css`, `xpath`, and `oracle`
+- `src/locators/realworld/*`: shared logical keys, coverage metadata, unsupported-family reporting
+- `tests/realworld/benchmark-active.scenarios.ts`: shared benchmark-active scenario definitions
+- `tests/realworld/helpers/*`: scenario support code kept constant across locator families
+- `tests/baseFixture.ts`: run harness, mutation application, oracle verification, result serialization
+- `src/webmutator/*`: mutation operators, registry, oracle-safety checks, mutation execution
+- `src/murun/runner/*`: scenario generation and aggregation
 
-## Comparison Model
+## Comparison Boundary
 
-All benchmarked locator factories implement the same logical keys across:
+The benchmark compares locator robustness at the family level:
 
 - `semantic-first`
 - `css`
 - `xpath`
 
-Oracle factories are independent and use `getByTestId(...)` only.
+The oracle layer is independent and not benchmarked. It exists only to ground postconditions and target verification.
 
-## Active Corpus Boundary
+Benchmark rules enforced by implementation and validation:
 
-The current end-to-end pipeline runs against the benchmark-active corpus `realworld-active`, not against the full `tests/realworld` directory.
+- scenario logic is shared across families
+- only locator resolution changes by family
+- `semantic-first` begins with a semantic Playwright query
+- `css` stays CSS-only
+- `xpath` stays XPath-only
+- oracle resolution uses `getByTestId()` chains only
+- unsupported or excluded cases remain visible in reports instead of being hidden by fallback logic
 
-Current active shared source intent:
+## Active Corpus
 
-- `tests/realworld/health.spec.ts`
-- `tests/realworld/auth.spec.ts`
-- `tests/realworld/articles.spec.ts`
-- `tests/realworld/comments.spec.ts`
-- `tests/realworld/navigation.spec.ts`
-- `tests/realworld/settings.spec.ts`
-- `tests/realworld/social.spec.ts`
+The executable corpus is `realworld-active`.
 
-Current executable entrypoint:
+Entrypoint:
 
-- `tests/realworld/benchmark-active.spec.ts`
+- [`tests/realworld/benchmark-active.spec.ts`](/c:/Users/aiste/Desktop/benchmark/tests/realworld/benchmark-active.spec.ts)
 
-Temporary exclusions are tracked in both:
+Scenario definitions:
 
-- `src/benchmark/realworld-corpus.ts`
-- `reports/realworld-benchmark-corpus.json`
+- [`tests/realworld/benchmark-active.scenarios.ts`](/c:/Users/aiste/Desktop/benchmark/tests/realworld/benchmark-active.scenarios.ts)
 
-This keeps the executable benchmark scope explicit while preserving a methodological boundary around non-locator security checks such as `tests/realworld/xss-security.spec.ts`.
+The corpus currently contains 12 migrated shared scenarios spanning:
 
-The current active corpus covers:
+- auth
+- articles
+- comments
+- navigation
+- settings
+- social
 
-- home load
-- sign in
-- open global feed
-- open first article from feed
-- favorite an article from detail
-- verify preview description visibility
-- paginate a tagged feed
-- delete own comment
-- add a comment
-- assert article title visibility
-- follow and unfollow a profile
-- update user bio
+Every RealWorld source spec now has an explicit disposition:
 
-## Artifact Scoping
+- `migrated`
+- `excluded-by-design`
+- `excluded-methodological`
 
-All outputs are app-scoped and corpus-scoped under `test-results/<app-id>/<corpus-id>/...` so baseline runs, target collection, scenario generation, mutated runs, and aggregation stay reproducible and isolated.
+There is no remaining temporary migration-debt state in the corpus manifest.
 
-For the current active corpus, the concrete layout is:
+Machine-readable corpus artifacts:
 
-- `test-results/<app-id>/realworld-active/benchmark-runs`
-- `test-results/<app-id>/realworld-active/accessibility-artifacts`
-- `test-results/<app-id>/realworld-active/reachable-targets.json`
-- `test-results/<app-id>/realworld-active/scenarios.json`
-- `test-results/<app-id>/realworld-active/aggregate`
+- [`reports/realworld-benchmark-corpus.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-benchmark-corpus.json)
+- [`reports/realworld-migration-matrix.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-migration-matrix.json)
 
-Aggregate outputs include excluded unsupported coverage so unsupported family/app combinations remain visible while staying out of fair family-comparison denominators.
-Semantic-first CSS-backed exceptions are reported independently in `reports/realworld-semantic-css-exceptions.json` so unsupported gaps and explicit exceptions do not get conflated.
+## Oracle Layer
+
+Oracle locators are implemented in the per-app locator modules through helper wrappers in [`src/locators/apps/shared-realworld.ts`](/c:/Users/aiste/Desktop/benchmark/src/locators/apps/shared-realworld.ts).
+
+Allowed oracle shape:
+
+- `getByTestId('...')`
+- `getByTestId('...').getByTestId('...')`
+- dynamic `getByTestId()` addressing for repeated entities such as comment cards and pagination items
+
+Disallowed oracle shape:
+
+- text filtering
+- `getByText(...)`
+- semantic fallbacks
+- CSS or XPath roots
+- generic `page.locator(...)` oracle resolution
+
+Oracle-safety is enforced in two places:
+
+- static validation of oracle source code
+- runtime mutation skipping for oracle nodes and oracle-critical ancestors
+
+## Mutation Pipeline
+
+Execution flow for one app:
+
+1. baseline run against `realworld-active`
+2. reachable-target collection
+3. deterministic mutation-scenario generation
+4. mutated re-execution
+5. aggregation into CSV and JSON summaries
+
+In-scope operators are registered through the shared catalog in [`src/webmutator/operators/catalog.ts`](/c:/Users/aiste/Desktop/benchmark/src/webmutator/operators/catalog.ts), which records:
+
+- implementation kind
+- thesis taxonomy category
+- benchmark scope
+- exclusion reason where applicable
+
+The catalog explicitly distinguishes:
+
+- in-scope DOM/accessibility operators
+- excluded-by-design visual operators
+
+## Reports And Auditability
+
+The architecture produces machine-readable artifacts for the main methodological surfaces:
+
+- corpus and source-spec disposition
+- locator support and unsupported coverage
+- semantic CSS exceptions
+- operator taxonomy and operator coverage
+- pipeline verification and workflow presence
+
+Generated report entrypoints:
+
+- [`scripts/generate-realworld-corpus-report.ts`](/c:/Users/aiste/Desktop/benchmark/scripts/generate-realworld-corpus-report.ts)
+- [`scripts/generate-operator-reports.ts`](/c:/Users/aiste/Desktop/benchmark/scripts/generate-operator-reports.ts)
+- [`scripts/generate-pipeline-verification.ts`](/c:/Users/aiste/Desktop/benchmark/scripts/generate-pipeline-verification.ts)
+
+## Execution Environments
+
+Primary thesis environment:
+
+- Chromium on Linux
+
+Supplementary engineering evidence:
+
+- Firefox smoke coverage
+- WebKit smoke coverage
+
+The architecture keeps that distinction explicit in scripts, CI, and generated reports so cross-browser evidence strengthens reproducibility without silently changing the thesis claim boundary.
+
+## CI Design
+
+PR workflow:
+
+- install dependencies
+- install Chromium
+- run lint
+- run typecheck
+- run methodological validation specs
+- run Chromium baseline corpus
+- run report freshness check
+
+Scheduled workflow:
+
+- install Chromium, Firefox, and WebKit
+- rerun validation specs
+- execute cross-browser baseline smoke
+- prepare one deterministic mutation sample per app
+- execute Chromium mutation sample
+- aggregate outputs and upload artifacts
 
 ## Compatibility Rule
 
-The benchmark treats the RealWorld apps as benchmark subjects. Application edits are restricted to cross-app parity and benchmark-enabling affordances, plus oracle hooks such as `data-testid`, rather than mutation-specific tuning.
+The RealWorld applications are benchmark subjects, not benchmark implementations. App-side edits are limited to:
 
-## Execution Flow
+- cross-app parity fixes needed for comparable flows
+- stable `data-testid` hooks required for pure oracle grounding
+- benchmark-neutral UI affordances that preserve the intended user task
 
-For each selected app, the current pipeline is:
-
-1. Run baseline against `tests/realworld/benchmark-active.spec.ts`
-2. Collect reachable targets into the app+corpus scoped registry
-3. Generate mutation scenarios from those targets
-4. Re-run the benchmark-active corpus with mutations applied
-5. Aggregate benchmark-run outputs into family/app summaries
-
-The package scripts in `package.json` wire this flow for one app or all three apps. Browser coverage is controlled through `PLAYWRIGHT_BROWSERS`, which defaults to `chromium,firefox,webkit`.
+The system does not optimize for green runs by weakening locator-family purity, oracle purity, or mutation interpretability.

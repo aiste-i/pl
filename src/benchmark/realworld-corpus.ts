@@ -3,8 +3,13 @@ import type { RealWorldLogicalKey } from '../locators';
 
 export type RealWorldCorpusStatus =
   | 'active'
-  | 'excluded-temporary-migration-debt'
-  | 'excluded-unsupported-coverage'
+  | 'excluded-by-design'
+  | 'excluded-unsupported-comparability'
+  | 'excluded-methodological';
+
+export type RealWorldSourceSpecStatus =
+  | 'migrated'
+  | 'excluded-by-design'
   | 'excluded-methodological';
 
 export type RealWorldScenarioCategory =
@@ -26,12 +31,21 @@ export interface RealWorldScenarioEntry {
   aggregateComparisonEligible: boolean;
 }
 
+export interface RealWorldSourceSpecDisposition {
+  sourceSpec: string;
+  status: RealWorldSourceSpecStatus;
+  rationale: string;
+  activeScenarioIds: string[];
+  excludedCoverage: string[];
+}
+
 export interface RealWorldCorpusManifest {
   corpusId: string;
   displayName: string;
   entrySpec: string;
   validationFiles: string[];
   scenarios: RealWorldScenarioEntry[];
+  sourceSpecs: RealWorldSourceSpecDisposition[];
 }
 
 export const REALWORLD_ACTIVE_CORPUS_ID = 'realworld-active';
@@ -203,6 +217,120 @@ export const REALWORLD_CORPUS_MANIFEST: RealWorldCorpusManifest = {
       aggregateComparisonEligible: false,
     },
   ],
+  sourceSpecs: [
+    {
+      sourceSpec: 'tests/realworld/health.spec.ts',
+      status: 'migrated',
+      rationale: 'The home-load baseline is fully migrated into the shared benchmark fixture and remains benchmark-active.',
+      activeScenarioIds: ['health.home-load'],
+      excludedCoverage: [],
+    },
+    {
+      sourceSpec: 'tests/realworld/auth.spec.ts',
+      status: 'migrated',
+      rationale: 'The thesis-active auth benchmark retains the comparable sign-in task and excludes broader auth-state correctness checks that would compare session policy rather than locator robustness under UI change.',
+      activeScenarioIds: ['auth.sign-in-valid'],
+      excludedCoverage: [
+        'registration and logout product flows',
+        'invalid-credential and wrong-password error semantics',
+        'session persistence and invalid-token recovery checks',
+      ],
+    },
+    {
+      sourceSpec: 'tests/realworld/articles.spec.ts',
+      status: 'migrated',
+      rationale: 'Comparable article-read and single-control state-change flows were migrated into the shared corpus; authoring and ownership workflows remain outside the thesis-active corpus because they compose many benchmarkable controls into one product-journey outcome.',
+      activeScenarioIds: [
+        'article.open-from-feed',
+        'article.favorite-from-detail',
+        'article.preview-description-visibility',
+        'article.assert-title',
+      ],
+      excludedCoverage: [
+        'create/edit/delete authoring workflows',
+        'multi-field editor-tag manipulation',
+        'authorization/ownership-only feature gating',
+      ],
+    },
+    {
+      sourceSpec: 'tests/realworld/comments.spec.ts',
+      status: 'migrated',
+      rationale: 'The shared corpus retains the comparable add-comment and delete-own-comment tasks and excludes broader correctness/edge-case checks that do not add distinct locator-family evidence.',
+      activeScenarioIds: ['comments.add-on-article', 'comments.delete-own'],
+      excludedCoverage: [
+        'long-comment rendering and persistence checks',
+        'login-gating correctness',
+        'multiple-comment list presentation checks',
+      ],
+    },
+    {
+      sourceSpec: 'tests/realworld/navigation.spec.ts',
+      status: 'migrated',
+      rationale: 'The shared corpus keeps the directly comparable global-feed and pagination tasks; broader route-walk and tag-surface checks are excluded because they are application-navigation correctness checks or depend on backend-specific feed/sidebar behavior.',
+      activeScenarioIds: ['feed.open-global-feed', 'navigation.pagination'],
+      excludedCoverage: [
+        'generic navbar route walking',
+        'popular-tag surfacing and tag-filter correctness',
+        'profile article-count presentation',
+      ],
+    },
+    {
+      sourceSpec: 'tests/realworld/settings.spec.ts',
+      status: 'migrated',
+      rationale: 'The active corpus benchmarks one controlled profile-update task and excludes orthogonal field-persistence variants whose value is product-correctness coverage rather than additional locator-family evidence.',
+      activeScenarioIds: ['settings.update-bio'],
+      excludedCoverage: [
+        'image-only and multi-field update permutations',
+        'navbar/profile persistence follow-up checks',
+      ],
+    },
+    {
+      sourceSpec: 'tests/realworld/social.spec.ts',
+      status: 'migrated',
+      rationale: 'The thesis-active corpus retains the comparable follow-toggle task while excluding broader profile/feed visibility assertions that primarily measure backend content state rather than a controlled locator-family interaction.',
+      activeScenarioIds: ['social.follow-unfollow'],
+      excludedCoverage: [
+        'own-profile and other-profile display checks',
+        'favorited-feed and followed-feed content assertions',
+        'profile article listing correctness',
+      ],
+    },
+    {
+      sourceSpec: 'tests/realworld/error-handling.spec.ts',
+      status: 'excluded-by-design',
+      rationale: 'This spec focuses on API error handling and resilience semantics rather than controlled locator-family robustness under non-breaking UI change.',
+      activeScenarioIds: [],
+      excludedCoverage: ['error-surface behavior and failure recovery'],
+    },
+    {
+      sourceSpec: 'tests/realworld/null-fields.spec.ts',
+      status: 'excluded-by-design',
+      rationale: 'Null-field normalization is backend/data-contract coverage rather than a locator robustness comparison task.',
+      activeScenarioIds: [],
+      excludedCoverage: ['nullable field rendering and persistence semantics'],
+    },
+    {
+      sourceSpec: 'tests/realworld/url-navigation.spec.ts',
+      status: 'excluded-by-design',
+      rationale: 'URL-shape and deep-link routing checks validate navigation correctness, not locator-family robustness under injected UI change.',
+      activeScenarioIds: [],
+      excludedCoverage: ['deep-link and route-shape correctness'],
+    },
+    {
+      sourceSpec: 'tests/realworld/user-fetch-errors.spec.ts',
+      status: 'excluded-by-design',
+      rationale: 'User-fetch failure handling probes infrastructure and resilience semantics, not the controlled UI-mutation question of the thesis benchmark.',
+      activeScenarioIds: [],
+      excludedCoverage: ['backend unavailability and auth-fetch recovery'],
+    },
+    {
+      sourceSpec: 'tests/realworld/xss-security.spec.ts',
+      status: 'excluded-methodological',
+      rationale: 'Security and sanitization checks remain intentionally outside the thesis-active corpus because they address application security guarantees rather than locator robustness.',
+      activeScenarioIds: [],
+      excludedCoverage: ['XSS and sanitization coverage'],
+    },
+  ],
 };
 
 export function getBenchmarkCorpusId(): string | undefined {
@@ -219,6 +347,10 @@ export function getActiveScenarioEntries(): RealWorldScenarioEntry[] {
 
 export function getExcludedScenarioEntries(): RealWorldScenarioEntry[] {
   return REALWORLD_CORPUS_MANIFEST.scenarios.filter(entry => entry.status !== 'active');
+}
+
+export function getSourceSpecDispositions(): RealWorldSourceSpecDisposition[] {
+  return REALWORLD_CORPUS_MANIFEST.sourceSpecs;
 }
 
 export function getActiveScenarioIds(): string[] {

@@ -119,6 +119,27 @@ test('semantic-first entries only use page.locator when they are explicit css-ba
   }
 });
 
+test('semantic-first locator modules do not use role locators filtered by text descendants when a direct accessible-name query should be used', async () => {
+  const appModules = [
+    'src/locators/apps/angular-realworld.locators.ts',
+    'src/locators/apps/react-realworld.locators.ts',
+    'src/locators/apps/vue3-realworld.locators.ts',
+  ];
+  const bannedPatterns = [
+    ".getByRole('link')\r\n                .filter({ has: page.getByText(",
+    ".getByRole('link')\n                .filter({ has: page.getByText(",
+    ".getByRole('button')\r\n                .filter({ has: page.getByText(",
+    ".getByRole('button')\n                .filter({ has: page.getByText(",
+  ];
+
+  for (const relativePath of appModules) {
+    const contents = fs.readFileSync(path.join(process.cwd(), relativePath), 'utf8');
+    for (const pattern of bannedPatterns) {
+      expect(contents.includes(pattern), `${relativePath} should prefer direct role+name queries over ${pattern}`).toBe(false);
+    }
+  }
+});
+
 test('active benchmark scenario files stay on the logical locator interface for benchmark interactions', async () => {
   const files = [
     'tests/realworld/benchmark-active.scenarios.ts',

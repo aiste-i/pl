@@ -170,9 +170,9 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
       const commentText = `Benchmark delete comment ${Date.now()}`;
       await openArticleBySlug(page, oracle, article.slug);
       const initialCommentCount = await getStableCommentCount(oracle);
-      await addCommentToOpenedArticle(locators, oracle, commentText);
+      const commentId = await addCommentToOpenedArticle(locators, oracle, commentText);
       await applyDeferredMutation('comments.delete-own', 'article-detail-before-comment-delete');
-      await deleteOwnCommentFromOpenedArticle(locators, oracle, initialCommentCount);
+      await deleteOwnCommentFromOpenedArticle(locators, oracle, commentId, initialCommentCount);
     },
     async collect({ page, request, appAdapter, locators, oracle, collectCheckpoint }) {
       await provisionAuthenticatedUser(page, request, appAdapter);

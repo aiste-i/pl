@@ -3,6 +3,7 @@ import path from 'path';
 import { test, expect } from '@playwright/test';
 import {
   getActiveScenarioEntries,
+  getSourceSpecDispositions,
   REALWORLD_CORPUS_MANIFEST,
 } from '../../src/benchmark/realworld-corpus';
 
@@ -22,6 +23,19 @@ test('benchmark-active corpus exposes a scenario-level manifest with active scen
     expect(scenario.status).toBe('active');
     expect(scenario.logicalKeys.length).toBeGreaterThan(0);
   }
+});
+
+test('source-spec corpus dispositions are explicit and contain no temporary migration-debt state', async () => {
+  const sourceSpecs = getSourceSpecDispositions();
+  expect(sourceSpecs.length).toBeGreaterThan(0);
+
+  for (const sourceSpec of sourceSpecs) {
+    expect(['migrated', 'excluded-by-design', 'excluded-methodological']).toContain(sourceSpec.status);
+    expect(sourceSpec.rationale.length).toBeGreaterThan(0);
+  }
+
+  const migratedSourceSpecs = sourceSpecs.filter(sourceSpec => sourceSpec.status === 'migrated');
+  expect(migratedSourceSpecs.every(sourceSpec => sourceSpec.activeScenarioIds.length > 0)).toBe(true);
 });
 
 test('active corpus benchmark files are benchmark-fixture-driven and free of selector bypasses', async () => {

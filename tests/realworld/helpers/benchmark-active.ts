@@ -6,6 +6,21 @@ export function getActiveBenchmarkTimeoutMs(): number {
   return process.env.APP_ID === 'vue3-realworld-example-app' ? 30000 : 10000;
 }
 
+export async function getStableCommentIds(oracle: any): Promise<number[]> {
+  const ids = await oracle.comments.cards().raw.evaluateAll(cards =>
+    cards
+      .map(card => {
+        const nested = card.querySelector('[data-testid^="comment-card-"]');
+        const value = nested?.getAttribute('data-testid') ?? null;
+        const match = value ? /^comment-card-(\d+)$/.exec(value) : null;
+        return match ? Number(match[1]) : null;
+      })
+      .filter((id): id is number => typeof id === 'number'),
+  );
+
+  return ids.sort((left, right) => left - right);
+}
+
 export async function visitHome(page: Page, oracle: any): Promise<void> {
   await page.goto(appPaths.home(), { waitUntil: 'load' });
   await oracle.nav.brandLink().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
@@ -137,28 +152,48 @@ export async function addCommentToOpenedArticle(
   locators: any,
   oracle: any,
   commentText: string,
-): Promise<void> {
-  const initialCommentCount = await getStableCommentCount(oracle);
+): Promise<number> {
+  const initialCommentIds = await getStableCommentIds(oracle);
   await locators.comments.textarea().fill(commentText);
   await locators.comments.submitButton().click();
-  await expect
-    .poll(() => oracle.comments.cards().raw.count(), {
-      timeout: getActiveBenchmarkTimeoutMs(),
-    })
-    .toBeGreaterThan(initialCommentCount);
+
+  const deadline = Date.now() + getActiveBenchmarkTimeoutMs();
+  let createdCommentId: number | null = null;
+  while (Date.now() < deadline) {
+    const currentIds = await getStableCommentIds(oracle);
+    createdCommentId = currentIds.find(id => !initialCommentIds.includes(id)) ?? null;
+    if (createdCommentId !== null) {
+      break;
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  expect(createdCommentId, 'Expected the UI to render a new comment card id after posting').not.toBeNull();
+
+  await oracle.comments.cardById(createdCommentId!).assertVisible({
+    timeout: getActiveBenchmarkTimeoutMs(),
+  });
+
+  return createdCommentId!;
 }
 
 export async function deleteOwnCommentFromOpenedArticle(
   locators: any,
   oracle: any,
+  commentId: number,
   expectedCommentCountAfterDelete: number,
 ): Promise<void> {
   const commentCards = oracle.comments.cards();
-  const commentCard = commentCards.raw.first();
+  const commentCard = oracle.comments.cardById(commentId);
   await locators.comments.deleteButton(commentCard).click();
   await commentCards.assertCount(expectedCommentCountAfterDelete, {
     timeout: getActiveBenchmarkTimeoutMs(),
   });
+  await expect
+    .poll(() => oracle.comments.cardById(commentId).raw.count(), {
+      timeout: getActiveBenchmarkTimeoutMs(),
+    })
+    .toBe(0);
 }
 
 export async function updateBioFromSettings(

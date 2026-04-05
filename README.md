@@ -1,66 +1,168 @@
 # Playwright RealWorld Mutation Benchmark
 
-This repository benchmarks Playwright locator-family robustness across three RealWorld applications:
+This repository implements a controlled Playwright benchmark of locator-family robustness under non-breaking UI change across three RealWorld applications:
 
 - `angular-realworld-example-app`
 - `realworld`
 - `vue3-realworld-example-app`
 
-The benchmark comparison model is fixed to:
+The benchmark comparison boundary is fixed to exactly three locator families:
 
 - `semantic-first`
 - `css`
 - `xpath`
 
-Oracle locators stay separate and use `data-testid` only.
+Oracle locators are not part of that comparison. They are a separate ground-truth layer that resolves through `getByTestId()` chains only.
 
-Semantic-first exceptions that require a CSS-backed locator are tracked separately in:
+## Benchmark Scope
 
-- `reports/realworld-semantic-css-exceptions.json`
+The executable thesis-active corpus is `realworld-active`, driven through [`tests/realworld/benchmark-active.spec.ts`](/c:/Users/aiste/Desktop/benchmark/tests/realworld/benchmark-active.spec.ts).
 
-## Current Executable Scope
+It currently contains 12 migrated shared scenarios:
 
-The repository now runs an end-to-end benchmark pipeline for the current benchmark-active shared corpus:
+- `health.home-load`
+- `auth.sign-in-valid`
+- `feed.open-global-feed`
+- `article.open-from-feed`
+- `article.favorite-from-detail`
+- `article.preview-description-visibility`
+- `navigation.pagination`
+- `comments.add-on-article`
+- `comments.delete-own`
+- `article.assert-title`
+- `social.follow-unfollow`
+- `settings.update-bio`
 
-- corpus id: `realworld-active`
-- executable entry spec: `tests/realworld/benchmark-active.spec.ts`
-- active source spec intent:
-  - `tests/realworld/health.spec.ts`
-  - `tests/realworld/auth.spec.ts`
-  - `tests/realworld/articles.spec.ts`
-  - `tests/realworld/comments.spec.ts`
-  - `tests/realworld/navigation.spec.ts`
-  - `tests/realworld/settings.spec.ts`
-  - `tests/realworld/social.spec.ts`
+Migration debt is no longer tracked as a temporary state. Every RealWorld source spec is now classified as either:
 
-This is an honest scope boundary. Security-oriented XSS coverage remains explicitly excluded on methodological grounds because it probes sanitization guarantees rather than locator robustness. Excluded specs are tracked in:
+- migrated into the benchmark-active corpus
+- excluded by design
+- excluded on methodological grounds
 
-- `src/benchmark/realworld-corpus.ts`
-- `reports/realworld-benchmark-corpus.json`
+The current source-spec matrix is published in:
 
-## App Selection
+- [`reports/realworld-benchmark-corpus.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-benchmark-corpus.json)
+- [`reports/realworld-migration-matrix.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-migration-matrix.json)
 
-Select the benchmark subject with `APP_ID`.
+Remaining explicit exclusions are:
 
-Examples:
+- `tests/realworld/error-handling.spec.ts`
+- `tests/realworld/null-fields.spec.ts`
+- `tests/realworld/url-navigation.spec.ts`
+- `tests/realworld/user-fetch-errors.spec.ts`
+- `tests/realworld/xss-security.spec.ts`
+
+The XSS/security spec remains excluded by methodology because it measures sanitization guarantees rather than locator robustness.
+
+## Locator And Oracle Rules
+
+- Scenario logic stays constant across `semantic-first`, `css`, and `xpath`; only locator resolution changes.
+- `semantic-first` starts with Playwright semantic queries such as `getByRole(...)`, `getByLabel(...)`, `getByText(...)`, `getByPlaceholder(...)`, `getByAltText(...)`, or `getByTitle(...)`.
+- `css` uses CSS only.
+- `xpath` uses XPath only.
+- No benchmarked locator uses cross-family fallback.
+- Oracle locators use chained `getByTestId()` only.
+- Oracle-critical nodes and ancestors are protected from mutation.
+
+Oracle purity migration details are documented in:
+
+- [`ORACLE_PURITY_MIGRATION.md`](/c:/Users/aiste/Desktop/benchmark/ORACLE_PURITY_MIGRATION.md)
+
+Semantic-first exceptions remain explicit and separately reportable in:
+
+- [`reports/realworld-semantic-css-exceptions.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-semantic-css-exceptions.json)
+
+## Mutation Scope
+
+In-scope mutation operators are categorized into the thesis taxonomy:
+
+- structural
+- content
+- accessibility-semantic
+- visibility-interaction-state
+
+Visual-only operators are not left in an ambiguous half-integrated state. They are present in the catalog and explicitly marked `excluded-by-design`.
+
+Machine-readable mutation artifacts:
+
+- [`reports/realworld-operator-taxonomy.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-operator-taxonomy.json)
+- [`reports/realworld-operator-coverage.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-operator-coverage.json)
+
+## Execution Environments
+
+Primary benchmark environment:
+
+- Chromium on Linux
+
+Supplementary smoke and regression evidence:
+
+- Firefox
+- WebKit
+
+This distinction is deliberate. Firefox and WebKit coverage strengthens engineering confidence and reproducibility, but it does not silently redefine the thesis dataset.
+
+Environment and workflow proof is published in:
+
+- [`reports/realworld-pipeline-verification.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-pipeline-verification.json)
+
+## Key Scripts
+
+Validation:
 
 ```bash
-cross-env APP_ID=angular-realworld-example-app npx playwright test tests/realworld/benchmark-active.spec.ts
-cross-env APP_ID=realworld npx playwright test tests/realworld/benchmark-active.spec.ts
-cross-env APP_ID=vue3-realworld-example-app npx playwright test tests/realworld/benchmark-active.spec.ts
+npm run lint
+npm run typecheck
+npm run validate:realworld
+npm run reports:generate
 ```
 
-The app registry under `src/apps/*` defines:
+Primary Chromium baseline:
 
-- startup command
-- base URL / health URL
-- result-path scoping
-- route/path helpers for shared RealWorld tests
-- per-app locator and oracle factories
+```bash
+PLAYWRIGHT_BROWSERS=chromium npm run benchmark:baseline:all
+```
+
+Cross-browser smoke:
+
+```bash
+npm run benchmark:baseline:smoke:all
+```
+
+Prepare one app for mutation sampling:
+
+```bash
+npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=1 --seed=12345
+```
+
+Run a Chromium mutation sample across all three apps:
+
+```bash
+npm run benchmark:mutate:sample:all
+```
+
+Aggregate benchmark outputs:
+
+```bash
+npm run benchmark:aggregate:all
+```
+
+Regenerate machine-readable reports:
+
+```bash
+npm run reports:generate
+```
+
+Check report freshness on a clean tree:
+
+```bash
+npm run reports:check
+```
+
+`reports:check` is designed for CI or a clean local worktree. It regenerates report artifacts and fails if the committed contents under `reports/` drift from generated outputs.
 
 ## Result Layout
 
-Artifacts are separated by app and corpus:
+Artifacts are app-scoped and corpus-scoped:
 
 - `test-results/<app-id>/realworld-active/benchmark-runs`
 - `test-results/<app-id>/realworld-active/accessibility-artifacts`
@@ -68,75 +170,26 @@ Artifacts are separated by app and corpus:
 - `test-results/<app-id>/realworld-active/scenarios.json`
 - `test-results/<app-id>/realworld-active/aggregate`
 
-## Coverage And Exclusions
+Aggregate outputs preserve:
 
-The benchmark keeps locator support and unsupported coverage explicit:
+- run-level comparison eligibility
+- unsupported family exclusions
+- accessibility scan status
+- operator telemetry
 
-- `reports/realworld-locator-support-matrix.json`
-- `reports/realworld-locator-unsupported.json`
-- `reports/realworld-pipeline-verification.json`
+## CI
 
-Known unsupported family cases, such as the current Angular `semantic-first` gaps, stay visible in raw reports and aggregate outputs and are excluded from fair family-comparison denominators rather than hidden behind fallback logic.
+The repository ships two workflow layers:
 
-The active corpus now includes:
+- PR validation in [`/.github/workflows/pr-realworld.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/pr-realworld.yml)
+- scheduled smoke and mutation sampling in [`/.github/workflows/scheduled-realworld.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/scheduled-realworld.yml)
 
-- home load
-- sign in
-- open global feed
-- open first article from feed
-- favorite an article from detail
-- verify preview description visibility
-- paginate a tagged feed
-- delete own comment
-- add a comment
-- assert article title visibility
-- follow and unfollow a profile
-- update user bio
+PR validation enforces linting, typechecking, methodological validation specs, Chromium baseline coverage, and report freshness. Scheduled smoke adds Firefox/WebKit baseline coverage plus a limited Chromium mutation sample and aggregate outputs.
 
-## Scripts
+## Additional Docs
 
-Run one app:
-
-```bash
-npm run benchmark:baseline:app --appid=angular-realworld-example-app
-npm run benchmark:collect:app --appid=realworld
-npm run benchmark:generate:app --appid=vue3-realworld-example-app --budget=3 --seed=12345
-npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=3 --seed=12345
-npm run benchmark:mutate:app --appid=realworld --limit=1
-npm run benchmark:aggregate:app --appid=vue3-realworld-example-app
-```
-
-Run all apps:
-
-```bash
-npm run benchmark:baseline:all
-npm run benchmark:aggregate:all
-```
-
-Select browser coverage with `PLAYWRIGHT_BROWSERS` when needed:
-
-```bash
-PLAYWRIGHT_BROWSERS=chromium npm run benchmark:baseline:all
-PLAYWRIGHT_BROWSERS=chromium,firefox,webkit npm run benchmark:baseline:all
-```
-
-## Verification Artifacts
-
-Machine-readable proof of the currently working pipeline lives in:
-
-- `reports/realworld-benchmark-corpus.json`
-- `reports/realworld-pipeline-verification.json`
-
-These reports document:
-
-- active corpus membership
-- excluded RealWorld specs and why they are excluded
-- app-by-app baseline / collect / generate / mutate / aggregate status
-- artifact locations
-- known unsupported and excluded comparison cases
-
-## Notes
-
-- Application-source edits are limited to benchmark-enabling parity work and oracle hooks, not benchmark-specific mutations.
-- Route differences are handled in the benchmark adapter layer, not by rewriting app behavior.
-- The legacy TodoMVC pilot wiring remains available only as a compatibility adapter and is no longer the main RealWorld execution path.
+- [`BENCHMARK_ARCHITECTURE.md`](/c:/Users/aiste/Desktop/benchmark/BENCHMARK_ARCHITECTURE.md)
+- [`AGGREGATION_PIPELINE.md`](/c:/Users/aiste/Desktop/benchmark/AGGREGATION_PIPELINE.md)
+- [`docs/MUTATION_OPERATORS.md`](/c:/Users/aiste/Desktop/benchmark/docs/MUTATION_OPERATORS.md)
+- [`reports/realworld-locator-audit.md`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-locator-audit.md)
+- [`THESIS_ALIGNMENT_NOTES.md`](/c:/Users/aiste/Desktop/benchmark/THESIS_ALIGNMENT_NOTES.md)

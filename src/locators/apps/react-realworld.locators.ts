@@ -5,6 +5,8 @@ import {
   css,
   markSemantic,
   oracle,
+  oracleDynamicTestId,
+  oracleTestIdChain,
   oracleTestId,
   semanticCssException,
   semanticNative,
@@ -104,14 +106,7 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
       firstReadMoreLink: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('home.firstReadMoreLink'), semanticEntryPoint: 'getByRole' },
-          (page: Page) =>
-            markSemantic(
-              page
-                .getByRole('link')
-                .filter({ has: page.getByText(/read more/i) })
-                .first(),
-              'getByRole',
-            ),
+          (page: Page) => markSemantic(page.getByRole('link', { name: /read more/i }).first(), 'getByRole'),
         ),
         css: css({ ...meta('home.firstReadMoreLink'), selector: '.article-preview:first-of-type a.preview-link' }),
         xpath: xpath({ ...meta('home.firstReadMoreLink'), selector: '(//div[contains(@class,"article-preview")])[1]//a[contains(@class,"preview-link")]' }),
@@ -345,17 +340,19 @@ export function getReactRealWorldOracle() {
         { ...meta('comments.cards'), selector: "getByTestId('comment-card')" },
         (page: Page) => page.getByTestId('comment-card'),
       ),
-      cardById: oracle(
-        { ...meta('comments.cardById'), selector: "getByTestId('comment-card-${commentId}')" },
-        (page: Page, commentId: number) => page.getByTestId(`comment-card-${commentId}`),
+      cardById: oracleDynamicTestId(
+        meta('comments.cardById'),
+        'comment-card-${commentId}',
+        (commentId: number) => `comment-card-${commentId}`,
       ),
-      card: oracle(
-        { ...meta('comments.card'), selector: "getByTestId('comment-card')" },
-        (page: Page, text: string) => page.getByTestId('comment-card').filter({ hasText: text }).first(),
+      card: oracleDynamicTestId(
+        meta('comments.card'),
+        'comment-card-${commentId}',
+        (commentId: number) => `comment-card-${commentId}`,
       ),
-      deleteButton: oracle(
-        { ...meta('comments.deleteButton'), selector: "getByTestId('comment-delete-button')" },
-        (commentRoot: Locator) => commentRoot.getByTestId('comment-delete-button').first(),
+      deleteButton: oracleTestIdChain(
+        meta('comments.deleteButton'),
+        ['comment-delete-button'],
       ),
     },
     profile: {

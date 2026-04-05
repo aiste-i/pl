@@ -19,6 +19,11 @@ export interface MutationCandidateMetadata {
     selectionSeed?: number;
     aggregateComparisonEligible?: boolean;
     comparisonExclusionReason?: string | null;
+    operatorCandidateCount?: number;
+    operatorApplicableCount?: number;
+    operatorSkippedOracleCount?: number;
+    operatorNotApplicableCount?: number;
+    operatorTotalCheckDurationMs?: number;
 }
 
 export class MutationCandidate {
@@ -44,6 +49,11 @@ export class MutationCandidate {
     selectionSeed?: number;
     aggregateComparisonEligible?: boolean;
     comparisonExclusionReason?: string | null;
+    operatorCandidateCount?: number;
+    operatorApplicableCount?: number;
+    operatorSkippedOracleCount?: number;
+    operatorNotApplicableCount?: number;
+    operatorTotalCheckDurationMs?: number;
 
     constructor(selector: string, operator: DomOperator, url?: string, fingerprint?: any, metadata: MutationCandidateMetadata = {}) {
         this.selector = selector;
@@ -79,6 +89,11 @@ export class MutationCandidate {
             selectionSeed: this.selectionSeed ?? null,
             aggregateComparisonEligible: this.aggregateComparisonEligible ?? true,
             comparisonExclusionReason: this.comparisonExclusionReason ?? null,
+            operatorCandidateCount: this.operatorCandidateCount ?? null,
+            operatorApplicableCount: this.operatorApplicableCount ?? null,
+            operatorSkippedOracleCount: this.operatorSkippedOracleCount ?? null,
+            operatorNotApplicableCount: this.operatorNotApplicableCount ?? null,
+            operatorTotalCheckDurationMs: this.operatorTotalCheckDurationMs ?? null,
             record: this.record
         };
     }

@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { getOperatorCatalog } from '../../webmutator/operators/catalog';
 
 interface AggregatedRun {
     runId: string;
@@ -26,6 +27,16 @@ interface AggregatedRun {
     totalViolations: number;
     criticalViolations: number;
     impactedNodes: number;
+    mutationTelemetry?: {
+        operatorCandidateCount: number | null;
+        operatorApplicableCount: number | null;
+        operatorSkippedOracleCount: number | null;
+        operatorNotApplicableCount: number | null;
+        operatorCheckDurationMs: number | null;
+        applyDurationMs: number | null;
+        applyFailureCount: number;
+        finalMutationOutcomeClass: string | null;
+    };
 }
 
 interface UnsupportedRow {
@@ -41,42 +52,9 @@ interface UnsupportedRow {
     specHints: string[];
 }
 
-const CATEGORY_MAPPING: Record<string, string> = {
-    'SubtreeDelete': 'structural',
-    'SubtreeInsert': 'structural',
-    'SubtreeMove': 'structural',
-    'SubtreeSwap': 'structural',
-    'ReverseChildrenOrder': 'structural',
-    'SwapAdjacentSiblings': 'structural',
-    'TagMutator': 'structural',
-    'ContainerNodeMutator': 'structural',
-    'AttributeAdd': 'structural',
-    'AttributeDelete': 'structural',
-    'AttributeReplace': 'structural',
-    'AttributeMutator': 'structural',
-    'SemanticToDiv': 'accessibility-semantic',
-    'ReplaceImageWithDiv': 'accessibility-semantic',
-    'ReplaceAnchorWithSpan': 'accessibility-semantic',
-    'ReplaceHeadingWithP': 'accessibility-semantic',
-    'ReplaceThWithTd': 'accessibility-semantic',
-    'TextDelete': 'content',
-    'TextInsert': 'content',
-    'TextNodeMutator': 'content',
-    'TextReplace': 'content',
-    'ChangeImageAlt': 'accessibility-semantic',
-    'RemoveImageAlt': 'accessibility-semantic',
-    'ChangeButtonLabel': 'accessibility-semantic',
-    'ActionableNodeMutator': 'accessibility-semantic',
-    'DuplicateId': 'accessibility-semantic',
-    'ChangeAriaLabel': 'accessibility-semantic',
-    'ToggleAriaExpanded': 'accessibility-semantic',
-    'RemoveInputNames': 'accessibility-semantic',
-    'StyleVisibility': 'visibility',
-    'StylePosition': 'visibility',
-    'StyleSize': 'visibility',
-    'StyleColor': 'visibility',
-    'ToggleCssClass': 'visibility'
-};
+const CATEGORY_MAPPING: Record<string, string> = Object.fromEntries(
+    getOperatorCatalog().map(entry => [entry.type, entry.thesisCategory === 'visibility-interaction-state' ? 'visibility-interaction-state' : entry.thesisCategory]),
+);
 
 function getCategory(operator: string, existingCategory?: string): string {
     if (existingCategory) return existingCategory;
@@ -139,6 +117,7 @@ function loadResults(inputDir: string): AggregatedRun[] {
                 totalViolations: content.accessibility?.totalViolations || 0,
                 criticalViolations: content.accessibility?.criticalCount || 0,
                 impactedNodes: content.accessibility?.impactedNodeCount || 0,
+                mutationTelemetry: content.mutationTelemetry || undefined,
             });
         } catch (e) {
             console.error(`Failed to parse ${file}:`, e);
@@ -341,8 +320,8 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     writeCsv(path.join(outputDir, 'accessibility_scan_status_summary.csv'), accessibilityScanStatusSummary);
 
     const accessibilitySummaryCompletedOnly = families.map(family => {
-        const completedBaseline = baseline.filter(run => run.locatorFamily === family && run.accessibilityScanStatus === 'completed');
-        const completedMutated = mutated.filter(run => run.locatorFamily === family && run.accessibilityScanStatus === 'completed');
+        const completedBaseline = baseline.filter(run => run.locatorFamily === family && run.runStatus !== 'invalid' && run.accessibilityScanStatus === 'completed');
+        const completedMutated = mutated.filter(run => run.locatorFamily === family && run.runStatus !== 'invalid' && run.accessibilityScanStatus === 'completed');
         return {
             family,
             completedBaselineScans: completedBaseline.length,
@@ -355,19 +334,49 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     });
     writeCsv(path.join(outputDir, 'accessibility_summary_completed_only.csv'), accessibilitySummaryCompletedOnly);
 
-    const accessibilitySummaryLowerBound = families.map(family => {
-        const familyBaseline = baseline.filter(run => run.locatorFamily === family);
-        const familyMutated = mutated.filter(run => run.locatorFamily === family);
+    const accessibilitySummaryAllValidRuns = families.map(family => {
+        const familyBaseline = baseline.filter(run => run.locatorFamily === family && run.runStatus !== 'invalid');
+        const familyMutated = mutated.filter(run => run.locatorFamily === family && run.runStatus !== 'invalid');
         return {
             family,
-            label: 'lower-bound-includes-failed-and-skipped-as-zero',
-            meanViolationsBaseline: mean(familyBaseline.map(run => run.totalViolations)).toFixed(2),
-            meanViolationsMutated: mean(familyMutated.map(run => run.totalViolations)).toFixed(2),
-            meanCriticalMutated: mean(familyMutated.map(run => run.criticalViolations)).toFixed(2),
-            meanImpactedNodesMutated: mean(familyMutated.map(run => run.impactedNodes)).toFixed(2),
+            baselineValidRuns: familyBaseline.length,
+            mutatedValidRuns: familyMutated.length,
+            baselineCompletedScans: familyBaseline.filter(run => run.accessibilityScanStatus === 'completed').length,
+            mutatedCompletedScans: familyMutated.filter(run => run.accessibilityScanStatus === 'completed').length,
+            baselineFailedScans: familyBaseline.filter(run => run.accessibilityScanStatus === 'failed').length,
+            mutatedFailedScans: familyMutated.filter(run => run.accessibilityScanStatus === 'failed').length,
+            baselineSkippedScans: familyBaseline.filter(run => run.accessibilityScanStatus === 'skipped').length,
+            mutatedSkippedScans: familyMutated.filter(run => run.accessibilityScanStatus === 'skipped').length,
+            baselineCompletedScanRate: (familyBaseline.filter(run => run.accessibilityScanStatus === 'completed').length / familyBaseline.length || 0).toFixed(4),
+            mutatedCompletedScanRate: (familyMutated.filter(run => run.accessibilityScanStatus === 'completed').length / familyMutated.length || 0).toFixed(4),
         };
     });
-    writeCsv(path.join(outputDir, 'accessibility_summary_lower_bound.csv'), accessibilitySummaryLowerBound);
+    writeCsv(path.join(outputDir, 'accessibility_summary_all_valid_runs.csv'), accessibilitySummaryAllValidRuns);
+
+    const operatorTelemetrySummary = operators.map(operator => {
+        const operatorRuns = mutated.filter(run => run.changeOperator === operator);
+        return {
+            operator,
+            totalMutatedRuns: operatorRuns.length,
+            totalCandidateCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorCandidateCount ?? 0), 0),
+            totalApplicableCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorApplicableCount ?? 0), 0),
+            totalSkippedOracleCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorSkippedOracleCount ?? 0), 0),
+            totalNotApplicableCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorNotApplicableCount ?? 0), 0),
+            totalCheckDurationMs: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorCheckDurationMs ?? 0), 0),
+            totalApplyDurationMs: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.applyDurationMs ?? 0), 0),
+            totalApplyFailures: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.applyFailureCount ?? 0), 0),
+            finalOutcomeClasses: JSON.stringify(
+                operatorRuns.reduce((acc, run) => {
+                    const outcome = run.mutationTelemetry?.finalMutationOutcomeClass;
+                    if (outcome) {
+                        acc[outcome] = (acc[outcome] || 0) + 1;
+                    }
+                    return acc;
+                }, {} as Record<string, number>),
+            ),
+        };
+    });
+    writeCsv(path.join(outputDir, 'operator_telemetry_summary.csv'), operatorTelemetrySummary);
 
     const report = {
         generatedAt: new Date().toISOString(),
@@ -384,8 +393,9 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         accessibility: {
             scanStatusSummary: accessibilityScanStatusSummary,
             completedOnly: accessibilitySummaryCompletedOnly,
-            lowerBound: accessibilitySummaryLowerBound,
+            allValidRuns: accessibilitySummaryAllValidRuns,
         },
+        operatorTelemetrySummary,
         operatorCounts: operators.map(operator => ({
             operator,
             totalMutated: mutated.filter(run => run.changeOperator === operator).length,

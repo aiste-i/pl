@@ -1,0 +1,290 @@
+[
+  {
+    "operator": "AttributeAdd",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "AttributeDelete",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "AttributeMutator",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "AttributeReplace",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "StyleColor",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "visibility",
+    "thesisCategory": "visibility-interaction-state",
+    "excludedReason": null
+  },
+  {
+    "operator": "StylePosition",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "visibility",
+    "thesisCategory": "visibility-interaction-state",
+    "excludedReason": null
+  },
+  {
+    "operator": "StyleSize",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "visibility",
+    "thesisCategory": "visibility-interaction-state",
+    "excludedReason": null
+  },
+  {
+    "operator": "StyleVisibility",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "visibility",
+    "thesisCategory": "visibility-interaction-state",
+    "excludedReason": null
+  },
+  {
+    "operator": "TextDelete",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "content",
+    "thesisCategory": "content",
+    "excludedReason": null
+  },
+  {
+    "operator": "TextInsert",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "content",
+    "thesisCategory": "content",
+    "excludedReason": null
+  },
+  {
+    "operator": "TextNodeMutator",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "content",
+    "thesisCategory": "content",
+    "excludedReason": null
+  },
+  {
+    "operator": "TextReplace",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "content",
+    "thesisCategory": "content",
+    "excludedReason": null
+  },
+  {
+    "operator": "SubtreeDelete",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "SubtreeInsert",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "SubtreeMove",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "SubtreeSwap",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "ReverseChildrenOrder",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "SwapAdjacentSiblings",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "TagMutator",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "ContainerNodeMutator",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "excludedReason": null
+  },
+  {
+    "operator": "ActionableNodeMutator",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "ToggleCssClass",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "visibility",
+    "thesisCategory": "visibility-interaction-state",
+    "excludedReason": null
+  },
+  {
+    "operator": "ChangeImageAlt",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "RemoveImageAlt",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "ReplaceImageWithDiv",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "ChangeButtonLabel",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "RemoveInputNames",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "ReplaceAnchorWithSpan",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "ReplaceHeadingWithP",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "ReplaceThWithTd",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "DuplicateId",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "SemanticToDiv",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "ChangeAriaLabel",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "ToggleAriaExpanded",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "excludedReason": null
+  },
+  {
+    "operator": "DistortMutator",
+    "implementationKind": "visual",
+    "benchmarkScope": "excluded-by-design",
+    "runtimeCategory": "visual",
+    "thesisCategory": "visual",
+    "excludedReason": "Visual-only distortions do not cleanly answer the thesis question about locator-family robustness under non-breaking DOM/accessibility change."
+  },
+  {
+    "operator": "MaskMutator",
+    "implementationKind": "visual",
+    "benchmarkScope": "excluded-by-design",
+    "runtimeCategory": "visual",
+    "thesisCategory": "visual",
+    "excludedReason": "Masking simulates visual regression rather than a DOM/accessibility mutation that can be interpreted at the locator-family level."
+  }
+]

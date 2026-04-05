@@ -1,9 +1,13 @@
 import { Page } from 'playwright';
 import { MutationCandidate } from '../../webmutator/MutationCandidate';
-import { DomOperators } from '../../webmutator/operators/DomOperators';
 import { DomOperator } from '../../webmutator/operators/dom/DomOperator';
 import { OperatorRegistry } from '../../webmutator/operators/OperatorRegistry';
 import { OracleSafety } from '../../webmutator/utils/OracleSafety';
+import {
+    getBenchmarkOperatorCatalog,
+    type OperatorCatalogEntry,
+    type ThesisMutationCategory,
+} from '../../webmutator/operators/catalog';
 import * as fs from 'fs';
 import * as path from 'path';
 import { createHash } from 'crypto';
@@ -41,6 +45,21 @@ export interface ReachableTarget {
     eligibleCategories: string[];
 }
 
+export interface OperatorCoverageTelemetry {
+    operator: string;
+    runtimeCategory: DomOperator['category'];
+    thesisCategory: ThesisMutationCategory;
+    candidateCount: number;
+    applicableCount: number;
+    skippedOracleCount: number;
+    notApplicableCount: number;
+    totalCheckDurationMs: number;
+    appliedCount: number;
+    applyDurationMs: number;
+    applyFailureCount: number;
+    finalOutcomeClasses: Record<string, number>;
+}
+
 interface SavedTargetRegistry {
     metadata: {
         applicationId: string;
@@ -48,6 +67,7 @@ interface SavedTargetRegistry {
         generatedAt: string;
         totalTargets: number;
         activeScenarioIds: string[];
+        operatorCoverage: OperatorCoverageTelemetry[];
     };
     targets: ReachableTarget[];
 }
@@ -75,6 +95,7 @@ export class MutantGenerator {
     private registryPath: string;
     private corpusId?: string;
     private lastSamplingSummary: SavedScenarioSet['metadata'] | null = null;
+    private operatorCoverage: Map<string, OperatorCoverageTelemetry> = new Map();
 
     constructor(page: Page, appName: string = 'default') {
         this.page = page;
@@ -82,6 +103,34 @@ export class MutantGenerator {
         this.registryPath = getAppReachableTargetsPath(this.appName as any);
         this.corpusId = getBenchmarkCorpusId();
         this.loadRegistryFromFile();
+    }
+
+    private ensureOperatorCoverageEntry(entry: OperatorCatalogEntry): OperatorCoverageTelemetry {
+        const existing = this.operatorCoverage.get(entry.type);
+        if (existing) {
+            return existing;
+        }
+
+        const created: OperatorCoverageTelemetry = {
+            operator: entry.type,
+            runtimeCategory: entry.runtimeCategory as DomOperator['category'],
+            thesisCategory: entry.thesisCategory,
+            candidateCount: 0,
+            applicableCount: 0,
+            skippedOracleCount: 0,
+            notApplicableCount: 0,
+            totalCheckDurationMs: 0,
+            appliedCount: 0,
+            applyDurationMs: 0,
+            applyFailureCount: 0,
+            finalOutcomeClasses: {},
+        };
+        this.operatorCoverage.set(entry.type, created);
+        return created;
+    }
+
+    private getOperatorCoverageRows(): OperatorCoverageTelemetry[] {
+        return [...this.operatorCoverage.values()].sort((left, right) => left.operator.localeCompare(right.operator));
     }
 
     private buildTargetRegistryKey(target: ReachableTarget): string {
@@ -121,6 +170,10 @@ export class MutantGenerator {
         try {
             const data = JSON.parse(fs.readFileSync(this.registryPath, 'utf8'));
             const targets = Array.isArray(data) ? data : data.targets;
+            const operatorCoverage = Array.isArray(data?.metadata?.operatorCoverage) ? data.metadata.operatorCoverage : [];
+            for (const row of operatorCoverage as OperatorCoverageTelemetry[]) {
+                this.operatorCoverage.set(row.operator, row);
+            }
             for (const item of targets as ReachableTarget[]) {
                 if (!item?.scenarioId || !item?.viewContext || !item?.applicationId) {
                     continue;
@@ -145,6 +198,7 @@ export class MutantGenerator {
                 generatedAt: new Date().toISOString(),
                 totalTargets: targets.length,
                 activeScenarioIds: [...new Set(targets.map(target => target.scenarioId).filter(Boolean))].sort(),
+                operatorCoverage: this.getOperatorCoverageRows(),
             },
             targets,
         };
@@ -207,7 +261,11 @@ export class MutantGenerator {
                 }));
         });
 
-        const operators = DomOperators.getDomOperators();
+        const operatorCatalog = getBenchmarkOperatorCatalog();
+        const operators = operatorCatalog.map(entry => ({
+            entry,
+            operator: entry.factory(),
+        }));
 
         for (const discovered of foundTargets) {
             const locator = this.page.locator(discovered.selector).first();
@@ -219,16 +277,29 @@ export class MutantGenerator {
             const eligibleOperators: string[] = [];
             const eligibleCategories = new Set<string>();
 
-            if (!oracleProtected) {
-                for (const operator of operators) {
-                    try {
-                        if (await operator.isApplicable(this.page, locator)) {
-                            eligibleOperators.push(operator.constructor.name);
-                            eligibleCategories.add(operator.category);
-                        }
-                    } catch {
-                        // Ignore operator applicability errors during collection.
+            for (const { entry, operator } of operators) {
+                const coverage = this.ensureOperatorCoverageEntry(entry);
+                coverage.candidateCount += 1;
+
+                if (oracleProtected) {
+                    coverage.skippedOracleCount += 1;
+                    continue;
+                }
+
+                const startedAt = Date.now();
+                try {
+                    const applicable = await operator.isApplicable(this.page, locator);
+                    coverage.totalCheckDurationMs += Date.now() - startedAt;
+                    if (applicable) {
+                        eligibleOperators.push(operator.constructor.name);
+                        eligibleCategories.add(operator.category);
+                        coverage.applicableCount += 1;
+                    } else {
+                        coverage.notApplicableCount += 1;
                     }
+                } catch {
+                    coverage.totalCheckDurationMs += Date.now() - startedAt;
+                    coverage.notApplicableCount += 1;
                 }
             }
 
@@ -274,6 +345,7 @@ export class MutantGenerator {
 
             for (const operatorName of target.eligibleOperators) {
                 const operator = OperatorRegistry.createOperator(operatorName);
+                const operatorCoverage = this.operatorCoverage.get(operatorName);
                 const candidate = new MutationCandidate(target.selector, operator, target.url, target.fingerprint, {
                     applicationId: target.applicationId,
                     corpusId: target.corpusId,
@@ -291,6 +363,11 @@ export class MutantGenerator {
                     quotaBucket: operator.category,
                     aggregateComparisonEligible: true,
                     comparisonExclusionReason: null,
+                    operatorCandidateCount: operatorCoverage?.candidateCount,
+                    operatorApplicableCount: operatorCoverage?.applicableCount,
+                    operatorSkippedOracleCount: operatorCoverage?.skippedOracleCount,
+                    operatorNotApplicableCount: operatorCoverage?.notApplicableCount,
+                    operatorTotalCheckDurationMs: operatorCoverage?.totalCheckDurationMs,
                 });
 
                 if (!candidateKeys.has(candidate.candidateId!)) {
@@ -355,6 +432,11 @@ export class MutantGenerator {
                 selectionSeed: d.selectionSeed,
                 aggregateComparisonEligible: d.aggregateComparisonEligible,
                 comparisonExclusionReason: d.comparisonExclusionReason,
+                operatorCandidateCount: d.operatorCandidateCount,
+                operatorApplicableCount: d.operatorApplicableCount,
+                operatorSkippedOracleCount: d.operatorSkippedOracleCount,
+                operatorNotApplicableCount: d.operatorNotApplicableCount,
+                operatorTotalCheckDurationMs: d.operatorTotalCheckDurationMs,
             });
             if (d.record) candidate.record = d.record;
             return candidate;

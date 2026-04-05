@@ -69,7 +69,7 @@ export interface BenchmarkResult {
   changeOperator?: string;
   quotaBucket?: string;
   comparisonEligible?: boolean;
-  comparisonExclusionReason?: string;
+  comparisonExclusionReason?: string | null;
   durationMs: number;
   runStatus: 'passed' | 'failed' | 'invalid';
   failureClass: FailureClass | null;
@@ -85,6 +85,16 @@ export interface BenchmarkResult {
   evidence: StructuredEvidence;
   instrumentationPathUsed: 'structured' | 'fallback' | 'mixed';
   accessibility: AccessibilitySummary;
+  mutationTelemetry?: {
+    operatorCandidateCount: number | null;
+    operatorApplicableCount: number | null;
+    operatorSkippedOracleCount: number | null;
+    operatorNotApplicableCount: number | null;
+    operatorCheckDurationMs: number | null;
+    applyDurationMs: number | null;
+    applyFailureCount: number;
+    finalMutationOutcomeClass: string | null;
+  };
 }
 
 /**
@@ -235,9 +245,22 @@ export const test = base.extend<TestOptions & {
       }
 
       const mutator = new WebMutator();
+      const startedAt = Date.now();
       const record = await mutator.applyMutation(page, mutation.selector, mutation.operator);
+      const applyDurationMs = Date.now() - startedAt;
       mutation.record = record;
       applied = true;
+      if (benchmarkResult.mutationTelemetry) {
+        benchmarkResult.mutationTelemetry.applyDurationMs = applyDurationMs;
+        benchmarkResult.mutationTelemetry.applyFailureCount = record.success ? 0 : 1;
+        benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = record.success
+          ? 'applied'
+          : record.error?.includes('oracle-protected')
+            ? 'skipped-oracle'
+            : record.error?.includes('Element not found')
+              ? 'target-not-found'
+              : 'apply-failed';
+      }
 
       if (!record.success) {
         benchmarkResult.runStatus = 'invalid';
@@ -262,6 +285,10 @@ export const test = base.extend<TestOptions & {
       benchmarkResult.comparisonEligible = false;
       benchmarkResult.comparisonExclusionReason = benchmarkResult.invalidRunReason;
       benchmarkResult.accessibility.scanStatus = 'skipped';
+      if (benchmarkResult.mutationTelemetry) {
+        benchmarkResult.mutationTelemetry.applyFailureCount = 1;
+        benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = 'checkpoint-not-reached';
+      }
     }
   },
 
@@ -328,6 +355,7 @@ export const test = base.extend<TestOptions & {
         oracleIntegrityOk: true,
         evidence: FailureClassifier.createEmptyEvidence(),
         instrumentationPathUsed: 'fallback',
+        mutationTelemetry: undefined,
         accessibility: {
             scanAttempted: false,
             scanStatus: 'skipped',
@@ -361,12 +389,35 @@ export const test = base.extend<TestOptions & {
         benchmarkResult.quotaBucket = mutation.quotaBucket;
         benchmarkResult.comparisonEligible = mutation.aggregateComparisonEligible !== false;
         benchmarkResult.comparisonExclusionReason = mutation.comparisonExclusionReason;
+        benchmarkResult.mutationTelemetry = {
+            operatorCandidateCount: mutation.operatorCandidateCount ?? null,
+            operatorApplicableCount: mutation.operatorApplicableCount ?? null,
+            operatorSkippedOracleCount: mutation.operatorSkippedOracleCount ?? null,
+            operatorNotApplicableCount: mutation.operatorNotApplicableCount ?? null,
+            operatorCheckDurationMs: mutation.operatorTotalCheckDurationMs ?? null,
+            applyDurationMs: null,
+            applyFailureCount: 0,
+            finalMutationOutcomeClass: null,
+        };
         if (getBenchmarkCorpusId() !== 'realworld-active') {
             await page.goto('/'); 
             const mutator = new WebMutator();
             try {
+                const startedAt = Date.now();
                 const record = await mutator.applyMutation(page, mutation.selector, mutation.operator);
+                const applyDurationMs = Date.now() - startedAt;
                 mutation.record = record;
+                if (benchmarkResult.mutationTelemetry) {
+                    benchmarkResult.mutationTelemetry.applyDurationMs = applyDurationMs;
+                    benchmarkResult.mutationTelemetry.applyFailureCount = record.success ? 0 : 1;
+                    benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = record.success
+                        ? 'applied'
+                        : record.error?.includes('oracle-protected')
+                            ? 'skipped-oracle'
+                            : record.error?.includes('Element not found')
+                                ? 'target-not-found'
+                                : 'apply-failed';
+                }
                 if (!record.success) {
                     benchmarkResult.runStatus = 'invalid';
                     benchmarkResult.invalidRunReason = record.error ?? 'Mutation skipped or failed during application';
@@ -378,6 +429,10 @@ export const test = base.extend<TestOptions & {
                 benchmarkResult.runStatus = 'invalid';
                 benchmarkResult.invalidRunReason = 'Setup failure during mutation application: ' + error.message;
                 benchmarkResult.accessibility.scanStatus = 'skipped';
+                if (benchmarkResult.mutationTelemetry) {
+                    benchmarkResult.mutationTelemetry.applyFailureCount = 1;
+                    benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = 'setup-failure';
+                }
                 throw error;
             }
         }

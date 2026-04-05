@@ -29,22 +29,18 @@ test.describe('Comments', () => {
     await new Promise(resolve => setTimeout(resolve, 500));
   });
 
-  test('should add a comment to an article', async ({ page, locators }) => {
+  test('should add a comment to an article', async ({ page, locators, oracle }) => {
     const commentText = 'This is a test comment from Playwright!';
-    await addComment(page, locators, commentText);
-    // Comment should be visible
-    await expect(locators.comments.card(commentText).raw).toBeVisible();
+    const commentId = await addComment(page, locators, oracle, commentText);
+    await expect(oracle.comments.cardById(commentId).raw).toBeVisible();
   });
 
-  test('should delete own comment', async ({ page, locators }) => {
+  test('should delete own comment', async ({ page, locators, oracle }) => {
     const commentText = 'Comment to be deleted';
-    await addComment(page, locators, commentText);
-    // Comment should be visible
-    await expect(locators.comments.card(commentText).raw).toBeVisible();
-    // Delete the comment
-    await deleteComment(page, locators, commentText);
-    // Comment should no longer be visible
-    await expect(locators.comments.card(commentText).raw).toHaveCount(0);
+    const commentId = await addComment(page, locators, oracle, commentText);
+    await expect(oracle.comments.cardById(commentId).raw).toBeVisible();
+    await deleteComment(locators, oracle, commentId);
+    await expect(oracle.comments.cardById(commentId).raw).toHaveCount(0);
   });
 
   /**
@@ -58,12 +54,11 @@ test.describe('Comments', () => {
    * an implementation returns 200 instead of 204. This is good engineering
    * practice: clients should handle status code classes, not specific codes.
    */
-  test('should delete comment when server returns 200 instead of 204', async ({ page, locators }) => {
+  test('should delete comment when server returns 200 instead of 204', async ({ page, locators, oracle }) => {
     test.skip(!API_MODE, 'API-only: tests client-side HTTP status code handling via page.route()');
     const commentText = 'Comment to test 200 status';
-    await addComment(page, locators, commentText);
-    // Comment should be visible
-    await expect(locators.comments.card(commentText).raw).toBeVisible();
+    const commentId = await addComment(page, locators, oracle, commentText);
+    await expect(oracle.comments.cardById(commentId).raw).toBeVisible();
 
     // Intercept DELETE requests to comments and respond with 200 instead of 204
     await page.route('**/api/articles/*/comments/*', async route => {
@@ -78,25 +73,21 @@ test.describe('Comments', () => {
       }
     });
 
-    // Delete the comment
-    await deleteComment(page, locators, commentText);
-    // Comment should no longer be visible (frontend should handle 200 the same as 204)
-    await expect(locators.comments.card(commentText).raw).toHaveCount(0);
+    await deleteComment(locators, oracle, commentId);
+    await expect(oracle.comments.cardById(commentId).raw).toHaveCount(0);
   });
 
-  test('should display multiple comments', async ({ page, locators }) => {
+  test('should display multiple comments', async ({ page, locators, oracle }) => {
     const comment1 = 'First comment';
     const comment2 = 'Second comment';
     const comment3 = 'Third comment';
-    await addComment(page, locators, comment1);
-    await addComment(page, locators, comment2);
-    await addComment(page, locators, comment3);
-    // All comments should be visible (exclude comment form)
-    await expect(locators.comments.card(comment1).raw).toBeVisible();
-    await expect(locators.comments.card(comment2).raw).toBeVisible();
-    await expect(locators.comments.card(comment3).raw).toBeVisible();
-    // Should have exactly 3 comments
-    const count = await getCommentCount(page);
+    const comment1Id = await addComment(page, locators, oracle, comment1);
+    const comment2Id = await addComment(page, locators, oracle, comment2);
+    const comment3Id = await addComment(page, locators, oracle, comment3);
+    await expect(oracle.comments.cardById(comment1Id).raw).toBeVisible();
+    await expect(oracle.comments.cardById(comment2Id).raw).toBeVisible();
+    await expect(oracle.comments.cardById(comment3Id).raw).toBeVisible();
+    const count = await getCommentCount(oracle);
     expect(count).toBe(3);
   });
 
@@ -114,7 +105,7 @@ test.describe('Comments', () => {
     await context2.close();
   });
 
-  test('should only allow comment author to delete', async ({ page, locators }) => {
+  test('should only allow comment author to delete', async ({ page, locators, oracle }) => {
     // Use an existing demo article from the backend (e.g., johndoe's article)
     // This avoids session isolation issues
     // Go to global feed to see all articles
@@ -133,31 +124,28 @@ test.describe('Comments', () => {
     }
     // Now add our own comment
     const commentText = `Comment by logged in user ${Date.now()}`;
-    await addComment(page, locators, commentText);
-    // Verify the delete button IS visible for OUR comment
-    const ownComment = locators.comments.card(commentText).raw;
+    const ownCommentId = await addComment(page, locators, oracle, commentText);
+    const ownComment = oracle.comments.cardById(ownCommentId);
     await expect(locators.comments.deleteButton(ownComment).raw).toBeVisible();
   });
 
-  test('should handle long comments', async ({ page, locators }) => {
+  test('should handle long comments', async ({ page, locators, oracle }) => {
     const longComment = 'This is a very long comment. '.repeat(50);
-    await addComment(page, locators, longComment);
-    // Comment should be visible and properly formatted (comment text is in a paragraph)
-    await expect(locators.comments.card(longComment).raw).toBeVisible();
+    const commentId = await addComment(page, locators, oracle, longComment);
+    await expect(oracle.comments.cardById(commentId).raw).toBeVisible();
   });
 
-  test('should preserve comments after page reload', async ({ page, locators }) => {
+  test('should preserve comments after page reload', async ({ page, locators, oracle }) => {
     const commentText = 'Persistent comment';
-    await addComment(page, locators, commentText);
+    const commentId = await addComment(page, locators, oracle, commentText);
     // Reload the page
     await page.reload();
-    // Comment should still be visible
-    await expect(locators.comments.card(commentText).raw).toBeVisible();
+    await expect(oracle.comments.cardById(commentId).raw).toBeVisible();
   });
 
-  test('should clear comment form after posting', async ({ page, locators }) => {
+  test('should clear comment form after posting', async ({ page, locators, oracle }) => {
     const commentText = 'Test comment';
-    await addComment(page, locators, commentText);
+    await addComment(page, locators, oracle, commentText);
     // Comment textarea should be empty
     await expect(locators.comments.textarea().raw).toHaveValue('');
   });

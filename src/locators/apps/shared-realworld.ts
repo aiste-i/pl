@@ -178,7 +178,44 @@ export function oracleTestId<TArgs extends any[] = []>(
       ...context,
       selector: `getByTestId('${testId}')`,
     },
-    ((scope: LocatorScope) => scope.getByTestId(testId)) as (scope: LocatorScope, ...args: TArgs) => Locator,
+    (((scope: LocatorScope) => scope.getByTestId(testId)) as unknown as (scope: LocatorScope, ...args: TArgs) => Locator),
+  );
+}
+
+export function oracleDynamicTestId<TArgs extends any[] = []>(
+  context: LocatorMetaContext,
+  selectorTemplate: string,
+  resolveTestId: (...args: TArgs) => string,
+): (scope: LocatorScope, ...args: TArgs) => Locator {
+  return oracle(
+    {
+      ...context,
+      selector: `getByTestId('${selectorTemplate}')`,
+    },
+    ((scope: LocatorScope, ...args: TArgs) => scope.getByTestId(resolveTestId(...args))) as (
+      scope: LocatorScope,
+      ...args: TArgs
+    ) => Locator,
+  );
+}
+
+export function oracleTestIdChain<TArgs extends any[] = []>(
+  context: LocatorMetaContext,
+  selectorChain: string[],
+  resolveChain?: (...args: TArgs) => string[],
+): (scope: LocatorScope, ...args: TArgs) => Locator {
+  const selector =
+    selectorChain.map(testId => `getByTestId('${testId}')`).join('.');
+
+  return oracle(
+    {
+      ...context,
+      selector,
+    },
+    ((scope: LocatorScope, ...args: TArgs) => {
+      const chain = resolveChain ? resolveChain(...args) : selectorChain;
+      return chain.reduce((current, testId) => current.getByTestId(testId), scope as LocatorScope);
+    }) as (scope: LocatorScope, ...args: TArgs) => Locator,
   );
 }
 
