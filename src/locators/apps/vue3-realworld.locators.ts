@@ -106,7 +106,7 @@ export function getVue3RealWorldLocators(strategy: StrategyName) {
       firstReadMoreLink: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('home.firstReadMoreLink'), semanticEntryPoint: 'getByRole' },
-          (page: Page) => markSemantic(page.getByRole('link', { name: /read more/i }).first(), 'getByRole'),
+          (page: Page) => markSemantic(page.getByRole('link', { name: /^article$/i }).first(), 'getByRole'),
         ),
         css: css({ ...meta('home.firstReadMoreLink'), selector: '.article-list .article-preview:first-of-type a[href^="#/article/"]' }),
         xpath: xpath({ ...meta('home.firstReadMoreLink'), selector: '((//div[contains(@class,"article-list")]//*[contains(@class,"article-preview")])[1]//a[starts-with(@href,"#/article/")])[1]' }),

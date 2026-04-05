@@ -70,7 +70,7 @@ The benchmarked locator families remain separated by construction:
 Specific hardening completed in this pass:
 
 - semantic-first `role -> descendant text filter` patterns were replaced where a direct accessible-name query exists
-- `home.firstReadMoreLink` now uses direct `getByRole('link', { name: /read more/i })` semantics instead of text-descendant filtering
+- `home.firstReadMoreLink` now uses direct role-and-accessible-name semantics in each app instead of text-descendant filtering; in Vue this resolves through the link's actual accessible name of `article`
 - locator purity validation now fails on the banned role-plus-descendant-text anti-pattern
 
 Semantic exceptions remain explicit and separately reportable in:

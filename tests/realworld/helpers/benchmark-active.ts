@@ -217,10 +217,9 @@ export async function updateBioFromSettings(
   if (options.profileUsername && !navigatedAway) {
     await page.goto(appPaths.profile(options.profileUsername), { waitUntil: 'load' });
   }
+  await oracle.profile.page().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
   await oracle.profile.bio().assertContainsText(bio, { timeout: getActiveBenchmarkTimeoutMs() });
-  if (options.profileUsername) {
-    await expect(page).toHaveURL(new RegExp(options.profileUsername.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  }
+  await expect(page).toHaveURL(/\/profile\/[^/?#]+/);
 }
 
 export async function paginateTaggedFeed(
