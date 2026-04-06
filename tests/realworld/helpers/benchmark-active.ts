@@ -1,9 +1,10 @@
 import type { Page } from '@playwright/test';
 import { expect } from '../../baseFixture';
+import { getSelectedAppId } from '../../../src/apps';
 import { appPaths } from './app';
 
 export function getActiveBenchmarkTimeoutMs(): number {
-  return process.env.APP_ID === 'vue3-realworld-example-app' ? 30000 : 10000;
+  return getSelectedAppId() === 'vue3-realworld-example-app' ? 30000 : 10000;
 }
 
 export async function getStableCommentIds(oracle: any): Promise<number[]> {

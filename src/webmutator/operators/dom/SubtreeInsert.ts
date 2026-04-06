@@ -1,11 +1,13 @@
 import { Page, Locator } from 'playwright';
 import { DomOperator } from './DomOperator';
 import { MutationRecord } from '../../MutationRecord';
+import { MutationTargetSafety } from '../../utils/MutationTargetSafety';
 
 export class SubtreeInsert implements DomOperator {
     category: 'structural' = 'structural';
     
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
+        if (!(await MutationTargetSafety.isSafeStructuralTarget(target))) return false;
         return await target.evaluate((node: HTMLElement) => !!node.parentElement);
     }
 

@@ -90,6 +90,12 @@ The JSON aggregate report mirrors the same split under:
 
 Mutation telemetry is captured at run level and summarized per operator. The current telemetry surface includes:
 
+- `selectedCandidateId`
+- `selectedTargetSelector`
+- `selectedTargetTagType`
+- `operatorRuntimeCategory`
+- `operatorThesisCategory`
+- `operatorConsideredCandidateCount`
 - `operatorCandidateCount`
 - `operatorApplicableCount`
 - `operatorSkippedOracleCount`
@@ -101,6 +107,7 @@ Mutation telemetry is captured at run level and summarized per operator. The cur
 
 Operator-level summary output:
 
+- `mutation_run_telemetry.csv`
 - `operator_telemetry_summary.csv`
 
 This allows the pipeline to report operator coverage and execution behavior, not just operator presence in code.
@@ -123,6 +130,7 @@ Per aggregation directory the pipeline writes:
 - `accessibility_scan_status_summary.csv`
 - `accessibility_summary_completed_only.csv`
 - `accessibility_summary_all_valid_runs.csv`
+- `mutation_run_telemetry.csv`
 - `operator_telemetry_summary.csv`
 - `aggregate_report.json`
 
@@ -148,6 +156,9 @@ Key denominator outputs:
 The aggregation pipeline is complemented by generated repo-level reports that describe the benchmark surface around the run artifacts:
 
 - [`reports/realworld-benchmark-corpus.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-benchmark-corpus.json)
+- [`reports/realworld-accessibility-summary-completed-only.csv`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-accessibility-summary-completed-only.csv)
+- [`reports/realworld-accessibility-summary-all-valid-runs.csv`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-accessibility-summary-all-valid-runs.csv)
+- [`reports/realworld-accessibility-scan-status-summary.csv`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-accessibility-scan-status-summary.csv)
 - [`reports/realworld-migration-matrix.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-migration-matrix.json)
 - [`reports/realworld-operator-taxonomy.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-operator-taxonomy.json)
 - [`reports/realworld-operator-coverage.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-operator-coverage.json)

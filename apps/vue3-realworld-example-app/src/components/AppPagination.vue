@@ -6,6 +6,7 @@
         :key="pageNumber"
         class="page-item"
         :class="[{ active: isActive(pageNumber) }]"
+        :aria-label="`Page ${pageNumber}`"
         :data-testid="`pagination-item-${pageNumber}`"
       >
         <a

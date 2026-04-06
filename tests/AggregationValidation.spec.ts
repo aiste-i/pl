@@ -17,13 +17,13 @@ test.describe('Aggregation Script Validation', () => {
         // 1. Create Mock Data
         const mockRuns = [
             // semantic-first: 2 mutated (1 pass, 1 fail NO_MATCH), 1 baseline pass
-            { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'health.home-load', activeScenarioCategory: 'load-visibility', sourceSpec: 'tests/realworld/health.spec.ts', locatorFamily: 'semantic-first', phase: 'mutated', runStatus: 'passed', changeOperator: 'SubtreeDelete', changeCategory: 'structural', durationMs: 100, mutationTelemetry: { operatorCandidateCount: 5, operatorApplicableCount: 2, operatorSkippedOracleCount: 1, operatorNotApplicableCount: 2, operatorCheckDurationMs: 30, applyDurationMs: 10, applyFailureCount: 0, finalMutationOutcomeClass: 'applied' } },
-            { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'health.home-load', activeScenarioCategory: 'load-visibility', sourceSpec: 'tests/realworld/health.spec.ts', locatorFamily: 'semantic-first', phase: 'mutated', runStatus: 'failed', failureClass: 'NO_MATCH', changeOperator: 'SubtreeDelete', changeCategory: 'structural', durationMs: 200, mutationTelemetry: { operatorCandidateCount: 5, operatorApplicableCount: 2, operatorSkippedOracleCount: 1, operatorNotApplicableCount: 2, operatorCheckDurationMs: 30, applyDurationMs: 12, applyFailureCount: 0, finalMutationOutcomeClass: 'applied' } },
+            { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'health.home-load', activeScenarioCategory: 'load-visibility', sourceSpec: 'tests/realworld/health.spec.ts', locatorFamily: 'semantic-first', phase: 'mutated', runStatus: 'passed', changeId: 'mut-sem-1', changeOperator: 'SubtreeDelete', changeCategory: 'structural', durationMs: 100, mutationTelemetry: { operatorCandidateCount: 5, operatorApplicableCount: 2, operatorSkippedOracleCount: 1, operatorNotApplicableCount: 2, operatorCheckDurationMs: 30, applyDurationMs: 10, applyFailureCount: 0, finalMutationOutcomeClass: 'applied' } },
+            { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'health.home-load', activeScenarioCategory: 'load-visibility', sourceSpec: 'tests/realworld/health.spec.ts', locatorFamily: 'semantic-first', phase: 'mutated', runStatus: 'failed', failureClass: 'NO_MATCH', changeId: 'mut-sem-2', changeOperator: 'SubtreeDelete', changeCategory: 'structural', durationMs: 200, mutationTelemetry: { operatorCandidateCount: 5, operatorApplicableCount: 2, operatorSkippedOracleCount: 1, operatorNotApplicableCount: 2, operatorCheckDurationMs: 30, applyDurationMs: 12, applyFailureCount: 0, finalMutationOutcomeClass: 'applied' } },
             { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'health.home-load', activeScenarioCategory: 'load-visibility', sourceSpec: 'tests/realworld/health.spec.ts', locatorFamily: 'semantic-first', phase: 'baseline', runStatus: 'passed', durationMs: 50 },
             
             // css: 2 mutated (2 fail ACTIONABILITY), 1 baseline pass
-            { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'health.home-load', activeScenarioCategory: 'load-visibility', sourceSpec: 'tests/realworld/health.spec.ts', locatorFamily: 'css', phase: 'mutated', runStatus: 'failed', failureClass: 'ACTIONABILITY', changeOperator: 'StyleVisibility', changeCategory: 'visibility-interaction-state', durationMs: 300, mutationTelemetry: { operatorCandidateCount: 4, operatorApplicableCount: 1, operatorSkippedOracleCount: 1, operatorNotApplicableCount: 2, operatorCheckDurationMs: 20, applyDurationMs: 8, applyFailureCount: 0, finalMutationOutcomeClass: 'applied' } },
-            { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'health.home-load', activeScenarioCategory: 'load-visibility', sourceSpec: 'tests/realworld/health.spec.ts', locatorFamily: 'css', phase: 'mutated', runStatus: 'failed', failureClass: 'ACTIONABILITY', changeOperator: 'StyleVisibility', changeCategory: 'visibility-interaction-state', durationMs: 400, mutationTelemetry: { operatorCandidateCount: 4, operatorApplicableCount: 1, operatorSkippedOracleCount: 1, operatorNotApplicableCount: 2, operatorCheckDurationMs: 20, applyDurationMs: 9, applyFailureCount: 0, finalMutationOutcomeClass: 'applied' } },
+            { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'health.home-load', activeScenarioCategory: 'load-visibility', sourceSpec: 'tests/realworld/health.spec.ts', locatorFamily: 'css', phase: 'mutated', runStatus: 'failed', failureClass: 'ACTIONABILITY', changeId: 'mut-css-1', changeOperator: 'StyleVisibility', changeCategory: 'visibility-interaction-state', durationMs: 300, mutationTelemetry: { operatorCandidateCount: 4, operatorApplicableCount: 1, operatorSkippedOracleCount: 1, operatorNotApplicableCount: 2, operatorCheckDurationMs: 20, applyDurationMs: 8, applyFailureCount: 0, finalMutationOutcomeClass: 'applied' } },
+            { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'health.home-load', activeScenarioCategory: 'load-visibility', sourceSpec: 'tests/realworld/health.spec.ts', locatorFamily: 'css', phase: 'mutated', runStatus: 'failed', failureClass: 'ACTIONABILITY', changeId: 'mut-css-2', changeOperator: 'StyleVisibility', changeCategory: 'visibility-interaction-state', durationMs: 400, mutationTelemetry: { operatorCandidateCount: 4, operatorApplicableCount: 1, operatorSkippedOracleCount: 1, operatorNotApplicableCount: 2, operatorCheckDurationMs: 20, applyDurationMs: 9, applyFailureCount: 0, finalMutationOutcomeClass: 'applied' } },
             { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'health.home-load', activeScenarioCategory: 'load-visibility', sourceSpec: 'tests/realworld/health.spec.ts', locatorFamily: 'css', phase: 'baseline', runStatus: 'passed', durationMs: 60 },
 
             // Invalid run (should be ignored)
@@ -42,6 +42,7 @@ test.describe('Aggregation Script Validation', () => {
         expect(fs.existsSync(path.join(outputDir, 'benchmark_runs.csv'))).toBe(true);
         expect(fs.existsSync(path.join(outputDir, 'summary_by_family.csv'))).toBe(true);
         expect(fs.existsSync(path.join(outputDir, 'aggregate_report.json'))).toBe(true);
+        expect(fs.existsSync(path.join(outputDir, 'mutation_run_telemetry.csv'))).toBe(true);
 
         const summaryByFamily = fs.readFileSync(path.join(outputDir, 'summary_by_family.csv'), 'utf8');
         console.log('Summary by Family:\n', summaryByFamily);
@@ -64,6 +65,37 @@ test.describe('Aggregation Script Validation', () => {
         const operatorTelemetry = fs.readFileSync(path.join(outputDir, 'operator_telemetry_summary.csv'), 'utf8');
         expect(operatorTelemetry).toContain('SubtreeDelete');
         expect(operatorTelemetry).toContain('StyleVisibility');
+
+        const mutationRunTelemetry = fs.readFileSync(path.join(outputDir, 'mutation_run_telemetry.csv'), 'utf8');
+        expect(mutationRunTelemetry).toContain('selectedTargetSelector');
+        expect(mutationRunTelemetry).toContain('operatorRuntimeCategory');
+    });
+
+    test('should keep only the latest record for the same logical run identity', async () => {
+        const dedupeInputDir = path.join(process.cwd(), 'test-results', 'agg-dedupe-test');
+        const dedupeOutputDir = path.join(process.cwd(), 'test-results', 'agg-dedupe-output');
+        if (fs.existsSync(dedupeInputDir)) fs.rmSync(dedupeInputDir, { recursive: true });
+        if (fs.existsSync(dedupeOutputDir)) fs.rmSync(dedupeOutputDir, { recursive: true });
+        fs.mkdirSync(dedupeInputDir, { recursive: true });
+
+        const duplicateRuns = [
+            { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'article.assert-title', activeScenarioCategory: 'assertion', sourceSpec: 'tests/realworld/article.spec.ts', locatorFamily: 'semantic-first', phase: 'mutated', runStatus: 'passed', changeId: 'candidate-1', changeOperator: 'TextInsert', changeCategory: 'content', durationMs: 100 },
+            { runId: uuidv4(), applicationId: 'angular-realworld-example-app', browserName: 'chromium', corpusId: 'realworld-active', activeScenarioId: 'article.assert-title', activeScenarioCategory: 'assertion', sourceSpec: 'tests/realworld/article.spec.ts', locatorFamily: 'semantic-first', phase: 'mutated', runStatus: 'failed', failureClass: 'TEXT_MISMATCH', changeId: 'candidate-1', changeOperator: 'TextInsert', changeCategory: 'content', durationMs: 250 },
+        ];
+
+        duplicateRuns.forEach((run, index) => {
+            fs.writeFileSync(path.join(dedupeInputDir, `duplicate_${index}.json`), JSON.stringify(run));
+        });
+
+        const { execSync } = require('child_process');
+        execSync(`npx ts-node src/murun/runner/aggregate.ts ${dedupeInputDir} ${dedupeOutputDir}`);
+
+        const benchmarkRuns = fs.readFileSync(path.join(dedupeOutputDir, 'benchmark_runs.csv'), 'utf8');
+        expect(benchmarkRuns).toContain('TEXT_MISMATCH');
+        expect(benchmarkRuns).not.toContain(',passed,');
+
+        const summaryByFamily = fs.readFileSync(path.join(dedupeOutputDir, 'summary_by_family.csv'), 'utf8');
+        expect(summaryByFamily).toContain('semantic-first,1,1,1,1');
     });
 
     test('should fail loudly on empty input', async () => {

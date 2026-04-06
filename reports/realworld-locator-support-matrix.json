@@ -609,7 +609,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('article-read-more')"
+    "selector": "getByTestId('article-read-more-1')"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1046,11 +1046,11 @@
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": "semantic-css-exception",
-    "purity": "css",
-    "semanticEntryPoint": null,
-    "isException": true,
-    "selector": "a.preview-link > p"
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
+    "isException": false,
+    "selector": null
   },
   {
     "app": "angular-realworld-example-app",
@@ -2381,7 +2381,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('article-read-more')"
+    "selector": "getByTestId('article-read-more-1')"
   },
   {
     "app": "realworld",
@@ -2818,11 +2818,11 @@
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": "semantic-css-exception",
-    "purity": "css",
-    "semanticEntryPoint": null,
-    "isException": true,
-    "selector": "a.preview-link > p"
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
+    "isException": false,
+    "selector": null
   },
   {
     "app": "realworld",
@@ -4153,7 +4153,7 @@
     "purity": "oracle",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "getByTestId('article-read-more')"
+    "selector": "getByTestId('article-read-more-1')"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4590,11 +4590,11 @@
     "specHints": [
       "tests/realworld/articles.spec.ts"
     ],
-    "sourceKind": "semantic-css-exception",
-    "purity": "css",
-    "semanticEntryPoint": null,
-    "isException": true,
-    "selector": "a.preview-link > p"
+    "sourceKind": "semantic-native",
+    "purity": "semantic",
+    "semanticEntryPoint": "getByRole",
+    "isException": false,
+    "selector": null
   },
   {
     "app": "vue3-realworld-example-app",

@@ -33,7 +33,9 @@ function main() {
       reportsCheck: packageJson.scripts?.['reports:check'] ?? null,
       baselineChromium: packageJson.scripts?.['benchmark:baseline:all'] ?? null,
       baselineCrossBrowserSmoke: packageJson.scripts?.['benchmark:baseline:smoke:all'] ?? null,
+      mutationSelected: packageJson.scripts?.['benchmark:mutate:all'] ?? null,
       mutationSample: packageJson.scripts?.['benchmark:mutate:sample:all'] ?? null,
+      aggregateAll: packageJson.scripts?.['benchmark:aggregate:all'] ?? null,
     },
     workflows: workflowFiles.map(relativePath => ({
       path: relativePath,

@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { getAppResultsDir, getSelectedAppId } from '../../apps';
 import { getOperatorCatalog } from '../../webmutator/operators/catalog';
 
 interface AggregatedRun {
@@ -28,6 +29,12 @@ interface AggregatedRun {
     criticalViolations: number;
     impactedNodes: number;
     mutationTelemetry?: {
+        selectedCandidateId: string | null;
+        selectedTargetSelector: string | null;
+        selectedTargetTagType: string | null;
+        operatorRuntimeCategory: string | null;
+        operatorThesisCategory: string | null;
+        operatorConsideredCandidateCount: number | null;
         operatorCandidateCount: number | null;
         operatorApplicableCount: number | null;
         operatorSkippedOracleCount: number | null;
@@ -37,6 +44,7 @@ interface AggregatedRun {
         applyFailureCount: number;
         finalMutationOutcomeClass: string | null;
     };
+    recordedAtMs?: number;
 }
 
 interface UnsupportedRow {
@@ -76,12 +84,46 @@ function getAllFiles(dir: string): string[] {
     return results;
 }
 
+function buildRunIdentity(run: AggregatedRun): string {
+    const mutationIdentity =
+        run.phase === 'mutated'
+            ? run.changeId && run.changeId !== 'none'
+                ? run.changeId
+                : run.runId
+            : 'baseline';
+
+    return [
+        run.applicationId,
+        run.browserName,
+        run.corpusId,
+        run.activeScenarioId,
+        run.locatorFamily,
+        run.phase,
+        mutationIdentity,
+    ].join('|');
+}
+
+function dedupeRuns(runs: AggregatedRun[]): AggregatedRun[] {
+    const latestByIdentity = new Map<string, AggregatedRun>();
+
+    for (const run of runs) {
+        const identity = buildRunIdentity(run);
+        const existing = latestByIdentity.get(identity);
+        if (!existing || (run.recordedAtMs ?? 0) >= (existing.recordedAtMs ?? 0)) {
+            latestByIdentity.set(identity, run);
+        }
+    }
+
+    return [...latestByIdentity.values()].sort((left, right) => (left.recordedAtMs ?? 0) - (right.recordedAtMs ?? 0));
+}
+
 function loadResults(inputDir: string): AggregatedRun[] {
     const runs: AggregatedRun[] = [];
     const files = getAllFiles(inputDir).filter(f => f.endsWith('.json') && !f.includes('axe.json'));
 
     for (const file of files) {
         try {
+            const stat = fs.statSync(file);
             const content = JSON.parse(fs.readFileSync(file, 'utf8'));
             if (!content.runId || !content.locatorFamily || !content.phase) {
                 console.warn(`Skipping malformed record: ${file}`);
@@ -118,12 +160,13 @@ function loadResults(inputDir: string): AggregatedRun[] {
                 criticalViolations: content.accessibility?.criticalCount || 0,
                 impactedNodes: content.accessibility?.impactedNodeCount || 0,
                 mutationTelemetry: content.mutationTelemetry || undefined,
+                recordedAtMs: stat.mtimeMs,
             });
         } catch (e) {
             console.error(`Failed to parse ${file}:`, e);
         }
     }
-    return runs;
+    return dedupeRuns(runs);
 }
 
 function writeCsv(filePath: string, data: any[]) {
@@ -353,18 +396,49 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     });
     writeCsv(path.join(outputDir, 'accessibility_summary_all_valid_runs.csv'), accessibilitySummaryAllValidRuns);
 
+    const mutationRunTelemetry = mutated.map(run => ({
+        runId: run.runId,
+        applicationId: run.applicationId,
+        browserName: run.browserName,
+        corpusId: run.corpusId,
+        activeScenarioId: run.activeScenarioId,
+        locatorFamily: run.locatorFamily,
+        changeOperator: run.changeOperator,
+        changeCategory: run.changeCategory,
+        operatorRuntimeCategory: run.mutationTelemetry?.operatorRuntimeCategory ?? null,
+        operatorThesisCategory: run.mutationTelemetry?.operatorThesisCategory ?? null,
+        selectedCandidateId: run.mutationTelemetry?.selectedCandidateId ?? null,
+        selectedTargetSelector: run.mutationTelemetry?.selectedTargetSelector ?? null,
+        selectedTargetTagType: run.mutationTelemetry?.selectedTargetTagType ?? null,
+        operatorConsideredCandidateCount: run.mutationTelemetry?.operatorConsideredCandidateCount ?? null,
+        operatorCandidateCount: run.mutationTelemetry?.operatorCandidateCount ?? null,
+        operatorApplicableCount: run.mutationTelemetry?.operatorApplicableCount ?? null,
+        operatorSkippedOracleCount: run.mutationTelemetry?.operatorSkippedOracleCount ?? null,
+        operatorNotApplicableCount: run.mutationTelemetry?.operatorNotApplicableCount ?? null,
+        operatorCheckDurationMs: run.mutationTelemetry?.operatorCheckDurationMs ?? null,
+        applyDurationMs: run.mutationTelemetry?.applyDurationMs ?? null,
+        applyFailureCount: run.mutationTelemetry?.applyFailureCount ?? 0,
+        finalMutationOutcomeClass: run.mutationTelemetry?.finalMutationOutcomeClass ?? null,
+    }));
+    writeCsv(path.join(outputDir, 'mutation_run_telemetry.csv'), mutationRunTelemetry);
+
     const operatorTelemetrySummary = operators.map(operator => {
         const operatorRuns = mutated.filter(run => run.changeOperator === operator);
         return {
             operator,
             totalMutatedRuns: operatorRuns.length,
+            distinctSelectedCandidates: new Set(operatorRuns.map(run => run.mutationTelemetry?.selectedCandidateId).filter(Boolean)).size,
             totalCandidateCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorCandidateCount ?? 0), 0),
+            totalConsideredCandidateCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorConsideredCandidateCount ?? 0), 0),
             totalApplicableCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorApplicableCount ?? 0), 0),
             totalSkippedOracleCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorSkippedOracleCount ?? 0), 0),
             totalNotApplicableCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorNotApplicableCount ?? 0), 0),
             totalCheckDurationMs: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorCheckDurationMs ?? 0), 0),
             totalApplyDurationMs: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.applyDurationMs ?? 0), 0),
             totalApplyFailures: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.applyFailureCount ?? 0), 0),
+            sampledTargetSelectors: JSON.stringify(
+                Array.from(new Set(operatorRuns.map(run => run.mutationTelemetry?.selectedTargetSelector).filter(Boolean))).slice(0, 5),
+            ),
             finalOutcomeClasses: JSON.stringify(
                 operatorRuns.reduce((acc, run) => {
                     const outcome = run.mutationTelemetry?.finalMutationOutcomeClass;
@@ -395,6 +469,7 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
             completedOnly: accessibilitySummaryCompletedOnly,
             allValidRuns: accessibilitySummaryAllValidRuns,
         },
+        mutationRunTelemetry,
         operatorTelemetrySummary,
         operatorCounts: operators.map(operator => ({
             operator,
@@ -414,13 +489,10 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
 }
 
 const args = process.argv.slice(2);
-if (args.length < 2) {
-    console.log('Usage: npx ts-node src/murun/runner/aggregate.ts <input_dir> <output_dir>');
-    process.exit(1);
-}
-
-const inputDir = path.resolve(args[0]);
-const outputDir = path.resolve(args[1]);
+const selectedAppId = getSelectedAppId();
+const defaultAppResultsDir = getAppResultsDir(selectedAppId);
+const inputDir = path.resolve(args[0] || path.join(defaultAppResultsDir, 'benchmark-runs'));
+const outputDir = path.resolve(args[1] || path.join(defaultAppResultsDir, 'aggregate'));
 
 if (!fs.existsSync(inputDir)) {
     console.error(`Input directory does not exist: ${inputDir}`);

@@ -1,6 +1,7 @@
 import { getSelectedAppAdapter } from '../../../src/apps';
 import type { StrategyName } from '../../../src/locators';
 import type { Page } from '@playwright/test';
+import { resolveFactoryScope } from '../../../src/locators/BenchmarkedLocator';
 
 export const appAdapter = getSelectedAppAdapter();
 export const appPaths = appAdapter.paths;
@@ -18,7 +19,16 @@ export function bindAppLocators(page: Page, strategy: StrategyName = 'semantic-f
 
   const bindNode = (node: any): any => {
     if (typeof node === 'function') {
-      return (...args: any[]) => ({ raw: node(page, ...args), fill: (value: string) => node(page, ...args).fill(value), click: () => node(page, ...args).click(), press: (key: string) => node(page, ...args).press(key) });
+      return (...args: any[]) => {
+        const { scope, remainingArgs } = resolveFactoryScope(page, args);
+        const locator = node(scope, ...remainingArgs);
+        return {
+          raw: locator,
+          fill: (value: string) => locator.fill(value),
+          click: () => locator.click(),
+          press: (key: string) => locator.press(key),
+        };
+      };
     }
     if (!node || typeof node !== 'object') {
       return node;

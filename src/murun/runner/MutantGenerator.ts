@@ -337,6 +337,7 @@ export class MutantGenerator {
     async constructScenarios(targets: ReachableTarget[]): Promise<MutationCandidate[]> {
         const candidates: MutationCandidate[] = [];
         const candidateKeys = new Set<string>();
+        const operatorCatalog = getBenchmarkOperatorCatalog();
 
         for (const target of targets) {
             if (!target.eligible) {
@@ -346,6 +347,7 @@ export class MutantGenerator {
             for (const operatorName of target.eligibleOperators) {
                 const operator = OperatorRegistry.createOperator(operatorName);
                 const operatorCoverage = this.operatorCoverage.get(operatorName);
+                const operatorEntry = operatorCatalog.find(entry => entry.type === operatorName);
                 const candidate = new MutationCandidate(target.selector, operator, target.url, target.fingerprint, {
                     applicationId: target.applicationId,
                     corpusId: target.corpusId,
@@ -368,6 +370,8 @@ export class MutantGenerator {
                     operatorSkippedOracleCount: operatorCoverage?.skippedOracleCount,
                     operatorNotApplicableCount: operatorCoverage?.notApplicableCount,
                     operatorTotalCheckDurationMs: operatorCoverage?.totalCheckDurationMs,
+                    operatorRuntimeCategory: operatorEntry?.runtimeCategory ?? operator.category,
+                    operatorThesisCategory: operatorEntry?.thesisCategory ?? operator.category,
                 });
 
                 if (!candidateKeys.has(candidate.candidateId!)) {
@@ -437,6 +441,8 @@ export class MutantGenerator {
                 operatorSkippedOracleCount: d.operatorSkippedOracleCount,
                 operatorNotApplicableCount: d.operatorNotApplicableCount,
                 operatorTotalCheckDurationMs: d.operatorTotalCheckDurationMs,
+                operatorRuntimeCategory: d.operatorRuntimeCategory ?? null,
+                operatorThesisCategory: d.operatorThesisCategory ?? null,
             });
             if (d.record) candidate.record = d.record;
             return candidate;

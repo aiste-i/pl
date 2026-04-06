@@ -1,19 +1,34 @@
 import { Page, Locator } from 'playwright';
 import { DomOperator } from './DomOperator';
 import { MutationRecord } from '../../MutationRecord';
-import { OracleSafety } from '../../utils/OracleSafety';
+import { MutationTargetSafety } from '../../utils/MutationTargetSafety';
 
 export class ReverseChildrenOrder implements DomOperator {
     category: 'structural' = 'structural';
 
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
-        if (await OracleSafety.isStructuralMutationUnsafe(target)) return false;
-        return await target.evaluate((node: HTMLElement) => node.children.length >= 2);
+        if (!(await MutationTargetSafety.isSafeStructuralTarget(target))) return false;
+        return await target.evaluate((node: HTMLElement) => {
+            const interactiveSelector = 'a[href], button, input, select, textarea, form, [role="button"], [role="link"], [role="textbox"]';
+            const safeChildren = Array.from(node.children).filter(child =>
+                !child.hasAttribute('data-testid') &&
+                !child.querySelector('[data-testid]') &&
+                !child.matches(interactiveSelector) &&
+                !child.querySelector(interactiveSelector),
+            );
+            return safeChildren.length >= 2;
+        });
     }
 
     async applyOperator(page: Page, target: Locator, record: MutationRecord): Promise<void> {
         const reversed = await target.evaluate((node: HTMLElement) => {
-            const children = Array.from(node.children);
+            const interactiveSelector = 'a[href], button, input, select, textarea, form, [role="button"], [role="link"], [role="textbox"]';
+            const children = Array.from(node.children).filter(child =>
+                !child.hasAttribute('data-testid') &&
+                !child.querySelector('[data-testid]') &&
+                !child.matches(interactiveSelector) &&
+                !child.querySelector(interactiveSelector),
+            );
             if (children.length < 2) {
                 return false;
             }

@@ -1,14 +1,13 @@
 import { Page, Locator } from 'playwright';
 import { DomOperator } from './DomOperator';
 import { MutationRecord } from '../../MutationRecord';
-import { OracleSafety } from '../../utils/OracleSafety';
+import { MutationTargetSafety } from '../../utils/MutationTargetSafety';
 
 export class SubtreeDelete implements DomOperator {
     category: 'structural' = 'structural';
     
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
-        // Double check: if node contains oracle descendants, do not delete.
-        if (await OracleSafety.isStructuralMutationUnsafe(target)) return false;
+        if (!(await MutationTargetSafety.isSafeStructuralTarget(target))) return false;
         return await target.evaluate((node: HTMLElement) => node.children.length > 0);
     }
 

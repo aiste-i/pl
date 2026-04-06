@@ -68,9 +68,17 @@ Oracle purity migration details are documented in:
 
 - [`ORACLE_PURITY_MIGRATION.md`](/c:/Users/aiste/Desktop/benchmark/ORACLE_PURITY_MIGRATION.md)
 
-Semantic-first exceptions remain explicit and separately reportable in:
+Cross-framework repeated oracle anchors now use stable `data-testid` patterns, including:
+
+- `article-preview-1`, `article-read-more-1`
+- `comment-card-<id>`
+- `pagination-item-<n>`, `pagination-link-<n>`
+
+The current semantic exception report is version-controlled in:
 
 - [`reports/realworld-semantic-css-exceptions.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-semantic-css-exceptions.json)
+
+At the moment, the active RealWorld corpus has no remaining semantic CSS exceptions.
 
 ## Mutation Scope
 
@@ -87,6 +95,24 @@ Machine-readable mutation artifacts:
 
 - [`reports/realworld-operator-taxonomy.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-operator-taxonomy.json)
 - [`reports/realworld-operator-coverage.json`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-operator-coverage.json)
+
+The operator taxonomy now records, for every operator:
+
+- thesis category
+- DOM applicability conditions
+- non-breaking safety guard
+
+Per-run mutation telemetry is flattened during aggregation so reviewers can inspect:
+
+- selected candidate id
+- mutated selector and target tag type
+- operator runtime and thesis category
+- candidate counts, applicability counts, and final outcome class
+
+Aggregate CSV evidence now includes:
+
+- `mutation_run_telemetry.csv`
+- `operator_telemetry_summary.csv`
 
 ## Execution Environments
 
@@ -140,6 +166,12 @@ Run a Chromium mutation sample across all three apps:
 npm run benchmark:mutate:sample:all
 ```
 
+Run the full selected mutation set across all three apps:
+
+```bash
+npm run benchmark:mutate:all
+```
+
 Aggregate benchmark outputs:
 
 ```bash
@@ -177,6 +209,17 @@ Aggregate outputs preserve:
 - accessibility scan status
 - operator telemetry
 
+Accessibility summary CSVs are retained in the aggregate artifact location for each app under:
+
+- `test-results/<app-id>/realworld-active/aggregate/accessibility_summary_completed_only.csv`
+- `test-results/<app-id>/realworld-active/aggregate/accessibility_summary_all_valid_runs.csv`
+
+Reviewer-facing copies are also version-controlled under:
+
+- [`reports/realworld-accessibility-summary-completed-only.csv`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-accessibility-summary-completed-only.csv)
+- [`reports/realworld-accessibility-summary-all-valid-runs.csv`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-accessibility-summary-all-valid-runs.csv)
+- [`reports/realworld-accessibility-scan-status-summary.csv`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-accessibility-scan-status-summary.csv)
+
 ## CI
 
 The repository ships two workflow layers:
@@ -184,7 +227,7 @@ The repository ships two workflow layers:
 - PR validation in [`/.github/workflows/pr-realworld.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/pr-realworld.yml)
 - scheduled smoke and mutation sampling in [`/.github/workflows/scheduled-realworld.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/scheduled-realworld.yml)
 
-PR validation enforces linting, typechecking, methodological validation specs, Chromium baseline coverage, and report freshness. Scheduled smoke adds Firefox/WebKit baseline coverage plus a limited Chromium mutation sample and aggregate outputs.
+PR validation enforces linting, typechecking, methodological validation specs, Chromium baseline coverage, deterministic mutation-sample preparation, aggregation, and report freshness. Scheduled smoke adds Firefox/WebKit baseline coverage plus the same Chromium mutation-sample and aggregation path.
 
 ## Additional Docs
 

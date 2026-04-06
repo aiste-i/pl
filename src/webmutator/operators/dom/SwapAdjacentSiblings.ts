@@ -1,13 +1,13 @@
 import { Locator, Page } from 'playwright';
 import { MutationRecord } from '../../MutationRecord';
-import { OracleSafety } from '../../utils/OracleSafety';
+import { MutationTargetSafety } from '../../utils/MutationTargetSafety';
 import { DomOperator } from './DomOperator';
 
 export class SwapAdjacentSiblings implements DomOperator {
     category: 'structural' = 'structural';
 
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
-        if (await OracleSafety.isStructuralMutationUnsafe(target)) return false;
+        if (!(await MutationTargetSafety.isSafeStructuralTarget(target))) return false;
 
         return await target.evaluate((node: HTMLElement) => {
             const sibling = node.nextElementSibling as HTMLElement | null;
@@ -15,8 +15,12 @@ export class SwapAdjacentSiblings implements DomOperator {
                 return false;
             }
 
+            const interactiveSelector = 'a[href], button, input, select, textarea, form, [role="button"], [role="link"], [role="textbox"]';
             const isProtected = (element: HTMLElement) =>
-                element.hasAttribute('data-testid') || Boolean(element.querySelector('[data-testid]'));
+                element.hasAttribute('data-testid') ||
+                Boolean(element.querySelector('[data-testid]')) ||
+                element.matches(interactiveSelector) ||
+                Boolean(element.querySelector(interactiveSelector));
 
             return !isProtected(node) && !isProtected(sibling);
         });

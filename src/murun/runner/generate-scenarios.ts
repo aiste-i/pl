@@ -4,9 +4,9 @@ import * as fs from 'fs';
 import { getAppScenariosPath, getSelectedAppId } from '../../apps';
 
 async function main() {
-    const appName = (process.argv[2] || process.env.APP_ID || getSelectedAppId()) as any;
-    const budget = parseInt(process.argv[3]) || 20;
-    const seed = parseInt(process.argv[4]) || 12345;
+    const appName = (process.argv[2] || process.env.APP_ID || process.env.npm_config_appid || getSelectedAppId()) as any;
+    const budget = parseInt(process.argv[3] || process.env.BENCHMARK_BUDGET || process.env.npm_config_budget || '20', 10);
+    const seed = parseInt(process.argv[4] || process.env.BENCHMARK_SEED || process.env.npm_config_seed || '12345', 10);
 
     console.log(`Generating scenarios for app: ${appName} (budget: ${budget}, seed: ${seed})`);
 

@@ -9,11 +9,15 @@ const APP_ID = getSelectedAppId();
 const MODE = process.env.BENCHMARK_ACTIVE_MODE || 'baseline';
 const SCENARIO_FILE = getAppScenariosPath(APP_ID);
 const REACHABLE_TARGETS_FILE = getAppReachableTargetsPath(APP_ID);
-const MUTATION_LIMIT = Number(process.env.MUTATION_LIMIT || '1');
+const MUTATION_LIMIT = Number(process.env.MUTATION_LIMIT || process.env.npm_config_limit || Number.MAX_SAFE_INTEGER);
 const ACTIVE_SCENARIOS = getActiveScenarioDefinitions();
 
-function describeScenario(strategy: StrategyName, scenario: ReturnType<typeof getActiveScenarioDefinitions>[number]) {
-  test(`${scenario.displayName} [${strategy}]`, async ({ page, request, locators, oracle, appAdapter, applyDeferredMutation, setScenarioMetadata }) => {
+function describeScenario(
+  strategy: StrategyName,
+  scenario: ReturnType<typeof getActiveScenarioDefinitions>[number],
+  testTitle = `${scenario.displayName} [${strategy}]`,
+) {
+  test(testTitle, async ({ page, request, locators, oracle, appAdapter, applyDeferredMutation, setScenarioMetadata }) => {
     setScenarioMetadata({
       activeScenarioId: scenario.scenarioId,
       activeScenarioCategory: scenario.category,
@@ -88,7 +92,11 @@ if (MODE === 'mutate' && fs.existsSync(SCENARIO_FILE)) {
           mutation: mutationScenario,
         });
 
-        describeScenario(strategy, matchingScenario);
+        describeScenario(
+          strategy,
+          matchingScenario,
+          `${matchingScenario.displayName} [${strategy}] (${mutationScenario.scenarioId} :: ${mutationScenario.candidateId ?? mutationScenario.selector})`,
+        );
       });
     }
   }

@@ -1,6 +1,7 @@
 import { Page, Locator } from 'playwright';
 import { DomOperator } from './DomOperator';
 import { MutationRecord } from '../../MutationRecord';
+import { MutationTargetSafety } from '../../utils/MutationTargetSafety';
 
 export class TagMutator implements DomOperator {
     category: 'structural' = 'structural';
@@ -20,6 +21,7 @@ export class TagMutator implements DomOperator {
     };
 
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
+        if (!(await MutationTargetSafety.isSafeStructuralTarget(target))) return false;
         const tag = await target.evaluate(n => n.tagName.toLowerCase());
         return !!this.switchMap[tag];
     }

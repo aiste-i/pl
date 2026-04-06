@@ -5,6 +5,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Any non-oracle element; existing attributes remain mutable except for preserved data-testid values.",
+    "safetyGuard": "Attribute mutations preserve data-testid so oracle roots stay grounded.",
     "excludedReason": null
   },
   {
@@ -13,6 +15,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Any non-oracle element; existing attributes remain mutable except for preserved data-testid values.",
+    "safetyGuard": "Attribute mutations preserve data-testid so oracle roots stay grounded.",
     "excludedReason": null
   },
   {
@@ -21,6 +25,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Any non-oracle element; existing attributes remain mutable except for preserved data-testid values.",
+    "safetyGuard": "Attribute mutations preserve data-testid so oracle roots stay grounded.",
     "excludedReason": null
   },
   {
@@ -29,6 +35,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Any non-oracle element; existing attributes remain mutable except for preserved data-testid values.",
+    "safetyGuard": "Attribute mutations preserve data-testid so oracle roots stay grounded.",
     "excludedReason": null
   },
   {
@@ -37,6 +45,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "visibility",
     "thesisCategory": "visibility-interaction-state",
+    "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
+    "safetyGuard": "Visual operators avoid hiding or displacing actionable controls and keep mutated nodes visible/actionable.",
     "excludedReason": null
   },
   {
@@ -45,6 +55,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "visibility",
     "thesisCategory": "visibility-interaction-state",
+    "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
+    "safetyGuard": "Visual operators avoid hiding or displacing actionable controls and keep mutated nodes visible/actionable.",
     "excludedReason": null
   },
   {
@@ -53,6 +65,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "visibility",
     "thesisCategory": "visibility-interaction-state",
+    "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
+    "safetyGuard": "Visual operators avoid hiding or displacing actionable controls and keep mutated nodes visible/actionable.",
     "excludedReason": null
   },
   {
@@ -61,6 +75,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "visibility",
     "thesisCategory": "visibility-interaction-state",
+    "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
+    "safetyGuard": "Visual operators avoid hiding or displacing actionable controls and keep mutated nodes visible/actionable.",
     "excludedReason": null
   },
   {
@@ -69,6 +85,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "content",
     "thesisCategory": "content",
+    "domConditions": "Element with non-empty visible text content.",
+    "safetyGuard": "Targets remain present in the DOM; only textual content is changed.",
     "excludedReason": null
   },
   {
@@ -77,6 +95,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "content",
     "thesisCategory": "content",
+    "domConditions": "Element with non-empty visible text content.",
+    "safetyGuard": "Targets remain present in the DOM; only textual content is changed.",
     "excludedReason": null
   },
   {
@@ -85,6 +105,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "content",
     "thesisCategory": "content",
+    "domConditions": "Element with non-empty visible text content.",
+    "safetyGuard": "Targets remain present in the DOM; only textual content is changed.",
     "excludedReason": null
   },
   {
@@ -93,6 +115,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "content",
     "thesisCategory": "content",
+    "domConditions": "Element with non-empty visible text content.",
+    "safetyGuard": "Targets remain present in the DOM; only textual content is changed.",
     "excludedReason": null
   },
   {
@@ -101,6 +125,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
+    "safetyGuard": "Structural operators skip oracle-rooted and interactive/form-critical regions to avoid breaking task completion.",
     "excludedReason": null
   },
   {
@@ -109,6 +135,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
+    "safetyGuard": "Structural operators skip oracle-rooted and interactive/form-critical regions to avoid breaking task completion.",
     "excludedReason": null
   },
   {
@@ -117,6 +145,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
+    "safetyGuard": "Structural operators skip oracle-rooted and interactive/form-critical regions to avoid breaking task completion.",
     "excludedReason": null
   },
   {
@@ -125,6 +155,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
+    "safetyGuard": "Structural operators skip oracle-rooted and interactive/form-critical regions to avoid breaking task completion.",
     "excludedReason": null
   },
   {
@@ -133,6 +165,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
+    "safetyGuard": "Structural operators skip oracle-rooted and interactive/form-critical regions to avoid breaking task completion.",
     "excludedReason": null
   },
   {
@@ -141,6 +175,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
+    "safetyGuard": "Structural operators skip oracle-rooted and interactive/form-critical regions to avoid breaking task completion.",
     "excludedReason": null
   },
   {
@@ -149,6 +185,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Non-oracle text-level semantic tags with a defined replacement mapping (for example h1->h2 or p->div).",
+    "safetyGuard": "Only non-interactive semantic text tags are remapped so controls and oracle anchors remain intact.",
     "excludedReason": null
   },
   {
@@ -157,6 +195,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "structural",
     "thesisCategory": "structural",
+    "domConditions": "Leaf container nodes whose tag is one of body/div/span/table/td/tr/ul/li and whose text is non-empty.",
+    "safetyGuard": "Only leaf container text is altered; descendants are not removed or hidden.",
     "excludedReason": null
   },
   {
@@ -165,6 +205,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "Anchor, input, or button elements with a mutable href/id/class/title surface.",
+    "safetyGuard": "Mutations stay on the actionable node itself rather than deleting or hiding required controls.",
     "excludedReason": null
   },
   {
@@ -173,6 +215,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "visibility",
     "thesisCategory": "visibility-interaction-state",
+    "domConditions": "Elements with a classList that can be toggled between stable style classes.",
+    "safetyGuard": "Class toggles preserve node presence and are blocked for oracle-protected targets.",
     "excludedReason": null
   },
   {
@@ -181,6 +225,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "img elements with an alt attribute.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -189,6 +235,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "img elements with an alt attribute.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -197,6 +245,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "img elements that can be replaced with a non-semantic div.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -205,6 +255,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "button elements with a visible or accessible label.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -213,6 +265,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "Named form controls whose name attributes can be removed.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -221,6 +275,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "Anchor elements that can be downgraded to non-link spans.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -229,6 +285,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "Heading elements h1-h6.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -237,6 +295,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "th elements inside table header structures.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -245,6 +305,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "Elements that already expose an id attribute.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -253,6 +315,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "Semantic landmark or sectioning elements with a valid div replacement path.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -261,6 +325,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "Elements that already expose aria-label.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -269,6 +335,8 @@
     "benchmarkScope": "in-scope",
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
+    "domConditions": "Elements with an aria-expanded state.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },
   {
@@ -277,6 +345,8 @@
     "benchmarkScope": "excluded-by-design",
     "runtimeCategory": "visual",
     "thesisCategory": "visual",
+    "domConditions": "Rendered visual nodes eligible for bitmap-style distortion or masking.",
+    "safetyGuard": "Excluded from the benchmark because they do not answer the DOM/accessibility robustness question directly.",
     "excludedReason": "Visual-only distortions do not cleanly answer the thesis question about locator-family robustness under non-breaking DOM/accessibility change."
   },
   {
@@ -285,6 +355,8 @@
     "benchmarkScope": "excluded-by-design",
     "runtimeCategory": "visual",
     "thesisCategory": "visual",
+    "domConditions": "Rendered visual nodes eligible for bitmap-style distortion or masking.",
+    "safetyGuard": "Excluded from the benchmark because they do not answer the DOM/accessibility robustness question directly.",
     "excludedReason": "Masking simulates visual regression rather than a DOM/accessibility mutation that can be interpreted at the locator-family level."
   }
 ]

@@ -14,7 +14,7 @@
 	<nav data-testid="pagination-nav">
 		<ul class="pagination" data-testid="pagination-list">
 			{#each range as n}
-				<li class="page-item" class:active={n == p} data-testid={"pagination-item-" + n}>
+				<li class="page-item" class:active={n == p} aria-label={"Page " + n} data-testid={"pagination-item-" + n}>
 					<a class="page-link" href={href(n)} aria-label={"Go to page " + n} data-testid={"pagination-link-" + n}>{n}</a>
 				</li>
 			{/each}

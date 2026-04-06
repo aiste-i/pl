@@ -43,6 +43,9 @@ jobs:
       - name: Aggregate reports
         run: npm run benchmark:aggregate:all
 
+      - name: Generate machine-readable reports
+        run: npm run reports:generate
+
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4

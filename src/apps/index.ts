@@ -20,7 +20,7 @@ export const REALWORLD_APP_IDS: SupportedAppId[] = [
 ];
 
 export function getSelectedAppId(): SupportedAppId {
-  const candidate = process.env.APP_ID as SupportedAppId | undefined;
+  const candidate = (process.env.APP_ID || process.env.npm_config_appid) as SupportedAppId | undefined;
   if (!candidate) {
     return 'angular-realworld-example-app';
   }

@@ -150,6 +150,9 @@ PR workflow:
 - run typecheck
 - run methodological validation specs
 - run Chromium baseline corpus
+- prepare deterministic mutation samples
+- execute Chromium mutation sample
+- aggregate benchmark outputs
 - run report freshness check
 
 Scheduled workflow:

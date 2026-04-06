@@ -40,6 +40,18 @@ jobs:
         run: |
           PLAYWRIGHT_BROWSERS=chromium npm run benchmark:baseline:all
 
+      - name: Prepare deterministic mutation samples
+        run: |
+          npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=1 --seed=12345
+          npm run benchmark:prepare:app --appid=realworld --budget=1 --seed=12345
+          npm run benchmark:prepare:app --appid=vue3-realworld-example-app --budget=1 --seed=12345
+
+      - name: Chromium mutation sample
+        run: npm run benchmark:mutate:sample:all
+
+      - name: Aggregate reports
+        run: npm run benchmark:aggregate:all
+
       - name: Reports freshness
         run: npm run reports:check
 

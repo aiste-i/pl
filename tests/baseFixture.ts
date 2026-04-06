@@ -4,7 +4,7 @@ import { WebMutator } from '../src/webmutator/WebMutator';
 import { MutationCandidate } from '../src/webmutator/MutationCandidate';
 import { StrategyName, STRATEGIES, getAppLocators, getAppOracle } from '../src/locators';
 import { FailureClassifier, ExecutionStage, FailureClass, ClassificationResult, StructuredEvidence } from '../src/webmutator/utils/FailureClassifier';
-import { BenchmarkedLocator, OracleLocator, InstrumentationContext } from '../src/locators/BenchmarkedLocator';
+import { BenchmarkedLocator, OracleLocator, InstrumentationContext, resolveFactoryScope } from '../src/locators/BenchmarkedLocator';
 import { AxeBuilder } from '@axe-core/playwright';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
@@ -86,6 +86,12 @@ export interface BenchmarkResult {
   instrumentationPathUsed: 'structured' | 'fallback' | 'mixed';
   accessibility: AccessibilitySummary;
   mutationTelemetry?: {
+    selectedCandidateId: string | null;
+    selectedTargetSelector: string | null;
+    selectedTargetTagType: string | null;
+    operatorRuntimeCategory: string | null;
+    operatorThesisCategory: string | null;
+    operatorConsideredCandidateCount: number | null;
     operatorCandidateCount: number | null;
     operatorApplicableCount: number | null;
     operatorSkippedOracleCount: number | null;
@@ -298,7 +304,10 @@ export const test = base.extend<TestOptions & {
 
     const wrapLocators = (node: any): any => {
       if (typeof node === 'function') {
-        return (...args: any[]) => new BenchmarkedLocator(node(page, ...args), context);
+        return (...args: any[]) => {
+          const { scope, remainingArgs } = resolveFactoryScope(page, args);
+          return new BenchmarkedLocator(node(scope, ...remainingArgs), context);
+        };
       }
       if (!node || typeof node !== 'object') {
         return node;
@@ -315,7 +324,10 @@ export const test = base.extend<TestOptions & {
     const rawOracle = getAppOracle(appAdapter);
     const wrapOracle = (node: any): any => {
       if (typeof node === 'function') {
-        return (...args: any[]) => new OracleLocator(node(page, ...args), context);
+        return (...args: any[]) => {
+          const { scope, remainingArgs } = resolveFactoryScope(page, args);
+          return new OracleLocator(node(scope, ...remainingArgs), context);
+        };
       }
       if (!node || typeof node !== 'object') {
         return node;
@@ -390,6 +402,12 @@ export const test = base.extend<TestOptions & {
         benchmarkResult.comparisonEligible = mutation.aggregateComparisonEligible !== false;
         benchmarkResult.comparisonExclusionReason = mutation.comparisonExclusionReason;
         benchmarkResult.mutationTelemetry = {
+            selectedCandidateId: mutation.candidateId ?? null,
+            selectedTargetSelector: mutation.selector ?? null,
+            selectedTargetTagType: mutation.fingerprint?.tagType ?? null,
+            operatorRuntimeCategory: mutation.operatorRuntimeCategory ?? mutation.operator.category,
+            operatorThesisCategory: mutation.operatorThesisCategory ?? mutation.operator.category,
+            operatorConsideredCandidateCount: mutation.operatorCandidateCount ?? null,
             operatorCandidateCount: mutation.operatorCandidateCount ?? null,
             operatorApplicableCount: mutation.operatorApplicableCount ?? null,
             operatorSkippedOracleCount: mutation.operatorSkippedOracleCount ?? null,

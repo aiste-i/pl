@@ -16,13 +16,46 @@ export interface OperatorCatalogEntry {
   benchmarkScope: OperatorBenchmarkScope;
   runtimeCategory: dom.DomOperator['category'] | 'visual';
   thesisCategory: ThesisMutationCategory;
+  domConditions: string;
+  safetyGuard: string;
   excludedReason?: string;
   factory(params?: any): dom.DomOperator;
 }
 
+const GENERIC_ATTRIBUTE_MUTATION = {
+  domConditions: 'Any non-oracle element; existing attributes remain mutable except for preserved data-testid values.',
+  safetyGuard: 'Attribute mutations preserve data-testid so oracle roots stay grounded.',
+} as const;
+
+const SAFE_STRUCTURAL_MUTATION = {
+  domConditions: 'Non-oracle, non-interactive node without interactive or form-critical descendants.',
+  safetyGuard: 'Structural operators skip oracle-rooted and interactive/form-critical regions to avoid breaking task completion.',
+} as const;
+
+const TEXT_CONTENT_MUTATION = {
+  domConditions: 'Element with non-empty visible text content.',
+  safetyGuard: 'Targets remain present in the DOM; only textual content is changed.',
+} as const;
+
+const SAFE_VISUAL_MUTATION = {
+  domConditions: 'Non-oracle, non-interactive node without interactive or form-critical descendants.',
+  safetyGuard: 'Visual operators avoid hiding or displacing actionable controls and keep mutated nodes visible/actionable.',
+} as const;
+
+const ACCESSIBILITY_MUTATION = {
+  domConditions: 'Elements that expose the specific accessibility attribute, role, or semantic mapping required by the operator.',
+  safetyGuard: 'Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.',
+} as const;
+
+const EXCLUDED_VISUAL_MUTATION = {
+  domConditions: 'Rendered visual nodes eligible for bitmap-style distortion or masking.',
+  safetyGuard: 'Excluded from the benchmark because they do not answer the DOM/accessibility robustness question directly.',
+} as const;
+
 export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   {
     type: 'AttributeAdd',
+    ...GENERIC_ATTRIBUTE_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -31,6 +64,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'AttributeDelete',
+    ...GENERIC_ATTRIBUTE_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -39,6 +73,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'AttributeMutator',
+    ...GENERIC_ATTRIBUTE_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -47,6 +82,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'AttributeReplace',
+    ...GENERIC_ATTRIBUTE_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -55,6 +91,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'StyleColor',
+    ...SAFE_VISUAL_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'visibility',
@@ -63,6 +100,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'StylePosition',
+    ...SAFE_VISUAL_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'visibility',
@@ -71,6 +109,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'StyleSize',
+    ...SAFE_VISUAL_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'visibility',
@@ -79,6 +118,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'StyleVisibility',
+    ...SAFE_VISUAL_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'visibility',
@@ -87,6 +127,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'TextDelete',
+    ...TEXT_CONTENT_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'content',
@@ -95,6 +136,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'TextInsert',
+    ...TEXT_CONTENT_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'content',
@@ -103,6 +145,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'TextNodeMutator',
+    ...TEXT_CONTENT_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'content',
@@ -111,6 +154,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'TextReplace',
+    ...TEXT_CONTENT_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'content',
@@ -119,6 +163,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'SubtreeDelete',
+    ...SAFE_STRUCTURAL_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -127,6 +172,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'SubtreeInsert',
+    ...SAFE_STRUCTURAL_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -135,6 +181,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'SubtreeMove',
+    ...SAFE_STRUCTURAL_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -143,6 +190,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'SubtreeSwap',
+    ...SAFE_STRUCTURAL_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -151,6 +199,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ReverseChildrenOrder',
+    ...SAFE_STRUCTURAL_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -159,6 +208,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'SwapAdjacentSiblings',
+    ...SAFE_STRUCTURAL_MUTATION,
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -167,6 +217,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'TagMutator',
+    domConditions: 'Non-oracle text-level semantic tags with a defined replacement mapping (for example h1->h2 or p->div).',
+    safetyGuard: 'Only non-interactive semantic text tags are remapped so controls and oracle anchors remain intact.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -175,6 +227,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ContainerNodeMutator',
+    domConditions: 'Leaf container nodes whose tag is one of body/div/span/table/td/tr/ul/li and whose text is non-empty.',
+    safetyGuard: 'Only leaf container text is altered; descendants are not removed or hidden.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'structural',
@@ -183,6 +237,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ActionableNodeMutator',
+    domConditions: 'Anchor, input, or button elements with a mutable href/id/class/title surface.',
+    safetyGuard: 'Mutations stay on the actionable node itself rather than deleting or hiding required controls.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -191,6 +247,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ToggleCssClass',
+    domConditions: 'Elements with a classList that can be toggled between stable style classes.',
+    safetyGuard: 'Class toggles preserve node presence and are blocked for oracle-protected targets.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'visibility',
@@ -199,6 +257,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ChangeImageAlt',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'img elements with an alt attribute.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -207,6 +267,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'RemoveImageAlt',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'img elements with an alt attribute.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -215,6 +277,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ReplaceImageWithDiv',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'img elements that can be replaced with a non-semantic div.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -223,6 +287,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ChangeButtonLabel',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'button elements with a visible or accessible label.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -231,6 +297,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'RemoveInputNames',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'Named form controls whose name attributes can be removed.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -239,6 +307,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ReplaceAnchorWithSpan',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'Anchor elements that can be downgraded to non-link spans.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -247,6 +317,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ReplaceHeadingWithP',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'Heading elements h1-h6.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -255,6 +327,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ReplaceThWithTd',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'th elements inside table header structures.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -263,6 +337,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'DuplicateId',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'Elements that already expose an id attribute.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -271,6 +347,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'SemanticToDiv',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'Semantic landmark or sectioning elements with a valid div replacement path.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -279,6 +357,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ChangeAriaLabel',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'Elements that already expose aria-label.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -287,6 +367,8 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'ToggleAriaExpanded',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'Elements with an aria-expanded state.',
     implementationKind: 'dom',
     benchmarkScope: 'in-scope',
     runtimeCategory: 'accessibility-semantic',
@@ -295,6 +377,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'DistortMutator',
+    ...EXCLUDED_VISUAL_MUTATION,
     implementationKind: 'visual',
     benchmarkScope: 'excluded-by-design',
     runtimeCategory: 'visual',
@@ -304,6 +387,7 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
   },
   {
     type: 'MaskMutator',
+    ...EXCLUDED_VISUAL_MUTATION,
     implementationKind: 'visual',
     benchmarkScope: 'excluded-by-design',
     runtimeCategory: 'visual',

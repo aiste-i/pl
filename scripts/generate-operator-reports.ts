@@ -52,6 +52,8 @@ function main() {
     benchmarkScope: entry.benchmarkScope,
     runtimeCategory: entry.runtimeCategory,
     thesisCategory: entry.thesisCategory,
+    domConditions: entry.domConditions,
+    safetyGuard: entry.safetyGuard,
     excludedReason: entry.excludedReason ?? null,
   }));
 
@@ -72,6 +74,9 @@ function main() {
 
     const appliedCounts = new Map<string, number>();
     const outcomeCounts = new Map<string, Record<string, number>>();
+    const selectedCandidateIds = new Map<string, Set<string>>();
+    const selectedTargetSelectors = new Map<string, Set<string>>();
+    const selectedTargetTagTypes = new Map<string, Set<string>>();
     for (const run of mutatedRuns) {
       const operator = run.changeOperator;
       if (!operator) {
@@ -82,6 +87,24 @@ function main() {
       const outcome = run.mutationTelemetry?.finalMutationOutcomeClass ?? 'unknown';
       bucket[outcome] = (bucket[outcome] ?? 0) + 1;
       outcomeCounts.set(operator, bucket);
+
+      const candidateBucket = selectedCandidateIds.get(operator) ?? new Set<string>();
+      if (run.mutationTelemetry?.selectedCandidateId) {
+        candidateBucket.add(run.mutationTelemetry.selectedCandidateId);
+      }
+      selectedCandidateIds.set(operator, candidateBucket);
+
+      const selectorBucket = selectedTargetSelectors.get(operator) ?? new Set<string>();
+      if (run.mutationTelemetry?.selectedTargetSelector) {
+        selectorBucket.add(run.mutationTelemetry.selectedTargetSelector);
+      }
+      selectedTargetSelectors.set(operator, selectorBucket);
+
+      const tagBucket = selectedTargetTagTypes.get(operator) ?? new Set<string>();
+      if (run.mutationTelemetry?.selectedTargetTagType) {
+        tagBucket.add(run.mutationTelemetry.selectedTargetTagType);
+      }
+      selectedTargetTagTypes.set(operator, tagBucket);
     }
 
     const operatorCoverage = new Map(
@@ -103,7 +126,10 @@ function main() {
         notApplicableCount: operatorCoverage.get(entry.operator)?.notApplicableCount ?? 0,
         totalCheckDurationMs: operatorCoverage.get(entry.operator)?.totalCheckDurationMs ?? 0,
         selectedMutationCount: selectedCounts.get(entry.operator) ?? 0,
+        selectedCandidateCount: selectedCandidateIds.get(entry.operator)?.size ?? 0,
         appliedMutationCount: appliedCounts.get(entry.operator) ?? 0,
+        sampleTargetSelectors: [...(selectedTargetSelectors.get(entry.operator) ?? new Set<string>())].slice(0, 5),
+        selectedTargetTagTypes: [...(selectedTargetTagTypes.get(entry.operator) ?? new Set<string>())].sort(),
         finalOutcomeClasses: outcomeCounts.get(entry.operator) ?? {},
       })),
     };

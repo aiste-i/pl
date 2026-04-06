@@ -1,6 +1,6 @@
 # RealWorld Locator Audit
 
-Date: 2026-04-05
+Date: 2026-04-06
 
 ## Scope
 
@@ -48,13 +48,15 @@ The benchmark-active oracle layer now resolves through `getByTestId()` chains on
 Key changes:
 
 - repeated comment entities are addressed by stable comment-id based test ids rather than visible text
+- repeated article preview oracle targets now use stable indexed ids such as `article-preview-1` and `article-read-more-1`
 - comment add and delete helpers now discover and track comment ids through oracle roots
 - nested oracle targeting uses chained `getByTestId()` helpers instead of semantic or text narrowing
-- runtime oracle safety verifies that mutation selection skips direct oracle nodes and oracle-critical ancestors
+- runtime oracle safety verifies that mutation selection skips direct oracle nodes, oracle-critical ancestors, and descendants inside oracle-rooted contexts
 
 Forbidden oracle patterns are now statically checked:
 
 - `.filter(...)`
+- `.first(...)`, `.nth(...)`, and other index narrowing inside oracle factories
 - `getByText(...)`
 - semantic fallbacks such as `getByRole(...)` and `getByLabel(...)`
 - generic `.locator(...)` inside benchmark-active oracle code
@@ -69,22 +71,28 @@ The benchmarked locator families remain separated by construction:
 
 Specific hardening completed in this pass:
 
-- semantic-first `role -> descendant text filter` patterns were replaced where a direct accessible-name query exists
-- `home.firstReadMoreLink` now uses direct role-and-accessible-name semantics in each app instead of text-descendant filtering; in Vue this resolves through the link's actual accessible name of `article`
-- locator purity validation now fails on the banned role-plus-descendant-text anti-pattern
+- semantic-first `role -> descendant text filter` patterns were replaced with direct accessible-name queries
+- article preview containers now expose `role="article"` and stable accessible names across Angular, Svelte, and Vue
+- article preview descriptions now expose direct semantic handles instead of CSS-backed exception fallbacks
+- pagination items now expose direct listitem names instead of role-plus-filter narrowing
+- locator purity validation now fails on AST-detected `filter({ hasText: ... })` and chained `getByText(...)` anti-patterns
 
 Semantic exceptions remain explicit and separately reportable in:
 
 - `reports/realworld-semantic-css-exceptions.json`
+
+The current report contains zero active exceptions.
 
 ## Mutation Alignment Findings
 
 Operator presence is no longer the only evidence available. The benchmark now records:
 
 - operator taxonomy
+- operator DOM applicability conditions
+- operator non-breaking safety guards
 - in-scope vs excluded-by-design operator scope
 - operator coverage counts
-- operator runtime telemetry
+- flattened per-run mutation telemetry including mutated selector, candidate id, and operator category
 
 Visual-only operators are explicit exclusions, not ambiguous leftovers:
 
@@ -101,6 +109,12 @@ The pipeline now emits:
 - `accessibility_summary_all_valid_runs.csv`
 - `accessibility_scan_status_summary.csv`
 
+Version-controlled reviewer copies are published in:
+
+- `reports/realworld-accessibility-summary-completed-only.csv`
+- `reports/realworld-accessibility-summary-all-valid-runs.csv`
+- `reports/realworld-accessibility-scan-status-summary.csv`
+
 This keeps accessibility useful as an analytical support layer without overstating or understating prevalence through hidden scan incompleteness.
 
 ## Validation Surface
@@ -111,6 +125,7 @@ Methodological validation now includes:
 - locator purity validation
 - oracle purity validation
 - mutation operator scope validation
+- mutation operator non-breaking safety validation
 - generated-report validation
 
 ## Remaining Explicit Exclusions

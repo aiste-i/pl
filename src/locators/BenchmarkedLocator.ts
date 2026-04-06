@@ -83,3 +83,34 @@ export class OracleLocator {
         return this.locator;
     }
 }
+
+export function resolveFactoryScope(
+    page: Page,
+    args: any[],
+): { scope: Page | Locator; remainingArgs: any[] } {
+    const [firstArg, ...remainingArgs] = args;
+
+    if (firstArg instanceof BenchmarkedLocator || firstArg instanceof OracleLocator) {
+        return {
+            scope: firstArg.raw,
+            remainingArgs,
+        };
+    }
+
+    if (
+        firstArg &&
+        typeof firstArg === 'object' &&
+        typeof firstArg.first === 'function' &&
+        typeof firstArg.locator === 'function'
+    ) {
+        return {
+            scope: firstArg as Locator,
+            remainingArgs,
+        };
+    }
+
+    return {
+        scope: page,
+        remainingArgs: args,
+    };
+}

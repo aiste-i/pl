@@ -24,6 +24,8 @@ export interface MutationCandidateMetadata {
     operatorSkippedOracleCount?: number;
     operatorNotApplicableCount?: number;
     operatorTotalCheckDurationMs?: number;
+    operatorRuntimeCategory?: string | null;
+    operatorThesisCategory?: string | null;
 }
 
 export class MutationCandidate {
@@ -54,6 +56,8 @@ export class MutationCandidate {
     operatorSkippedOracleCount?: number;
     operatorNotApplicableCount?: number;
     operatorTotalCheckDurationMs?: number;
+    operatorRuntimeCategory?: string | null;
+    operatorThesisCategory?: string | null;
 
     constructor(selector: string, operator: DomOperator, url?: string, fingerprint?: any, metadata: MutationCandidateMetadata = {}) {
         this.selector = selector;
@@ -94,6 +98,8 @@ export class MutationCandidate {
             operatorSkippedOracleCount: this.operatorSkippedOracleCount ?? null,
             operatorNotApplicableCount: this.operatorNotApplicableCount ?? null,
             operatorTotalCheckDurationMs: this.operatorTotalCheckDurationMs ?? null,
+            operatorRuntimeCategory: this.operatorRuntimeCategory ?? null,
+            operatorThesisCategory: this.operatorThesisCategory ?? null,
             record: this.record
         };
     }

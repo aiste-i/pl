@@ -8,7 +8,6 @@ import {
   oracleDynamicTestId,
   oracleTestIdChain,
   oracleTestId,
-  semanticCssException,
   semanticNative,
   xpath,
 } from './shared-realworld';
@@ -21,12 +20,6 @@ const meta = (logicalKey: string) => ({
   moduleId: MODULE_ID,
   logicalKey,
 });
-
-const previewDescriptionException = {
-  reason: 'Svelte article preview descriptions render as plain paragraph text without a stable semantic-only entry point.',
-  activeInCorpus: true,
-  affectsFairComparisonWording: true,
-};
 
 export function getReactRealWorldLocators(strategy: StrategyName) {
   return {
@@ -84,15 +77,9 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
     },
     home: {
       firstArticlePreview: chooseStrategy(strategy, {
-        'semantic-first': semanticCssException(
-          {
-            ...meta('home.firstArticlePreview'),
-            reason: 'Svelte article preview cards do not expose a stable semantic container handle for first-item selection.',
-            cssSelector: '.article-preview:first-of-type',
-            activeInCorpus: false,
-            affectsFairComparisonWording: false,
-          },
-          (page: Page) => page.locator('.article-preview').first(),
+        'semantic-first': semanticNative(
+          { ...meta('home.firstArticlePreview'), semanticEntryPoint: 'getByRole' },
+          (page: Page) => markSemantic(page.getByRole('article', { name: /^article preview:/i }).first(), 'getByRole'),
         ),
         css: css(
           { ...meta('home.firstArticlePreview'), selector: '.article-preview:first-of-type' },
@@ -106,19 +93,18 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
       firstReadMoreLink: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('home.firstReadMoreLink'), semanticEntryPoint: 'getByRole' },
-          (page: Page) => markSemantic(page.getByRole('link', { name: /read more/i }).first(), 'getByRole'),
+          (page: Page) => markSemantic(page.getByRole('link', { name: /^read more about /i }).first(), 'getByRole'),
         ),
-        css: css({ ...meta('home.firstReadMoreLink'), selector: '.article-preview:first-of-type a.preview-link' }),
+        css: css(
+          { ...meta('home.firstReadMoreLink'), selector: '.article-preview:first-of-type a.preview-link' },
+          (page: Page) => page.locator('.article-preview').first().locator('a.preview-link'),
+        ),
         xpath: xpath({ ...meta('home.firstReadMoreLink'), selector: '(//div[contains(@class,"article-preview")])[1]//a[contains(@class,"preview-link")]' }),
       }),
       previewDescription: chooseStrategy(strategy, {
-        'semantic-first': semanticCssException(
-          {
-            ...meta('home.previewDescription'),
-            cssSelector: 'a.preview-link > p',
-            ...previewDescriptionException,
-          },
-          (preview: Locator) => preview.locator('a.preview-link > p').first(),
+        'semantic-first': semanticNative(
+          { ...meta('home.previewDescription'), semanticEntryPoint: 'getByRole' },
+          (preview: Locator) => markSemantic(preview.getByRole('note', { name: /^article preview description$/i }).first(), 'getByRole'),
         ),
         css: css(
           { ...meta('home.previewDescription'), selector: 'a.preview-link > p' },
@@ -149,10 +135,7 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
         'semantic-first': semanticNative(
           { ...meta('home.paginationItem'), semanticEntryPoint: 'getByRole' },
           (page: Page, pageNumber: number) =>
-            markSemantic(
-              page.getByRole('listitem').filter({ has: page.getByRole('link', { name: new RegExp(`^go to page ${pageNumber}$`, 'i') }) }).first(),
-              'getByRole',
-            ),
+            markSemantic(page.getByRole('listitem', { name: new RegExp(`^page ${pageNumber}$`, 'i') }).first(), 'getByRole'),
         ),
         css: css(
           { ...meta('home.paginationItem'), selector: '.pagination li.page-item' },
@@ -293,10 +276,7 @@ export function getReactRealWorldOracle() {
       navbar: oracleTestId(meta('nav.navbar'), 'navbar'),
       brandLink: oracleTestId(meta('nav.brandLink'), 'navbar-brand'),
       globalFeedTab: oracleTestId(meta('nav.globalFeedTab'), 'nav-link-global-feed'),
-      profileLink: oracle(
-        { ...meta('nav.profileLink'), selector: "getByTestId('nav-link-profile')" },
-        (page: Page, _username?: string) => page.getByTestId('nav-link-profile').first(),
-      ),
+      profileLink: oracleTestId(meta('nav.profileLink'), 'nav-link-profile'),
     },
     auth: {
       title: oracleTestId(meta('auth.title'), 'auth-title'),
@@ -306,17 +286,11 @@ export function getReactRealWorldOracle() {
       submitButton: oracleTestId(meta('auth.submitButton'), 'auth-submit-button'),
     },
     home: {
-      firstArticlePreview: oracle(
-        { ...meta('home.firstArticlePreview'), selector: "getByTestId('article-preview')" },
-        (page: Page) => page.getByTestId('article-preview').first(),
-      ),
-      firstReadMoreLink: oracle(
-        { ...meta('home.firstReadMoreLink'), selector: "getByTestId('article-read-more')" },
-        (page: Page) => page.getByTestId('article-read-more').first(),
-      ),
+      firstArticlePreview: oracleTestId(meta('home.firstArticlePreview'), 'article-preview-1'),
+      firstReadMoreLink: oracleTestId(meta('home.firstReadMoreLink'), 'article-read-more-1'),
       previewDescription: oracle(
         { ...meta('home.previewDescription'), selector: "getByTestId('article-description')" },
-        (preview: Locator) => preview.getByTestId('article-description').first(),
+        (preview: Locator) => preview.getByTestId('article-description'),
       ),
       paginationButton: oracle(
         { ...meta('home.paginationButton'), selector: "getByTestId('pagination-link-${pageNumber}')" },

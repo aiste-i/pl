@@ -4,6 +4,13 @@ import { DomOperators } from '../../src/webmutator/operators/DomOperators';
 import { OperatorRegistry } from '../../src/webmutator/operators/OperatorRegistry';
 import { getBenchmarkOperatorCatalog, getOperatorCatalog } from '../../src/webmutator/operators/catalog';
 import { SwapAdjacentSiblings } from '../../src/webmutator/operators/dom/SwapAdjacentSiblings';
+import { ReverseChildrenOrder } from '../../src/webmutator/operators/dom/ReverseChildrenOrder';
+import { StylePosition } from '../../src/webmutator/operators/dom/StylePosition';
+import { StyleSize } from '../../src/webmutator/operators/dom/StyleSize';
+import { StyleVisibility } from '../../src/webmutator/operators/dom/StyleVisibility';
+import { SubtreeDelete } from '../../src/webmutator/operators/dom/SubtreeDelete';
+import { SubtreeMove } from '../../src/webmutator/operators/dom/SubtreeMove';
+import { SubtreeSwap } from '../../src/webmutator/operators/dom/SubtreeSwap';
 import { ToggleCssClass } from '../../src/webmutator/operators/dom/ToggleCssClass';
 import { ToggleAriaExpanded } from '../../src/webmutator/operators/dom/accessibility/ToggleAriaExpanded';
 
@@ -41,9 +48,9 @@ test('operator registry can recreate the expanded operator set', async () => {
 test('SwapAdjacentSiblings swaps the target with its next sibling', async ({ page }) => {
   await page.setContent(`
     <div id="stack">
-      <button id="first">First</button>
-      <button id="second">Second</button>
-      <button id="third">Third</button>
+      <p id="first">First</p>
+      <p id="second">Second</p>
+      <p id="third">Third</p>
     </div>
   `);
 
@@ -105,4 +112,74 @@ test('ToggleAriaExpanded flips aria-expanded while honoring oracle safety', asyn
     originalValue: 'false',
     newValue: 'true',
   });
+});
+
+test('visibility-style operators skip interactive controls and mutate safe presentation nodes non-destructively', async ({ page }) => {
+  await page.setContent(`
+    <div id="safe-copy">Summary text</div>
+    <button id="cta-button">Publish</button>
+    <div id="form-shell"><input id="title-input" /></div>
+  `);
+
+  const safeNode = page.locator('#safe-copy');
+  const interactiveButton = page.locator('#cta-button');
+  const formShell = page.locator('#form-shell');
+
+  const visibility = new StyleVisibility();
+  const position = new StylePosition();
+  const size = new StyleSize();
+
+  expect(await visibility.isApplicable(page, safeNode)).toBe(true);
+  expect(await position.isApplicable(page, safeNode)).toBe(true);
+  expect(await size.isApplicable(page, safeNode)).toBe(true);
+  expect(await visibility.isApplicable(page, interactiveButton)).toBe(false);
+  expect(await position.isApplicable(page, interactiveButton)).toBe(false);
+  expect(await size.isApplicable(page, formShell)).toBe(false);
+
+  const visibilityRecord = new MutationRecord(true);
+  await visibility.applyOperator(page, safeNode, visibilityRecord);
+  await expect(safeNode).toBeVisible();
+  expect(visibilityRecord.data?.opacity).toBe('0.35');
+
+  const positionRecord = new MutationRecord(true);
+  await position.applyOperator(page, safeNode, positionRecord);
+  expect(positionRecord.data?.transform).toContain('translate');
+
+  const sizeRecord = new MutationRecord(true);
+  await size.applyOperator(page, safeNode, sizeRecord);
+  expect(sizeRecord.data?.transform).toContain('scale');
+});
+
+test('structural operators skip containers with interactive descendants', async ({ page }) => {
+  await page.setContent(`
+    <div id="safe-structure">
+      <p>Alpha</p>
+      <p>Beta</p>
+      <p>Gamma</p>
+    </div>
+    <div id="move-parent">
+      <p id="move-me">Move me</p>
+      <div id="drop-zone"><span>Drop zone</span></div>
+    </div>
+    <div id="unsafe-structure">
+      <button>Save</button>
+      <button>Cancel</button>
+    </div>
+  `);
+
+  const safeStructure = page.locator('#safe-structure');
+  const safeMoveTarget = page.locator('#move-me');
+  const unsafeStructure = page.locator('#unsafe-structure');
+  expect(await new SubtreeDelete().isApplicable(page, safeStructure)).toBe(true);
+  expect(await new SubtreeDelete().isApplicable(page, unsafeStructure)).toBe(false);
+  expect(await new SubtreeMove().isApplicable(page, safeMoveTarget)).toBe(true);
+  expect(await new SubtreeMove().isApplicable(page, page.locator('#unsafe-structure button').first())).toBe(false);
+  expect(await new SubtreeSwap().isApplicable(page, safeStructure)).toBe(true);
+  expect(await new SubtreeSwap().isApplicable(page, unsafeStructure)).toBe(false);
+  expect(await new ReverseChildrenOrder().isApplicable(page, safeStructure)).toBe(true);
+  expect(await new ReverseChildrenOrder().isApplicable(page, unsafeStructure)).toBe(false);
+
+  const siblingSwap = new SwapAdjacentSiblings();
+  expect(await siblingSwap.isApplicable(page, page.locator('#safe-structure p').first())).toBe(true);
+  expect(await siblingSwap.isApplicable(page, page.locator('#unsafe-structure button').first())).toBe(false);
 });
