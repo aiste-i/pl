@@ -10,7 +10,6 @@ import {
   deleteOwnCommentFromOpenedArticle,
   followAndUnfollowProfile,
   getActiveBenchmarkTimeoutMs,
-  getStableCommentCount,
   openArticleBySlug,
   openFirstArticleFromFeed,
   openGlobalFeed,
@@ -165,15 +164,14 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
   {
     ...ensureScenarioEntry('comments.delete-own'),
     async run({ page, request, appAdapter, locators, oracle, applyDeferredMutation }) {
-      await provisionAuthenticatedUser(page, request, appAdapter);
-      const article = await getFirstPublicArticleSummary(request);
-      const commentText = `Benchmark delete comment ${Date.now()}`;
-      await openArticleBySlug(page, oracle, article.slug);
-      const initialCommentCount = await getStableCommentCount(oracle);
-      const commentId = await addCommentToOpenedArticle(locators, oracle, commentText);
-      await applyDeferredMutation('comments.delete-own', 'article-detail-before-comment-delete');
-      await deleteOwnCommentFromOpenedArticle(locators, oracle, commentId, initialCommentCount);
-    },
+        await provisionAuthenticatedUser(page, request, appAdapter);
+        const article = await getFirstPublicArticleSummary(request);
+        const commentText = `Benchmark delete comment ${Date.now()}`;
+        await openArticleBySlug(page, oracle, article.slug);
+        const commentId = await addCommentToOpenedArticle(locators, oracle, commentText);
+        await applyDeferredMutation('comments.delete-own', 'article-detail-before-comment-delete');
+        await deleteOwnCommentFromOpenedArticle(locators, oracle, commentId);
+      },
     async collect({ page, request, appAdapter, locators, oracle, collectCheckpoint }) {
       await provisionAuthenticatedUser(page, request, appAdapter);
       const article = await getFirstPublicArticleSummary(request);

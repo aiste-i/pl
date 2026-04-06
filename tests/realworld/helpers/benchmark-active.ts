@@ -7,7 +7,7 @@ export function getActiveBenchmarkTimeoutMs(): number {
   return getSelectedAppId() === 'vue3-realworld-example-app' ? 30000 : 10000;
 }
 
-export async function getStableCommentIds(oracle: any): Promise<number[]> {
+async function readCommentIds(oracle: any): Promise<number[]> {
   const ids = await oracle.comments.cards().raw.evaluateAll(cards =>
     cards
       .map(card => {
@@ -20,6 +20,35 @@ export async function getStableCommentIds(oracle: any): Promise<number[]> {
   );
 
   return ids.sort((left, right) => left - right);
+}
+
+export async function getStableCommentIds(
+  oracle: any,
+  options: { timeoutMs?: number; intervalMs?: number; stableSamples?: number } = {},
+): Promise<number[]> {
+  const timeoutMs = options.timeoutMs ?? getActiveBenchmarkTimeoutMs();
+  const intervalMs = options.intervalMs ?? 100;
+  const stableSamples = options.stableSamples ?? 3;
+  const deadline = Date.now() + timeoutMs;
+
+  let lastIds: number[] = [];
+  let stableCount = 0;
+
+  while (Date.now() < deadline) {
+    const currentIds = await readCommentIds(oracle);
+    if (JSON.stringify(currentIds) === JSON.stringify(lastIds)) {
+      stableCount += 1;
+      if (stableCount >= stableSamples) {
+        return currentIds;
+      }
+    } else {
+      lastIds = currentIds;
+      stableCount = 1;
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+
+  return lastIds;
 }
 
 export async function visitHome(page: Page, oracle: any): Promise<void> {
@@ -124,29 +153,7 @@ export async function getStableCommentCount(
   oracle: any,
   options: { timeoutMs?: number; intervalMs?: number; stableSamples?: number } = {},
 ): Promise<number> {
-  const timeoutMs = options.timeoutMs ?? getActiveBenchmarkTimeoutMs();
-  const intervalMs = options.intervalMs ?? 100;
-  const stableSamples = options.stableSamples ?? 3;
-  const deadline = Date.now() + timeoutMs;
-
-  let lastCount = -1;
-  let stableCount = 0;
-
-  while (Date.now() < deadline) {
-    const currentCount = await oracle.comments.cards().raw.count();
-    if (currentCount === lastCount) {
-      stableCount += 1;
-      if (stableCount >= stableSamples) {
-        return currentCount;
-      }
-    } else {
-      lastCount = currentCount;
-      stableCount = 1;
-    }
-    await new Promise(resolve => setTimeout(resolve, intervalMs));
-  }
-
-  return lastCount;
+  return (await getStableCommentIds(oracle, options)).length;
 }
 
 export async function addCommentToOpenedArticle(
@@ -161,8 +168,17 @@ export async function addCommentToOpenedArticle(
   const deadline = Date.now() + getActiveBenchmarkTimeoutMs();
   let createdCommentId: number | null = null;
   while (Date.now() < deadline) {
-    const currentIds = await getStableCommentIds(oracle);
-    createdCommentId = currentIds.find(id => !initialCommentIds.includes(id)) ?? null;
+    const currentIds = await readCommentIds(oracle);
+    const candidateIds = currentIds.filter(id => !initialCommentIds.includes(id));
+
+    for (const candidateId of candidateIds) {
+      const deleteButtonCount = await locators.comments.deleteButton(oracle.comments.cardById(candidateId)).raw.count();
+      if (deleteButtonCount > 0) {
+        createdCommentId = candidateId;
+        break;
+      }
+    }
+
     if (createdCommentId !== null) {
       break;
     }
@@ -182,19 +198,21 @@ export async function deleteOwnCommentFromOpenedArticle(
   locators: any,
   oracle: any,
   commentId: number,
-  expectedCommentCountAfterDelete: number,
 ): Promise<void> {
+  const preDeleteCount = await getStableCommentCount(oracle);
   const commentCards = oracle.comments.cards();
   const commentCard = oracle.comments.cardById(commentId);
   await locators.comments.deleteButton(commentCard).click();
-  await commentCards.assertCount(expectedCommentCountAfterDelete, {
-    timeout: getActiveBenchmarkTimeoutMs(),
-  });
   await expect
     .poll(() => oracle.comments.cardById(commentId).raw.count(), {
       timeout: getActiveBenchmarkTimeoutMs(),
     })
     .toBe(0);
+  await expect
+    .poll(() => commentCards.raw.count(), {
+      timeout: getActiveBenchmarkTimeoutMs(),
+    })
+    .toBe(Math.max(preDeleteCount - 1, 0));
 }
 
 export async function updateBioFromSettings(
