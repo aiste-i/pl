@@ -12,7 +12,7 @@
     "benchmark:baseline:app": "cross-env BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=baseline npx playwright test tests/realworld/benchmark-active.spec.ts",
     "benchmark:baseline:all": "cross-env APP_ID=angular-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=baseline npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env APP_ID=realworld BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=baseline npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env APP_ID=vue3-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=baseline npx playwright test tests/realworld/benchmark-active.spec.ts",
     "benchmark:baseline:smoke:all": "cross-env PLAYWRIGHT_BROWSERS=chromium,firefox,webkit npm run benchmark:baseline:all",
-    "benchmark:collect:app": "cross-env BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=collect npx playwright test tests/realworld/benchmark-active.spec.ts",
+    "benchmark:collect:app": "cross-env PLAYWRIGHT_BROWSERS=chromium BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=collect npx playwright test tests/realworld/benchmark-active.spec.ts",
     "benchmark:generate:app": "cross-env BENCHMARK_CORPUS_ID=realworld-active npx ts-node --transpile-only src/murun/runner/generate-scenarios.ts",
     "benchmark:prepare:app": "npm run benchmark:collect:app && npm run benchmark:generate:app",
     "benchmark:mutate:app": "cross-env BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate npx playwright test tests/realworld/benchmark-active.spec.ts",

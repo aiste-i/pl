@@ -157,7 +157,7 @@ npm run benchmark:baseline:smoke:all
 Prepare one app for mutation sampling:
 
 ```bash
-npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=1 --seed=12345
+PLAYWRIGHT_BROWSERS=chromium npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=1 --seed=12345
 ```
 
 Run a Chromium mutation sample across all three apps:
@@ -227,7 +227,7 @@ The repository ships two workflow layers:
 - PR validation in [`/.github/workflows/pr-realworld.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/pr-realworld.yml)
 - scheduled smoke and mutation sampling in [`/.github/workflows/scheduled-realworld.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/scheduled-realworld.yml)
 
-PR validation enforces linting, typechecking, methodological validation specs, Chromium baseline coverage, deterministic mutation-sample preparation, aggregation, and report freshness. Scheduled smoke adds Firefox/WebKit baseline coverage plus the same Chromium mutation-sample and aggregation path.
+PR validation enforces linting, typechecking, methodological validation specs, Chromium baseline coverage, deterministic Chromium mutation-sample preparation, aggregation, and report freshness. Scheduled smoke adds Firefox/WebKit baseline coverage plus the same Chromium mutation-sample and aggregation path.
 
 ## Additional Docs
 

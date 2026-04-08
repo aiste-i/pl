@@ -33,6 +33,7 @@ function main() {
       reportsCheck: packageJson.scripts?.['reports:check'] ?? null,
       baselineChromium: packageJson.scripts?.['benchmark:baseline:all'] ?? null,
       baselineCrossBrowserSmoke: packageJson.scripts?.['benchmark:baseline:smoke:all'] ?? null,
+      mutationPrepareApp: packageJson.scripts?.['benchmark:prepare:app'] ?? null,
       mutationSelected: packageJson.scripts?.['benchmark:mutate:all'] ?? null,
       mutationSample: packageJson.scripts?.['benchmark:mutate:sample:all'] ?? null,
       aggregateAll: packageJson.scripts?.['benchmark:aggregate:all'] ?? null,
@@ -44,6 +45,7 @@ function main() {
     notes: [
       'Chromium remains the primary benchmark environment unless the thesis methodology is revised in parallel.',
       'Firefox and WebKit runs are tracked as supplementary smoke coverage and do not silently redefine the thesis dataset.',
+      'Mutation-sample preparation and collection stay pinned to Chromium so the selected corpus is generated in the primary benchmark environment.',
       'Report freshness is enforced through generated machine-readable artifacts committed in reports/.',
     ],
   };
