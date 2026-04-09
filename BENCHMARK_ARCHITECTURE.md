@@ -153,7 +153,7 @@ PR workflow:
 - prepare deterministic mutation samples
 - execute Chromium mutation sample
 - aggregate benchmark outputs
-- run report freshness check
+- run source-derived report freshness check
 
 Scheduled workflow:
 

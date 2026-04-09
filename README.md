@@ -139,7 +139,7 @@ Validation:
 npm run lint
 npm run typecheck
 npm run validate:realworld
-npm run reports:generate
+npm run reports:generate:source
 ```
 
 Primary Chromium baseline:
@@ -184,13 +184,33 @@ Regenerate machine-readable reports:
 npm run reports:generate
 ```
 
-Check report freshness on a clean tree:
+Regenerate only source-derived reports:
+
+```bash
+npm run reports:generate:source
+```
+
+Regenerate run-derived reports from the current aggregated benchmark artifacts:
+
+```bash
+npm run reports:generate:run
+```
+
+Check source-derived report freshness on a clean tree:
+
+```bash
+npm run reports:check:source
+```
+
+Check full report freshness against the current benchmark dataset:
 
 ```bash
 npm run reports:check
 ```
 
-`reports:check` is designed for CI or a clean local worktree. It regenerates report artifacts and fails if the committed contents under `reports/` drift from generated outputs.
+`reports:check:source` is the PR-safe CI gate. It only regenerates deterministic source-derived artifacts.
+
+`reports:check` is the stricter full-dataset check. It regenerates both source-derived and run-derived report artifacts and fails if the committed contents under `reports/` drift from the current benchmark dataset.
 
 ## Result Layout
 
@@ -227,7 +247,7 @@ The repository ships two workflow layers:
 - PR validation in [`/.github/workflows/pr-realworld.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/pr-realworld.yml)
 - scheduled smoke and mutation sampling in [`/.github/workflows/scheduled-realworld.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/scheduled-realworld.yml)
 
-PR validation enforces linting, typechecking, methodological validation specs, Chromium baseline coverage, deterministic Chromium mutation-sample preparation, aggregation, and report freshness. Scheduled smoke adds Firefox/WebKit baseline coverage plus the same Chromium mutation-sample and aggregation path.
+PR validation enforces linting, typechecking, methodological validation specs, Chromium baseline coverage, deterministic Chromium mutation-sample preparation, aggregation, and source-derived report freshness. Scheduled smoke adds Firefox/WebKit baseline coverage plus the same Chromium mutation-sample and aggregation path. Full run-derived report regeneration remains tied to the benchmark dataset that was actually aggregated.
 
 ## Additional Docs
 

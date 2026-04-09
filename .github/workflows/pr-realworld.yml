@@ -54,8 +54,8 @@ jobs:
       - name: Aggregate reports
         run: npm run benchmark:aggregate:all
 
-      - name: Reports freshness
-        run: npm run reports:check
+      - name: Source report freshness
+        run: npm run reports:check:source
 
       - name: Upload artifacts
         if: always()

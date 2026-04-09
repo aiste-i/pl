@@ -45,6 +45,7 @@ function loadMutatedRuns(dirPath: string): any[] {
 function main() {
   const reportsDir = path.join(process.cwd(), 'reports');
   fs.mkdirSync(reportsDir, { recursive: true });
+  const scope = process.env.REPORT_GENERATION_SCOPE ?? 'all';
 
   const catalog = getOperatorCatalog().map(entry => ({
     operator: entry.type,
@@ -56,6 +57,15 @@ function main() {
     safetyGuard: entry.safetyGuard,
     excludedReason: entry.excludedReason ?? null,
   }));
+
+  fs.writeFileSync(
+    path.join(reportsDir, 'realworld-operator-taxonomy.json'),
+    JSON.stringify(catalog, null, 2),
+  );
+
+  if (scope === 'taxonomy') {
+    return;
+  }
 
   const coverageReport = REALWORLD_APP_IDS.map(appId => {
     const appDir = path.join(process.cwd(), 'test-results', appId, 'realworld-active');
@@ -135,10 +145,6 @@ function main() {
     };
   });
 
-  fs.writeFileSync(
-    path.join(reportsDir, 'realworld-operator-taxonomy.json'),
-    JSON.stringify(catalog, null, 2),
-  );
   fs.writeFileSync(
     path.join(reportsDir, 'realworld-operator-coverage.json'),
     JSON.stringify(coverageReport, null, 2),

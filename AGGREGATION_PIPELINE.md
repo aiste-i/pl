@@ -184,7 +184,25 @@ Regenerate repo-level machine-readable reports:
 npm run reports:generate
 ```
 
-Check generated-report freshness on a clean tree:
+Regenerate only source-derived reports:
+
+```bash
+npm run reports:generate:source
+```
+
+Regenerate run-derived reports from the current aggregate artifacts:
+
+```bash
+npm run reports:generate:run
+```
+
+Check source-derived report freshness on a clean tree:
+
+```bash
+npm run reports:check:source
+```
+
+Check full generated-report freshness against the current benchmark dataset:
 
 ```bash
 npm run reports:check
