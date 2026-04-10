@@ -33,6 +33,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Unit tests
+        run: npm run test:unit
+
       - name: RealWorld validation specs
         run: npm run validate:realworld
 
@@ -50,6 +53,9 @@ jobs:
 
       - name: Chromium mutation sample
         run: npm run benchmark:mutate:sample:all
+
+      - name: Validate benchmark results
+        run: npm run validate:results
 
       - name: Aggregate reports
         run: npm run benchmark:aggregate:all

@@ -120,7 +120,7 @@ Primary benchmark environment:
 
 - Chromium on Linux
 
-Supplementary smoke and regression evidence:
+Supplementary cross-browser dataset dimensions when explicitly generated:
 
 - Firefox
 - WebKit
@@ -138,6 +138,7 @@ Validation:
 ```bash
 npm run lint
 npm run typecheck
+npm run test:unit
 npm run validate:realworld
 npm run reports:generate:source
 ```
@@ -145,13 +146,13 @@ npm run reports:generate:source
 Primary Chromium baseline:
 
 ```bash
-PLAYWRIGHT_BROWSERS=chromium npm run benchmark:baseline:all
+npm run benchmark:baseline:primary
 ```
 
-Cross-browser smoke:
+Cross-browser baseline dataset:
 
 ```bash
-npm run benchmark:baseline:smoke:all
+npm run benchmark:baseline:cross-browser
 ```
 
 Prepare one app for mutation sampling:
@@ -172,10 +173,22 @@ Run the full selected mutation set across all three apps:
 npm run benchmark:mutate:all
 ```
 
+Run the selected mutation set across all three apps and all supported browsers:
+
+```bash
+npm run benchmark:mutate:cross-browser
+```
+
 Aggregate benchmark outputs:
 
 ```bash
 npm run benchmark:aggregate:all
+```
+
+Validate structured benchmark outputs:
+
+```bash
+npm run validate:results
 ```
 
 Regenerate machine-readable reports:
@@ -221,6 +234,9 @@ Artifacts are app-scoped and corpus-scoped:
 - `test-results/<app-id>/realworld-active/reachable-targets.json`
 - `test-results/<app-id>/realworld-active/scenarios.json`
 - `test-results/<app-id>/realworld-active/aggregate`
+- `artifacts/<run-id>/run-metadata.json`
+- `artifacts/<run-id>/results.json`
+- `artifacts/<run-id>/results.csv`
 
 Aggregate outputs preserve:
 
@@ -228,6 +244,9 @@ Aggregate outputs preserve:
 - unsupported family exclusions
 - accessibility scan status
 - operator telemetry
+- browser dimensions
+
+The formal result contract is defined in `schemas/benchmark-results.schema.json` and enforced by `npm run validate:results`.
 
 Accessibility summary CSVs are retained in the aggregate artifact location for each app under:
 
@@ -246,13 +265,16 @@ The repository ships two workflow layers:
 
 - PR validation in [`/.github/workflows/pr-realworld.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/pr-realworld.yml)
 - scheduled smoke and mutation sampling in [`/.github/workflows/scheduled-realworld.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/scheduled-realworld.yml)
+- manual thesis-primary Chromium dataset generation in [`/.github/workflows/thesis-primary.yml`](/c:/Users/aiste/Desktop/benchmark/.github/workflows/thesis-primary.yml)
 
-PR validation enforces linting, typechecking, methodological validation specs, Chromium baseline coverage, deterministic Chromium mutation-sample preparation, aggregation, and source-derived report freshness. Scheduled smoke adds Firefox/WebKit baseline coverage plus the same Chromium mutation-sample and aggregation path. Full run-derived report regeneration remains tied to the benchmark dataset that was actually aggregated.
+PR validation enforces linting, typechecking, unit tests, methodological validation specs, Chromium baseline coverage, deterministic Chromium mutation-sample preparation, schema validation, aggregation, and source-derived report freshness. The scheduled workflow generates a cross-browser baseline dataset plus the same Chromium mutation-sample and aggregation path. Full run-derived report regeneration remains tied to the benchmark dataset that was actually aggregated.
 
 ## Additional Docs
 
 - [`BENCHMARK_ARCHITECTURE.md`](/c:/Users/aiste/Desktop/benchmark/BENCHMARK_ARCHITECTURE.md)
 - [`AGGREGATION_PIPELINE.md`](/c:/Users/aiste/Desktop/benchmark/AGGREGATION_PIPELINE.md)
+- [`REPLICATION.md`](/c:/Users/aiste/Desktop/benchmark/REPLICATION.md)
+- [`DATASET.md`](/c:/Users/aiste/Desktop/benchmark/DATASET.md)
 - [`docs/MUTATION_OPERATORS.md`](/c:/Users/aiste/Desktop/benchmark/docs/MUTATION_OPERATORS.md)
 - [`reports/realworld-locator-audit.md`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-locator-audit.md)
 - [`THESIS_ALIGNMENT_NOTES.md`](/c:/Users/aiste/Desktop/benchmark/THESIS_ALIGNMENT_NOTES.md)

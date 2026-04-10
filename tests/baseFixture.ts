@@ -2,6 +2,7 @@ import { test as base, expect, Locator, Page } from '@playwright/test';
 import { MutantGenerator } from '../src/murun/runner/MutantGenerator';
 import { WebMutator } from '../src/webmutator/WebMutator';
 import { MutationCandidate } from '../src/webmutator/MutationCandidate';
+import { MutationRecord } from '../src/webmutator/MutationRecord';
 import { StrategyName, STRATEGIES, getAppLocators, getAppOracle } from '../src/locators';
 import { FailureClassifier, ExecutionStage, FailureClass, ClassificationResult, StructuredEvidence } from '../src/webmutator/utils/FailureClassifier';
 import { BenchmarkedLocator, OracleLocator, InstrumentationContext, resolveFactoryScope } from '../src/locators/BenchmarkedLocator';
@@ -13,6 +14,14 @@ import { createHash } from 'crypto';
 import { AppAdapter } from '../src/apps/types';
 import { getAppResultsDir, getSelectedAppAdapter } from '../src/apps';
 import { getBenchmarkCorpusId } from '../src/benchmark/realworld-corpus';
+import {
+    BENCHMARK_DATASET_VERSION,
+    BENCHMARK_SCHEMA_VERSION,
+    createRunMetadata,
+    flattenResultForCsv,
+    inferExecutionMode,
+    writeCsvRows,
+} from '../src/benchmark/result-contract';
 
 // Define custom options for our tests
 export type TestOptions = {
@@ -52,10 +61,39 @@ export interface AccessibilitySummary {
   stabilization: StabilizationMetadata;
 }
 
+export interface MutationMetadataSummary {
+  mutationId: string;
+  operatorId: string;
+  operatorCategory: 'none' | 'structural' | 'content' | 'accessibility-semantic' | 'visibility' | 'visibility-interaction-state';
+  candidateId: string | null;
+  seed: number | null;
+  phase: 'baseline' | 'mutated';
+  selected: boolean;
+  applied: boolean;
+  skipped: boolean;
+  skipReason: string | null;
+}
+
 export interface BenchmarkResult {
+  schemaVersion: string;
+  datasetVersion: string;
+  generatedAt: string;
+  commitSha: string;
+  gitBranch: string | null;
+  dirtyWorkingTree: boolean | null;
+  nodeVersion: string;
+  playwrightVersion: string;
+  benchmarkPackageVersion: string | null;
+  platform: {
+    os: string;
+    platform: string;
+    release: string;
+    arch: string;
+  };
   runId: string;
   applicationId: string;
   browserName: string;
+  browserChannel: string | null;
   corpusId?: string;
   scenarioId: string;
   activeScenarioId?: string;
@@ -64,6 +102,7 @@ export interface BenchmarkResult {
   locatorFamily: string;
   semanticEntryPoint?: string;
   phase: 'baseline' | 'mutated';
+  mutation: MutationMetadataSummary;
   changeId?: string;
   changeCategory?: string;
   changeOperator?: string;
@@ -85,6 +124,11 @@ export interface BenchmarkResult {
   evidence: StructuredEvidence;
   instrumentationPathUsed: 'structured' | 'fallback' | 'mixed';
   accessibility: AccessibilitySummary;
+  tracePath?: string | null;
+  screenshotPath?: string | null;
+  axeArtifactPath?: string | null;
+  ariaSnapshotPath?: string | null;
+  metadataPath?: string | null;
   mutationTelemetry?: {
     selectedCandidateId: string | null;
     selectedTargetSelector: string | null;
@@ -140,6 +184,27 @@ function createArtifactStem(scenarioId: string, runId: string): string {
     const compact = normalized.slice(0, 80).replace(/_+/g, '_');
     const digest = createHash('sha1').update(scenarioId).digest('hex').slice(0, 10);
     return `${compact}_${digest}_${runId}`;
+}
+
+function parseOptionalInteger(value: string | undefined): number | null {
+    if (!value) return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+}
+
+function classifyMutationSkipReason(error: string | undefined): string | null {
+    if (!error) return null;
+    if (error.includes('oracle-protected')) return 'oracle-protected';
+    if (error.includes('target-not-found') || error.includes('Element not found')) return 'target-not-found';
+    if (error.includes('behavior-preservation-gate-failed')) return 'behavior-preservation-gate-failed';
+    if (error.includes('operator-applicability-error')) return 'operator-applicability-error';
+    if (error.includes('Deferred mutation was never applied')) return 'checkpoint-not-reached';
+    return 'apply-failed';
+}
+
+function classifyMutationOutcome(record: MutationRecord): string {
+    if (record.success) return 'applied';
+    return classifyMutationSkipReason(record.error) ?? 'apply-failed';
 }
 
 // Extend base test with custom options and fixtures
@@ -256,16 +321,13 @@ export const test = base.extend<TestOptions & {
       const applyDurationMs = Date.now() - startedAt;
       mutation.record = record;
       applied = true;
+      benchmarkResult.mutation.applied = record.success;
+      benchmarkResult.mutation.skipped = !record.success;
+      benchmarkResult.mutation.skipReason = classifyMutationSkipReason(record.error);
       if (benchmarkResult.mutationTelemetry) {
         benchmarkResult.mutationTelemetry.applyDurationMs = applyDurationMs;
         benchmarkResult.mutationTelemetry.applyFailureCount = record.success ? 0 : 1;
-        benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = record.success
-          ? 'applied'
-          : record.error?.includes('oracle-protected')
-            ? 'skipped-oracle'
-            : record.error?.includes('Element not found')
-              ? 'target-not-found'
-              : 'apply-failed';
+        benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = classifyMutationOutcome(record);
       }
 
       if (!record.success) {
@@ -291,6 +353,8 @@ export const test = base.extend<TestOptions & {
       benchmarkResult.comparisonEligible = false;
       benchmarkResult.comparisonExclusionReason = benchmarkResult.invalidRunReason;
       benchmarkResult.accessibility.scanStatus = 'skipped';
+      benchmarkResult.mutation.skipped = true;
+      benchmarkResult.mutation.skipReason = 'checkpoint-not-reached';
       if (benchmarkResult.mutationTelemetry) {
         benchmarkResult.mutationTelemetry.applyFailureCount = 1;
         benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = 'checkpoint-not-reached';
@@ -340,18 +404,47 @@ export const test = base.extend<TestOptions & {
 
   page: async ({ page, locatorStrategy, mutation, benchmarkResult, appAdapter }, use, testInfo) => {
     const appName = appAdapter.id;
-    const browserName = (testInfo.project.use as { browserName?: string }).browserName || testInfo.project.metadata.browserName || 'chromium';
+    const projectUse = testInfo.project.use as { browserName?: string; channel?: string };
+    const browserName = projectUse.browserName || testInfo.project.metadata.browserName || 'chromium';
+    const browserChannel = projectUse.channel ?? null;
 
     const scenarioId = testInfo.titlePath.join(' > ');
     const runId = uuidv4();
     const phase = mutation ? 'mutated' : 'baseline';
+    const generatedAt = new Date().toISOString();
     const startTime = Date.now();
+    const mutationBudget = parseOptionalInteger(process.env.BENCHMARK_BUDGET || process.env.npm_config_budget);
+    const mutationSeed = mutation?.selectionSeed ?? parseOptionalInteger(process.env.BENCHMARK_SEED || process.env.npm_config_seed);
+    const runMetadata = createRunMetadata({
+        runId,
+        generatedAt,
+        applicationId: appName,
+        browserName,
+        browserChannel,
+        corpusId: getBenchmarkCorpusId(),
+        seed: mutationSeed,
+        mutationBudget,
+        selectedMutationIds: mutation?.candidateId ? [mutation.candidateId] : [],
+        totalCandidatesConsidered: mutation?.operatorCandidateCount ?? null,
+        executionMode: inferExecutionMode(phase),
+    });
 
     // Initialize benchmark result with runId and empty accessibility status
     Object.assign(benchmarkResult, {
+        schemaVersion: BENCHMARK_SCHEMA_VERSION,
+        datasetVersion: BENCHMARK_DATASET_VERSION,
+        generatedAt,
+        commitSha: runMetadata.commitSha,
+        gitBranch: runMetadata.gitBranch,
+        dirtyWorkingTree: runMetadata.dirtyWorkingTree,
+        nodeVersion: runMetadata.nodeVersion,
+        playwrightVersion: runMetadata.playwrightVersion,
+        benchmarkPackageVersion: runMetadata.benchmarkPackageVersion,
+        platform: runMetadata.platform,
         runId: runId,
         applicationId: appName,
         browserName,
+        browserChannel,
         corpusId: getBenchmarkCorpusId(),
         scenarioId: scenarioId,
         activeScenarioId: undefined,
@@ -359,6 +452,18 @@ export const test = base.extend<TestOptions & {
         sourceSpec: undefined,
         locatorFamily: locatorStrategy,
         phase: phase,
+        mutation: {
+            mutationId: mutation?.candidateId || 'baseline',
+            operatorId: mutation ? mutation.operator.constructor.name : 'none',
+            operatorCategory: mutation ? mutation.operator.category : 'none',
+            candidateId: mutation?.candidateId ?? null,
+            seed: mutationSeed,
+            phase,
+            selected: Boolean(mutation),
+            applied: false,
+            skipped: false,
+            skipReason: null,
+        },
         comparisonEligible: true,
         durationMs: 0,
         runStatus: 'passed',
@@ -367,10 +472,16 @@ export const test = base.extend<TestOptions & {
         oracleIntegrityOk: true,
         evidence: FailureClassifier.createEmptyEvidence(),
         instrumentationPathUsed: 'fallback',
+        tracePath: null,
+        screenshotPath: null,
+        axeArtifactPath: null,
+        ariaSnapshotPath: null,
+        metadataPath: null,
         mutationTelemetry: undefined,
         accessibility: {
             scanAttempted: false,
             scanStatus: 'skipped',
+            scanError: null,
             detailedArtifactWritten: false,
             artifactPath: null,
             totalViolations: 0,
@@ -425,16 +536,13 @@ export const test = base.extend<TestOptions & {
                 const record = await mutator.applyMutation(page, mutation.selector, mutation.operator);
                 const applyDurationMs = Date.now() - startedAt;
                 mutation.record = record;
+                benchmarkResult.mutation.applied = record.success;
+                benchmarkResult.mutation.skipped = !record.success;
+                benchmarkResult.mutation.skipReason = classifyMutationSkipReason(record.error);
                 if (benchmarkResult.mutationTelemetry) {
                     benchmarkResult.mutationTelemetry.applyDurationMs = applyDurationMs;
                     benchmarkResult.mutationTelemetry.applyFailureCount = record.success ? 0 : 1;
-                    benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = record.success
-                        ? 'applied'
-                        : record.error?.includes('oracle-protected')
-                            ? 'skipped-oracle'
-                            : record.error?.includes('Element not found')
-                                ? 'target-not-found'
-                                : 'apply-failed';
+                    benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = classifyMutationOutcome(record);
                 }
                 if (!record.success) {
                     benchmarkResult.runStatus = 'invalid';
@@ -447,6 +555,8 @@ export const test = base.extend<TestOptions & {
                 benchmarkResult.runStatus = 'invalid';
                 benchmarkResult.invalidRunReason = 'Setup failure during mutation application: ' + error.message;
                 benchmarkResult.accessibility.scanStatus = 'skipped';
+                benchmarkResult.mutation.skipped = true;
+                benchmarkResult.mutation.skipReason = 'setup-failure';
                 if (benchmarkResult.mutationTelemetry) {
                     benchmarkResult.mutationTelemetry.applyFailureCount = 1;
                     benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = 'setup-failure';
@@ -509,8 +619,12 @@ export const test = base.extend<TestOptions & {
                 // Full mirrored metadata for standalone artifact consumption
                 const artifactContent = {
                     metadata: {
+                        schemaVersion: BENCHMARK_SCHEMA_VERSION,
+                        datasetVersion: BENCHMARK_DATASET_VERSION,
                         runId: runId,
                         applicationId: appName,
+                        browserName,
+                        browserChannel,
                         scenarioId: scenarioId,
                         locatorFamily: locatorStrategy,
                         semanticEntryPoint: benchmarkResult.semanticEntryPoint,
@@ -530,6 +644,7 @@ export const test = base.extend<TestOptions & {
                 
                 // 5. Normalize Path (POSIX relative)
                 benchmarkResult.accessibility.artifactPath = path.relative(process.cwd(), artifactPath).split(path.sep).join('/');
+                benchmarkResult.axeArtifactPath = benchmarkResult.accessibility.artifactPath;
                 benchmarkResult.accessibility.detailedArtifactWritten = true;
                 
             } catch (axeError: any) {
@@ -546,7 +661,23 @@ export const test = base.extend<TestOptions & {
         if (!fs.existsSync(resultsDir)) fs.mkdirSync(resultsDir, { recursive: true });
         const artifactStem = createArtifactStem(benchmarkResult.activeScenarioId || scenarioId, runId);
         const resultPath = path.join(resultsDir, `${artifactStem}.json`);
+        const rootArtifactDir = path.join(process.cwd(), 'artifacts', runId);
+        if (!fs.existsSync(rootArtifactDir)) fs.mkdirSync(rootArtifactDir, { recursive: true });
+        const metadataPath = path.join(rootArtifactDir, 'run-metadata.json');
+        const rootResultsJsonPath = path.join(rootArtifactDir, 'results.json');
+        const rootResultsCsvPath = path.join(rootArtifactDir, 'results.csv');
+        benchmarkResult.metadataPath = path.relative(process.cwd(), metadataPath).split(path.sep).join('/');
+        const finalizedRunMetadata = {
+            ...runMetadata,
+            selectedScenarios: benchmarkResult.activeScenarioId ? [benchmarkResult.activeScenarioId] : runMetadata.selectedScenarios,
+            selectedMutationIds: mutation?.candidateId ? [mutation.candidateId] : [],
+            totalCandidatesConsidered: mutation?.operatorCandidateCount ?? runMetadata.totalCandidatesConsidered,
+        };
+
         fs.writeFileSync(resultPath, JSON.stringify(benchmarkResult, null, 2));
+        fs.writeFileSync(metadataPath, JSON.stringify(finalizedRunMetadata, null, 2));
+        fs.writeFileSync(rootResultsJsonPath, JSON.stringify(benchmarkResult, null, 2));
+        writeCsvRows(rootResultsCsvPath, [flattenResultForCsv(benchmarkResult)]);
     }
   },
 });

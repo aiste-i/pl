@@ -2,7 +2,7 @@ import { Page, Locator } from 'playwright';
 import { MutationMode } from './MutationMode';
 import { MutationRecord } from './MutationRecord';
 import { DomOperator } from './operators/dom/DomOperator';
-import { OracleSafety } from './utils/OracleSafety';
+import { evaluateMutationApplicability } from './operators/applicability';
 
 export class WebMutator {
     mutationMode: MutationMode;
@@ -14,12 +14,9 @@ export class WebMutator {
     async applyMutation(page: Page, selector: string, operator: DomOperator): Promise<MutationRecord> {
         try {
             const target = page.locator(selector).first();
-            if (await target.count() === 0) {
-                return MutationRecord.fromError(`Element not found for selector: ${selector}`);
-            }
-
-            if (await OracleSafety.isProtected(target)) {
-                return MutationRecord.fromError(`Mutation skipped: target is oracle-protected for selector ${selector}`);
+            const applicability = await evaluateMutationApplicability(page, target, operator);
+            if (!applicability.applicable) {
+                return MutationRecord.fromError(`Mutation skipped: ${applicability.reason} for selector ${selector}`);
             }
 
             const record = new MutationRecord(true);

@@ -28,8 +28,11 @@ jobs:
       - name: Validation specs
         run: npm run validate:realworld
 
-      - name: Cross-browser baseline smoke
-        run: npm run benchmark:baseline:smoke:all
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Cross-browser baseline dataset
+        run: npm run benchmark:baseline:cross-browser
 
       - name: Prepare mutation samples
         env:
@@ -41,6 +44,9 @@ jobs:
 
       - name: Chromium mutation sample
         run: npm run benchmark:mutate:sample:all
+
+      - name: Validate benchmark results
+        run: npm run validate:results
 
       - name: Aggregate reports
         run: npm run benchmark:aggregate:all
