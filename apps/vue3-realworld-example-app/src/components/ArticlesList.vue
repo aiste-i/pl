@@ -27,6 +27,7 @@
         v-for="(article, index) in articles"
         :key="article.slug"
         :article="article"
+        :preview-index="index + 1"
         @update="newArticle => updateArticle(index, newArticle)"
         data-testid="article-preview"
       />

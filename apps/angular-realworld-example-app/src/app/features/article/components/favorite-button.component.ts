@@ -26,8 +26,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
         'btn-outline-primary': !article.favorited,
         'btn-primary': article.favorited,
       }"
+      [attr.aria-label]="article.favorited ? 'Unfavorite article' : 'Favorite article'"
+      [attr.data-testid]="article.favorited ? unfavoriteTestId : favoriteTestId"
       (click)="toggleFavorite()"
-      data-testid="article-favorite-btn"
     >
       <i class="ion-heart"></i> <ng-content></ng-content>
     </button>
@@ -40,6 +41,8 @@ export class FavoriteButtonComponent {
   isSubmitting = signal(false);
 
   @Input() article!: Article;
+  @Input() favoriteTestId = 'article-favorite-btn';
+  @Input() unfavoriteTestId = 'article-unfavorite-btn';
   @Output() toggle = new EventEmitter<boolean>();
 
   constructor(

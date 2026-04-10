@@ -5,6 +5,11 @@
 	const { children, data } = $props();
 
 	const is_favorites = $derived($page.route.id === '/profile/@[user]/favorites');
+	let following = $state(false);
+
+	$effect(() => {
+		following = data.profile.following;
+	});
 </script>
 
 <svelte:head>
@@ -33,27 +38,33 @@
 							action="/profile/@{data.profile.username}?/toggleFollow"
 							use:enhance={({ form }) => {
 								// optimistic UI
-								data.profile.following = !data.profile.following;
+								following = !following;
 
 								const button = form.querySelector('button');
 								button.disabled = true;
 
 								return ({ result, update }) => {
 									button.disabled = false;
-									if (result.type === 'error') update();
+									if (result.type === 'error') {
+										following = data.profile.following;
+										update();
+									} else {
+										data.profile.following = following;
+									}
 								};
 							}}
 							data-testid="profile-follow-form"
 						>
-							<input hidden type="checkbox" name="following" checked={data.profile.following} />
+							<input hidden type="checkbox" name="following" checked={following} />
 							<button
 								class="btn btn-sm action-btn"
-								class:btn-secondary={data.profile.following}
-								class:btn-outline-secondary={!data.profile.following}
-								data-testid="profile-follow-btn"
+								class:btn-secondary={following}
+								class:btn-outline-secondary={!following}
+								aria-label={following ? 'Unfollow user' : 'Follow user'}
+								data-testid={following ? 'profile-unfollow-btn' : 'profile-follow-btn'}
 							>
 								<i class="ion-plus-round"></i>
-								{data.profile.following ? 'Unfollow' : 'Follow'}
+								{following ? 'Unfollow' : 'Follow'}
 								{data.profile.username}
 							</button>
 						</form>

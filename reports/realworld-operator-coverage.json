@@ -1,0 +1,2229 @@
+[
+  {
+    "appId": "angular-realworld-example-app",
+    "corpusId": "realworld-active",
+    "operators": [
+      {
+        "operator": "AttributeAdd",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 2,
+        "selectedCandidateCount": 2,
+        "appliedMutationCount": 9,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(2)",
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(1)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 9
+        }
+      },
+      {
+        "operator": "AttributeDelete",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 24,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 84,
+        "totalCheckDurationMs": 563,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "AttributeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 24,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 84,
+        "totalCheckDurationMs": 1119,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "AttributeReplace",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 24,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 84,
+        "totalCheckDurationMs": 568,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "StyleColor",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 2,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(2) > app-article-meta > div > span > app-favorite-button > button > span"
+        ],
+        "selectedTargetTagTypes": [
+          "span"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "StylePosition",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 1694,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "StyleSize",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 1704,
+        "selectedMutationCount": 2,
+        "selectedCandidateCount": 2,
+        "appliedMutationCount": 15,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(1)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 6,
+          "unknown": 9
+        }
+      },
+      {
+        "operator": "StyleVisibility",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 1692,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(3)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "TextDelete",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 251,
+        "selectedMutationCount": 2,
+        "selectedCandidateCount": 2,
+        "appliedMutationCount": 6,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > h2:nth-of-type(2)",
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(1)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2",
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 6
+        }
+      },
+      {
+        "operator": "TextInsert",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 237,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(4)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 3
+        }
+      },
+      {
+        "operator": "TextNodeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 237,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > h2:nth-of-type(2)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "TextReplace",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 1126,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > h2:nth-of-type(2)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "SubtreeDelete",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 2246,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SubtreeInsert",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 2248,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SubtreeMove",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 2305,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(1)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "SubtreeSwap",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 2270,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReverseChildrenOrder",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 2360,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SwapAdjacentSiblings",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 72,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 36,
+        "totalCheckDurationMs": 2301,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "TagMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 2247,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(1)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "ContainerNodeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(3)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 3
+        }
+      },
+      {
+        "operator": "ActionableNodeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 1,
+        "selectedMutationCount": 5,
+        "selectedCandidateCount": 5,
+        "appliedMutationCount": 15,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(4)",
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > h2:nth-of-type(1)",
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > h2:nth-of-type(2)",
+          "app-root > app-article-page > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(3)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2",
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 15
+        }
+      },
+      {
+        "operator": "ToggleCssClass",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 108,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 1108,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "app-root > app-article-page > div > div:nth-of-type(1) > div > app-article-meta > div > span > app-favorite-button > button > span"
+        ],
+        "selectedTargetTagTypes": [
+          "span"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "ChangeImageAlt",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1120,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "RemoveImageAlt",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1126,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceImageWithDiv",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1100,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ChangeButtonLabel",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1133,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "RemoveInputNames",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1111,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceAnchorWithSpan",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1121,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceHeadingWithP",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 36,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 72,
+        "totalCheckDurationMs": 1167,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceThWithTd",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1132,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "DuplicateId",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1126,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SemanticToDiv",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1104,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ChangeAriaLabel",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1682,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ToggleAriaExpanded",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 2094,
+        "applicableCount": 0,
+        "skippedOracleCount": 1986,
+        "notApplicableCount": 108,
+        "totalCheckDurationMs": 1684,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "DistortMutator",
+        "benchmarkScope": "excluded-by-design",
+        "runtimeCategory": "visual",
+        "thesisCategory": "visual",
+        "excludedReason": "Visual-only distortions do not cleanly answer the thesis question about locator-family robustness under non-breaking DOM/accessibility change.",
+        "candidateCount": 0,
+        "applicableCount": 0,
+        "skippedOracleCount": 0,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "MaskMutator",
+        "benchmarkScope": "excluded-by-design",
+        "runtimeCategory": "visual",
+        "thesisCategory": "visual",
+        "excludedReason": "Masking simulates visual regression rather than a DOM/accessibility mutation that can be interpreted at the locator-family level.",
+        "candidateCount": 0,
+        "applicableCount": 0,
+        "skippedOracleCount": 0,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      }
+    ]
+  },
+  {
+    "appId": "realworld",
+    "corpusId": "realworld-active",
+    "operators": [
+      {
+        "operator": "AttributeAdd",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 76,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(1)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "AttributeDelete",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 20,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 56,
+        "totalCheckDurationMs": 374,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 6,
+        "sampleTargetSelectors": [
+          "#svelte-announcer"
+        ],
+        "selectedTargetTagTypes": [
+          "div"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 6
+        }
+      },
+      {
+        "operator": "AttributeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 18,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 58,
+        "totalCheckDurationMs": 752,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "#svelte-announcer"
+        ],
+        "selectedTargetTagTypes": [
+          "div"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 2,
+          "target-not-found": 1
+        }
+      },
+      {
+        "operator": "AttributeReplace",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 20,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 56,
+        "totalCheckDurationMs": 385,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "StyleColor",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 76,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 1,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > h2:nth-of-type(1)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "StylePosition",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 74,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 2,
+        "totalCheckDurationMs": 1138,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "StyleSize",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 74,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 2,
+        "totalCheckDurationMs": 1163,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 11,
+        "sampleTargetSelectors": [
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > h2:nth-of-type(2)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3,
+          "unknown": 8
+        }
+      },
+      {
+        "operator": "StyleVisibility",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 74,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 2,
+        "totalCheckDurationMs": 1164,
+        "selectedMutationCount": 2,
+        "selectedCandidateCount": 2,
+        "appliedMutationCount": 6,
+        "sampleTargetSelectors": [
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(2)",
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(1)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 6
+        }
+      },
+      {
+        "operator": "TextDelete",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 73,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 3,
+        "totalCheckDurationMs": 199,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "TextInsert",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 73,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 3,
+        "totalCheckDurationMs": 153,
+        "selectedMutationCount": 2,
+        "selectedCandidateCount": 2,
+        "appliedMutationCount": 6,
+        "sampleTargetSelectors": [
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(2)",
+          "#svelte-announcer"
+        ],
+        "selectedTargetTagTypes": [
+          "div",
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 6
+        }
+      },
+      {
+        "operator": "TextNodeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 73,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 3,
+        "totalCheckDurationMs": 150,
+        "selectedMutationCount": 2,
+        "selectedCandidateCount": 2,
+        "appliedMutationCount": 6,
+        "sampleTargetSelectors": [
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > h2:nth-of-type(3)",
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(4)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2",
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 6
+        }
+      },
+      {
+        "operator": "TextReplace",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 71,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 5,
+        "totalCheckDurationMs": 770,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(4)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "SubtreeDelete",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 1524,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SubtreeInsert",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 74,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 2,
+        "totalCheckDurationMs": 1553,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SubtreeMove",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 74,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 2,
+        "totalCheckDurationMs": 1544,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SubtreeSwap",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 1546,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReverseChildrenOrder",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 1535,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SwapAdjacentSiblings",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 60,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 16,
+        "totalCheckDurationMs": 1536,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "TagMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 62,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 14,
+        "totalCheckDurationMs": 1508,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > main > div > div:nth-of-type(1) > div > div > form > button > span"
+        ],
+        "selectedTargetTagTypes": [
+          "span"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 3
+        }
+      },
+      {
+        "operator": "ContainerNodeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 76,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "#svelte-announcer"
+        ],
+        "selectedTargetTagTypes": [
+          "div"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 3
+        }
+      },
+      {
+        "operator": "ActionableNodeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 76,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 4,
+        "selectedCandidateCount": 4,
+        "appliedMutationCount": 12,
+        "sampleTargetSelectors": [
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(2)",
+          "#svelte-announcer",
+          "div > main > div > div:nth-of-type(1) > div > div > form > button > span"
+        ],
+        "selectedTargetTagTypes": [
+          "div",
+          "p",
+          "span"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 12
+        }
+      },
+      {
+        "operator": "ToggleCssClass",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 74,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 2,
+        "totalCheckDurationMs": 753,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > main > div > div:nth-of-type(2) > div:nth-of-type(1) > div > div > p:nth-of-type(4)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "ChangeImageAlt",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 778,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "RemoveImageAlt",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 767,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceImageWithDiv",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 789,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ChangeButtonLabel",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 768,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "RemoveInputNames",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 768,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceAnchorWithSpan",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 769,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceHeadingWithP",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 24,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 52,
+        "totalCheckDurationMs": 784,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceThWithTd",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 778,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "DuplicateId",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 12,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 64,
+        "totalCheckDurationMs": 775,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "#svelte-announcer"
+        ],
+        "selectedTargetTagTypes": [
+          "div"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "SemanticToDiv",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 759,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ChangeAriaLabel",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 1154,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ToggleAriaExpanded",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1464,
+        "applicableCount": 0,
+        "skippedOracleCount": 1388,
+        "notApplicableCount": 76,
+        "totalCheckDurationMs": 1154,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "DistortMutator",
+        "benchmarkScope": "excluded-by-design",
+        "runtimeCategory": "visual",
+        "thesisCategory": "visual",
+        "excludedReason": "Visual-only distortions do not cleanly answer the thesis question about locator-family robustness under non-breaking DOM/accessibility change.",
+        "candidateCount": 0,
+        "applicableCount": 0,
+        "skippedOracleCount": 0,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "MaskMutator",
+        "benchmarkScope": "excluded-by-design",
+        "runtimeCategory": "visual",
+        "thesisCategory": "visual",
+        "excludedReason": "Masking simulates visual regression rather than a DOM/accessibility mutation that can be interpreted at the locator-family level.",
+        "candidateCount": 0,
+        "applicableCount": 0,
+        "skippedOracleCount": 0,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      }
+    ]
+  },
+  {
+    "appId": "vue3-realworld-example-app",
+    "corpusId": "realworld-active",
+    "operators": [
+      {
+        "operator": "AttributeAdd",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "AttributeDelete",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 222,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "AttributeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 467,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "AttributeReplace",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 222,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "StyleColor",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(4)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "StylePosition",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 667,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > h2:nth-of-type(2)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "StyleSize",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 671,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 12,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > h2:nth-of-type(2)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3,
+          "unknown": 9
+        }
+      },
+      {
+        "operator": "StyleVisibility",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 688,
+        "selectedMutationCount": 2,
+        "selectedCandidateCount": 2,
+        "appliedMutationCount": 6,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(4)",
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(3)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 6
+        }
+      },
+      {
+        "operator": "TextDelete",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 96,
+        "selectedMutationCount": 3,
+        "selectedCandidateCount": 3,
+        "appliedMutationCount": 9,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(4)",
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(1)",
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > h2:nth-of-type(3)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2",
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 9
+        }
+      },
+      {
+        "operator": "TextInsert",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 90,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(2)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 3
+        }
+      },
+      {
+        "operator": "TextNodeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 80,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "TextReplace",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "content",
+        "thesisCategory": "content",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 457,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > h2:nth-of-type(3)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "SubtreeDelete",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 895,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SubtreeInsert",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 892,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(3)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 3
+        }
+      },
+      {
+        "operator": "SubtreeMove",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 882,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 6,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(2)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "applied": 6
+        }
+      },
+      {
+        "operator": "SubtreeSwap",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 873,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReverseChildrenOrder",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 900,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SwapAdjacentSiblings",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 36,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 6,
+        "totalCheckDurationMs": 949,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "TagMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 915,
+        "selectedMutationCount": 2,
+        "selectedCandidateCount": 2,
+        "appliedMutationCount": 6,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > h2:nth-of-type(3)",
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(3)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2",
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 3,
+          "applied": 3
+        }
+      },
+      {
+        "operator": "ContainerNodeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "structural",
+        "thesisCategory": "structural",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 1,
+        "selectedCandidateCount": 1,
+        "appliedMutationCount": 3,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(4)"
+        ],
+        "selectedTargetTagTypes": [
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 3
+        }
+      },
+      {
+        "operator": "ActionableNodeMutator",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 5,
+        "selectedCandidateCount": 5,
+        "appliedMutationCount": 15,
+        "sampleTargetSelectors": [
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > h2:nth-of-type(1)",
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(3)",
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > h2:nth-of-type(3)",
+          "div > div > div:nth-of-type(2) > div:nth-of-type(1) > div > p:nth-of-type(2)"
+        ],
+        "selectedTargetTagTypes": [
+          "h2",
+          "p"
+        ],
+        "finalOutcomeClasses": {
+          "apply-failed": 15
+        }
+      },
+      {
+        "operator": "ToggleCssClass",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "visibility",
+        "thesisCategory": "visibility-interaction-state",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 42,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 455,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ChangeImageAlt",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 455,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "RemoveImageAlt",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 450,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceImageWithDiv",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 442,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ChangeButtonLabel",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 447,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "RemoveInputNames",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 431,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceAnchorWithSpan",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 436,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceHeadingWithP",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 18,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 24,
+        "totalCheckDurationMs": 448,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ReplaceThWithTd",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 443,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "DuplicateId",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 438,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "SemanticToDiv",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 459,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ChangeAriaLabel",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 680,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "ToggleAriaExpanded",
+        "benchmarkScope": "in-scope",
+        "runtimeCategory": "accessibility-semantic",
+        "thesisCategory": "accessibility-semantic",
+        "excludedReason": null,
+        "candidateCount": 1798,
+        "applicableCount": 0,
+        "skippedOracleCount": 1756,
+        "notApplicableCount": 42,
+        "totalCheckDurationMs": 677,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "DistortMutator",
+        "benchmarkScope": "excluded-by-design",
+        "runtimeCategory": "visual",
+        "thesisCategory": "visual",
+        "excludedReason": "Visual-only distortions do not cleanly answer the thesis question about locator-family robustness under non-breaking DOM/accessibility change.",
+        "candidateCount": 0,
+        "applicableCount": 0,
+        "skippedOracleCount": 0,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      },
+      {
+        "operator": "MaskMutator",
+        "benchmarkScope": "excluded-by-design",
+        "runtimeCategory": "visual",
+        "thesisCategory": "visual",
+        "excludedReason": "Masking simulates visual regression rather than a DOM/accessibility mutation that can be interpreted at the locator-family level.",
+        "candidateCount": 0,
+        "applicableCount": 0,
+        "skippedOracleCount": 0,
+        "notApplicableCount": 0,
+        "totalCheckDurationMs": 0,
+        "selectedMutationCount": 0,
+        "selectedCandidateCount": 0,
+        "appliedMutationCount": 0,
+        "sampleTargetSelectors": [],
+        "selectedTargetTagTypes": [],
+        "finalOutcomeClasses": {}
+      }
+    ]
+  }
+]

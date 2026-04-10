@@ -31,9 +31,20 @@
             </span>
           } @else {
             <span>
-              <app-follow-button [profile]="a.author" (toggle)="toggleFollowing($event)" data-testid="article-follow-btn"> </app-follow-button>
+              <app-follow-button
+                [profile]="a.author"
+                (toggle)="toggleFollowing($event)"
+                followTestId="article-follow-btn"
+                unfollowTestId="article-unfollow-btn"
+              >
+              </app-follow-button>
 
-              <app-favorite-button [article]="a" (toggle)="onToggleFavorite($event)" data-testid="article-favorite-btn">
+              <app-favorite-button
+                [article]="a"
+                (toggle)="onToggleFavorite($event)"
+                favoriteTestId="article-favorite-btn"
+                unfavoriteTestId="article-unfavorite-btn"
+              >
                 {{ a.favorited ? 'Unfavorite' : 'Favorite' }} Article
                 <span class="counter">({{ a.favoritesCount }})</span>
               </app-favorite-button>
@@ -79,9 +90,19 @@
             </span>
           } @else {
             <span>
-              <app-follow-button [profile]="a.author" (toggle)="toggleFollowing($event)" data-testid="article-follow-btn-bottom" />
+              <app-follow-button
+                [profile]="a.author"
+                (toggle)="toggleFollowing($event)"
+                followTestId="article-follow-btn-bottom"
+                unfollowTestId="article-unfollow-btn-bottom"
+              />
 
-              <app-favorite-button [article]="a" (toggle)="onToggleFavorite($event)" data-testid="article-favorite-btn-bottom">
+              <app-favorite-button
+                [article]="a"
+                (toggle)="onToggleFavorite($event)"
+                favoriteTestId="article-favorite-btn-bottom"
+                unfavoriteTestId="article-unfavorite-btn-bottom"
+              >
                 {{ a.favorited ? 'Unfavorite' : 'Favorite' }} Article
                 <span class="counter">({{ a.favoritesCount }})</span>
               </app-favorite-button>

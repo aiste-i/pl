@@ -5,12 +5,14 @@
         v-for="link in links"
         :key="link.name"
         class="nav-item"
+        :data-testid="`feed-toggle-item-${link.name}`"
       >
         <AppLink
           class="nav-link"
           :name="link.routeName"
           active-class="active"
           :params="link.routeParams"
+          :data-testid="link.name === 'global-feed' ? 'nav-link-global-feed' : link.name === 'my-feed' ? 'nav-link-your-feed' : link.name === 'tag-feed' ? 'nav-link-tag-feed' : link.name === 'user-feed' ? 'profile-tab-my-posts' : 'profile-tab-favorited-posts'"
         >
           <i
             v-if="link.icon"

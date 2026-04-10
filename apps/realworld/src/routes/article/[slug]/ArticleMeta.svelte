@@ -2,6 +2,14 @@
 	import { enhance } from '$app/forms';
 
 	const { article, user } = $props();
+
+	let favorited = $state(false);
+	let favoritesCount = $state(0);
+
+	$effect(() => {
+		favorited = article.favorited;
+		favoritesCount = article.favoritesCount;
+	});
 </script>
 
 <div class="article-meta" data-testid="article-meta">
@@ -28,5 +36,46 @@
 				</button>
 			</form>
 		</span>
+	{:else if user}
+		<form
+			method="POST"
+			action="/article/{article.slug}?/toggleFavorite"
+			use:enhance={({ form }) => {
+				if (favorited) {
+					favorited = false;
+					favoritesCount -= 1;
+				} else {
+					favorited = true;
+					favoritesCount += 1;
+				}
+
+				const button = form.querySelector('button');
+				button.disabled = true;
+
+				return ({ result, update }) => {
+					button.disabled = false;
+					if (result.type === 'error') {
+						favorited = article.favorited;
+						favoritesCount = article.favoritesCount;
+						update();
+					} else {
+						article.favorited = favorited;
+						article.favoritesCount = favoritesCount;
+					}
+				};
+			}}
+			data-testid="article-favorite-form"
+		>
+			<input hidden type="checkbox" name="favorited" checked={favorited} />
+			<button
+				class="btn btn-sm {favorited ? 'btn-primary' : 'btn-outline-primary'}"
+				aria-label={favorited ? 'Unfavorite article' : 'Favorite article'}
+				data-testid={favorited ? 'article-unfavorite-btn' : 'article-favorite-btn'}
+			>
+				<i class="ion-heart"></i>
+				{favorited ? 'Unfavorite' : 'Favorite'} Article
+				<span class="counter">({favoritesCount})</span>
+			</button>
+		</form>
 	{/if}
 </div>

@@ -2,13 +2,17 @@ import { test as base, expect, Locator, Page } from '@playwright/test';
 import { MutantGenerator } from '../src/murun/runner/MutantGenerator';
 import { WebMutator } from '../src/webmutator/WebMutator';
 import { MutationCandidate } from '../src/webmutator/MutationCandidate';
-import { StrategyName, STRATEGIES, getTodoMVCLocators, getTodoMVCOracle } from '../src/locators';
+import { StrategyName, STRATEGIES, getAppLocators, getAppOracle } from '../src/locators';
 import { FailureClassifier, ExecutionStage, FailureClass, ClassificationResult, StructuredEvidence } from '../src/webmutator/utils/FailureClassifier';
-import { BenchmarkedLocator, OracleLocator, InstrumentationContext } from '../src/locators/BenchmarkedLocator';
+import { BenchmarkedLocator, OracleLocator, InstrumentationContext, resolveFactoryScope } from '../src/locators/BenchmarkedLocator';
 import { AxeBuilder } from '@axe-core/playwright';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
+import { createHash } from 'crypto';
+import { AppAdapter } from '../src/apps/types';
+import { getAppResultsDir, getSelectedAppAdapter } from '../src/apps';
+import { getBenchmarkCorpusId } from '../src/benchmark/realworld-corpus';
 
 // Define custom options for our tests
 export type TestOptions = {
@@ -42,6 +46,7 @@ export interface AccessibilitySummary {
   // Metadata linkage duplicated here for unambiguous joins if files are separated
   runId: string;
   applicationId: string;
+  browserName: string;
   scenarioId: string;
   phase: 'baseline' | 'mutated';
   stabilization: StabilizationMetadata;
@@ -50,13 +55,21 @@ export interface AccessibilitySummary {
 export interface BenchmarkResult {
   runId: string;
   applicationId: string;
+  browserName: string;
+  corpusId?: string;
   scenarioId: string;
+  activeScenarioId?: string;
+  activeScenarioCategory?: string;
+  sourceSpec?: string;
   locatorFamily: string;
   semanticEntryPoint?: string;
   phase: 'baseline' | 'mutated';
   changeId?: string;
   changeCategory?: string;
   changeOperator?: string;
+  quotaBucket?: string;
+  comparisonEligible?: boolean;
+  comparisonExclusionReason?: string | null;
   durationMs: number;
   runStatus: 'passed' | 'failed' | 'invalid';
   failureClass: FailureClass | null;
@@ -72,6 +85,22 @@ export interface BenchmarkResult {
   evidence: StructuredEvidence;
   instrumentationPathUsed: 'structured' | 'fallback' | 'mixed';
   accessibility: AccessibilitySummary;
+  mutationTelemetry?: {
+    selectedCandidateId: string | null;
+    selectedTargetSelector: string | null;
+    selectedTargetTagType: string | null;
+    operatorRuntimeCategory: string | null;
+    operatorThesisCategory: string | null;
+    operatorConsideredCandidateCount: number | null;
+    operatorCandidateCount: number | null;
+    operatorApplicableCount: number | null;
+    operatorSkippedOracleCount: number | null;
+    operatorNotApplicableCount: number | null;
+    operatorCheckDurationMs: number | null;
+    applyDurationMs: number | null;
+    applyFailureCount: number;
+    finalMutationOutcomeClass: string | null;
+  };
 }
 
 /**
@@ -106,14 +135,24 @@ async function stabilizePage(page: Page): Promise<StabilizationMetadata> {
     };
 }
 
+function createArtifactStem(scenarioId: string, runId: string): string {
+    const normalized = scenarioId.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const compact = normalized.slice(0, 80).replace(/_+/g, '_');
+    const digest = createHash('sha1').update(scenarioId).digest('hex').slice(0, 10);
+    return `${compact}_${digest}_${runId}`;
+}
+
 // Extend base test with custom options and fixtures
 export const test = base.extend<TestOptions & { 
     benchmarkResult: BenchmarkResult,
+    appAdapter: AppAdapter,
+    setScenarioMetadata: (metadata: { activeScenarioId: string; activeScenarioCategory: string; sourceSpec: string }) => void,
     runAction: (action: () => Promise<any>, locator?: Locator) => Promise<any>,
     runAssertion: (assertion: () => Promise<any>) => Promise<any>,
     runOraclePrecheck: (precheck: () => Promise<any>) => Promise<any>,
-    locators: ReturnType<typeof getTodoMVCLocators>,
-    oracle: ReturnType<typeof getTodoMVCOracle>
+    applyDeferredMutation: (scenarioId: string, viewContext: string) => Promise<void>,
+    locators: any,
+    oracle: any
 }>({
   // Default locator strategy
   locatorStrategy: ['semantic-first', { option: true }],
@@ -122,12 +161,25 @@ export const test = base.extend<TestOptions & {
 
   benchmarkResult: [{} as any, { option: true }],
 
+  appAdapter: async ({}, use) => {
+    await use(getSelectedAppAdapter());
+  },
+
+  setScenarioMetadata: async ({ benchmarkResult }, use) => {
+    const setScenarioMetadata = (metadata: { activeScenarioId: string; activeScenarioCategory: string; sourceSpec: string }) => {
+      benchmarkResult.activeScenarioId = metadata.activeScenarioId;
+      benchmarkResult.activeScenarioCategory = metadata.activeScenarioCategory;
+      benchmarkResult.sourceSpec = metadata.sourceSpec;
+    };
+    await use(setScenarioMetadata);
+  },
+
   runOraclePrecheck: async ({ benchmarkResult }, use) => {
     const runOraclePrecheck = async (precheck: () => Promise<any>) => {
         benchmarkResult.instrumentationPathUsed = 'structured';
         try {
             return await precheck();
-        } catch (error) {
+        } catch (error: any) {
             benchmarkResult.oracleIntegrityOk = false;
             benchmarkResult.oracleIntegrityError = error.message;
             const classification = FailureClassifier.classify(error, ExecutionStage.ORACLE_PRECHECK, benchmarkResult.evidence);
@@ -186,38 +238,109 @@ export const test = base.extend<TestOptions & {
     await use(runAssertion);
   },
 
-  locators: async ({ page, locatorStrategy, runAction, runAssertion, runOraclePrecheck }, use) => {
-    const context: InstrumentationContext = { runAction, runAssertion, runOraclePrecheck };
-    const rawLocators = getTodoMVCLocators(locatorStrategy);
-    
-    // Wrap the locators to enforce instrumentation
-    const wrapped: any = {};
-    for (const [key, fn] of Object.entries(rawLocators)) {
-        wrapped[key] = (...args: any[]) => {
-            const locator = (fn as any)(page, ...args);
-            return new BenchmarkedLocator(locator, context);
-        };
+  applyDeferredMutation: async ({ page, mutation, benchmarkResult }, use) => {
+    let applied = false;
+
+    const applyDeferredMutation = async (scenarioId: string, viewContext: string) => {
+      if (!mutation || applied) {
+        return;
+      }
+
+      if (mutation.scenarioId !== scenarioId || mutation.viewContext !== viewContext) {
+        return;
+      }
+
+      const mutator = new WebMutator();
+      const startedAt = Date.now();
+      const record = await mutator.applyMutation(page, mutation.selector, mutation.operator);
+      const applyDurationMs = Date.now() - startedAt;
+      mutation.record = record;
+      applied = true;
+      if (benchmarkResult.mutationTelemetry) {
+        benchmarkResult.mutationTelemetry.applyDurationMs = applyDurationMs;
+        benchmarkResult.mutationTelemetry.applyFailureCount = record.success ? 0 : 1;
+        benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = record.success
+          ? 'applied'
+          : record.error?.includes('oracle-protected')
+            ? 'skipped-oracle'
+            : record.error?.includes('Element not found')
+              ? 'target-not-found'
+              : 'apply-failed';
+      }
+
+      if (!record.success) {
+        benchmarkResult.runStatus = 'invalid';
+        benchmarkResult.invalidRunReason = record.error ?? 'Mutation skipped or failed during deferred application';
+        benchmarkResult.comparisonEligible = false;
+        benchmarkResult.comparisonExclusionReason = record.error ?? 'Mutation skipped or failed during deferred application';
+        benchmarkResult.accessibility.scanStatus = 'skipped';
+      }
+    };
+
+    await use(applyDeferredMutation);
+
+    if (
+      mutation &&
+      getBenchmarkCorpusId() === 'realworld-active' &&
+      benchmarkResult.activeScenarioId === mutation.scenarioId &&
+      !applied &&
+      benchmarkResult.runStatus === 'passed'
+    ) {
+      benchmarkResult.runStatus = 'invalid';
+      benchmarkResult.invalidRunReason = `Deferred mutation was never applied for checkpoint ${mutation.viewContext}`;
+      benchmarkResult.comparisonEligible = false;
+      benchmarkResult.comparisonExclusionReason = benchmarkResult.invalidRunReason;
+      benchmarkResult.accessibility.scanStatus = 'skipped';
+      if (benchmarkResult.mutationTelemetry) {
+        benchmarkResult.mutationTelemetry.applyFailureCount = 1;
+        benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = 'checkpoint-not-reached';
+      }
     }
+  },
+
+  locators: async ({ page, locatorStrategy, runAction, runAssertion, runOraclePrecheck, appAdapter }: any, use: any) => {
+    const context: InstrumentationContext = { runAction, runAssertion, runOraclePrecheck };
+    const rawLocators = getAppLocators(appAdapter, locatorStrategy);
+
+    const wrapLocators = (node: any): any => {
+      if (typeof node === 'function') {
+        return (...args: any[]) => {
+          const { scope, remainingArgs } = resolveFactoryScope(page, args);
+          return new BenchmarkedLocator(node(scope, ...remainingArgs), context);
+        };
+      }
+      if (!node || typeof node !== 'object') {
+        return node;
+      }
+      return Object.fromEntries(Object.entries(node).map(([key, value]) => [key, wrapLocators(value)]));
+    };
+
+    const wrapped = wrapLocators(rawLocators);
     await use(wrapped);
   },
 
-  oracle: async ({ page, runAction, runAssertion, runOraclePrecheck }, use) => {
+  oracle: async ({ page, runAction, runAssertion, runOraclePrecheck, appAdapter }: any, use: any) => {
     const context: InstrumentationContext = { runAction, runAssertion, runOraclePrecheck };
-    const rawOracle = getTodoMVCOracle();
-    const wrapped: any = {};
-    for (const [key, fn] of Object.entries(rawOracle)) {
-        wrapped[key] = (...args: any[]) => {
-            const locator = (fn as any)(page, ...args);
-            return new OracleLocator(locator, context);
+    const rawOracle = getAppOracle(appAdapter);
+    const wrapOracle = (node: any): any => {
+      if (typeof node === 'function') {
+        return (...args: any[]) => {
+          const { scope, remainingArgs } = resolveFactoryScope(page, args);
+          return new OracleLocator(node(scope, ...remainingArgs), context);
         };
-    }
+      }
+      if (!node || typeof node !== 'object') {
+        return node;
+      }
+      return Object.fromEntries(Object.entries(node).map(([key, value]) => [key, wrapOracle(value)]));
+    };
+    const wrapped = wrapOracle(rawOracle);
     await use(wrapped);
   },
 
-  page: async ({ page, locatorStrategy, mutation, benchmarkResult }, use, testInfo) => {
-    let appName = 'default';
-    const appTag = testInfo.titlePath.join(' ').match(/@app:(\w+)/);
-    if (appTag) appName = appTag[1];
+  page: async ({ page, locatorStrategy, mutation, benchmarkResult, appAdapter }, use, testInfo) => {
+    const appName = appAdapter.id;
+    const browserName = (testInfo.project.use as { browserName?: string }).browserName || testInfo.project.metadata.browserName || 'chromium';
 
     const scenarioId = testInfo.titlePath.join(' > ');
     const runId = uuidv4();
@@ -228,9 +351,15 @@ export const test = base.extend<TestOptions & {
     Object.assign(benchmarkResult, {
         runId: runId,
         applicationId: appName,
+        browserName,
+        corpusId: getBenchmarkCorpusId(),
         scenarioId: scenarioId,
+        activeScenarioId: undefined,
+        activeScenarioCategory: undefined,
+        sourceSpec: undefined,
         locatorFamily: locatorStrategy,
         phase: phase,
+        comparisonEligible: true,
         durationMs: 0,
         runStatus: 'passed',
         failureClass: null,
@@ -238,6 +367,7 @@ export const test = base.extend<TestOptions & {
         oracleIntegrityOk: true,
         evidence: FailureClassifier.createEmptyEvidence(),
         instrumentationPathUsed: 'fallback',
+        mutationTelemetry: undefined,
         accessibility: {
             scanAttempted: false,
             scanStatus: 'skipped',
@@ -252,6 +382,7 @@ export const test = base.extend<TestOptions & {
             minorCount: 0,
             runId: runId,
             applicationId: appName,
+            browserName,
             scenarioId: scenarioId,
             phase: phase,
             stabilization: {
@@ -264,19 +395,64 @@ export const test = base.extend<TestOptions & {
     });
 
     if (mutation) {
-        benchmarkResult.changeId = mutation.selector;
+        benchmarkResult.changeId = mutation.candidateId || mutation.selector;
         benchmarkResult.changeOperator = mutation.operator.constructor.name;
         benchmarkResult.changeCategory = mutation.operator.category;
-        await page.goto('/'); 
-        const mutator = new WebMutator();
-        try {
-            await mutator.applyMutation(page, mutation.selector, mutation.operator);
-        } catch (error) {
-            benchmarkResult.runStatus = 'invalid';
-            benchmarkResult.invalidRunReason = 'Setup failure during mutation application: ' + error.message;
-            // Scan will be skipped for this invalid setup
-            benchmarkResult.accessibility.scanStatus = 'skipped';
-            throw error;
+        benchmarkResult.quotaBucket = mutation.quotaBucket;
+        benchmarkResult.comparisonEligible = mutation.aggregateComparisonEligible !== false;
+        benchmarkResult.comparisonExclusionReason = mutation.comparisonExclusionReason;
+        benchmarkResult.mutationTelemetry = {
+            selectedCandidateId: mutation.candidateId ?? null,
+            selectedTargetSelector: mutation.selector ?? null,
+            selectedTargetTagType: mutation.fingerprint?.tagType ?? null,
+            operatorRuntimeCategory: mutation.operatorRuntimeCategory ?? mutation.operator.category,
+            operatorThesisCategory: mutation.operatorThesisCategory ?? mutation.operator.category,
+            operatorConsideredCandidateCount: mutation.operatorCandidateCount ?? null,
+            operatorCandidateCount: mutation.operatorCandidateCount ?? null,
+            operatorApplicableCount: mutation.operatorApplicableCount ?? null,
+            operatorSkippedOracleCount: mutation.operatorSkippedOracleCount ?? null,
+            operatorNotApplicableCount: mutation.operatorNotApplicableCount ?? null,
+            operatorCheckDurationMs: mutation.operatorTotalCheckDurationMs ?? null,
+            applyDurationMs: null,
+            applyFailureCount: 0,
+            finalMutationOutcomeClass: null,
+        };
+        if (getBenchmarkCorpusId() !== 'realworld-active') {
+            await page.goto('/'); 
+            const mutator = new WebMutator();
+            try {
+                const startedAt = Date.now();
+                const record = await mutator.applyMutation(page, mutation.selector, mutation.operator);
+                const applyDurationMs = Date.now() - startedAt;
+                mutation.record = record;
+                if (benchmarkResult.mutationTelemetry) {
+                    benchmarkResult.mutationTelemetry.applyDurationMs = applyDurationMs;
+                    benchmarkResult.mutationTelemetry.applyFailureCount = record.success ? 0 : 1;
+                    benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = record.success
+                        ? 'applied'
+                        : record.error?.includes('oracle-protected')
+                            ? 'skipped-oracle'
+                            : record.error?.includes('Element not found')
+                                ? 'target-not-found'
+                                : 'apply-failed';
+                }
+                if (!record.success) {
+                    benchmarkResult.runStatus = 'invalid';
+                    benchmarkResult.invalidRunReason = record.error ?? 'Mutation skipped or failed during application';
+                    benchmarkResult.comparisonEligible = false;
+                    benchmarkResult.comparisonExclusionReason = record.error ?? 'Mutation skipped or failed during application';
+                    benchmarkResult.accessibility.scanStatus = 'skipped';
+                }
+            } catch (error: any) {
+                benchmarkResult.runStatus = 'invalid';
+                benchmarkResult.invalidRunReason = 'Setup failure during mutation application: ' + error.message;
+                benchmarkResult.accessibility.scanStatus = 'skipped';
+                if (benchmarkResult.mutationTelemetry) {
+                    benchmarkResult.mutationTelemetry.applyFailureCount = 1;
+                    benchmarkResult.mutationTelemetry.finalMutationOutcomeClass = 'setup-failure';
+                }
+                throw error;
+            }
         }
     }
 
@@ -293,7 +469,10 @@ export const test = base.extend<TestOptions & {
         benchmarkResult.durationMs = Date.now() - startTime;
         // Run accessibility scan at the end of the scenario
         // Policy: Skip scan if the page was never correctly navigated or crashed early
-        const skipScan = benchmarkResult.runStatus === 'invalid' && benchmarkResult.invalidRunReason?.includes('Setup failure');
+        const skipScan =
+            benchmarkResult.runStatus === 'invalid' &&
+            (benchmarkResult.invalidRunReason?.includes('Setup failure') ||
+             benchmarkResult.invalidRunReason?.includes('Mutation skipped'));
         
         if (!skipScan) {
             try {
@@ -320,11 +499,11 @@ export const test = base.extend<TestOptions & {
                 });
 
                 // 4. Persist Detailed Artifact
-                const artifactsDir = path.join(process.cwd(), 'test-results', appName, 'accessibility-artifacts');
+                const artifactsDir = path.join(getAppResultsDir(appName as any), 'accessibility-artifacts');
                 if (!fs.existsSync(artifactsDir)) fs.mkdirSync(artifactsDir, { recursive: true });
                 
-                const safeScenarioId = scenarioId.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-                const artifactName = `${safeScenarioId}_${runId}_axe.json`;
+                const artifactStem = createArtifactStem(benchmarkResult.activeScenarioId || scenarioId, runId);
+                const artifactName = `${artifactStem}_axe.json`;
                 const artifactPath = path.join(artifactsDir, artifactName);
                 
                 // Full mirrored metadata for standalone artifact consumption
@@ -363,10 +542,10 @@ export const test = base.extend<TestOptions & {
         }
 
         // Save main benchmark result
-        const resultsDir = path.join(process.cwd(), 'test-results', appName, 'benchmark-runs');
+        const resultsDir = path.join(getAppResultsDir(appName as any), 'benchmark-runs');
         if (!fs.existsSync(resultsDir)) fs.mkdirSync(resultsDir, { recursive: true });
-        const safeScenarioId = scenarioId.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        const resultPath = path.join(resultsDir, `${safeScenarioId}_${runId}.json`);
+        const artifactStem = createArtifactStem(benchmarkResult.activeScenarioId || scenarioId, runId);
+        const resultPath = path.join(resultsDir, `${artifactStem}.json`);
         fs.writeFileSync(resultPath, JSON.stringify(benchmarkResult, null, 2));
     }
   },

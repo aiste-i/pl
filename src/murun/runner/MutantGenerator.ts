@@ -1,14 +1,35 @@
 import { Page } from 'playwright';
-import { WebMutator } from '../../webmutator/WebMutator';
 import { MutationCandidate } from '../../webmutator/MutationCandidate';
-import { DomOperators } from '../../webmutator/operators/DomOperators';
 import { DomOperator } from '../../webmutator/operators/dom/DomOperator';
 import { OperatorRegistry } from '../../webmutator/operators/OperatorRegistry';
 import { OracleSafety } from '../../webmutator/utils/OracleSafety';
+import {
+    getBenchmarkOperatorCatalog,
+    type OperatorCatalogEntry,
+    type ThesisMutationCategory,
+} from '../../webmutator/operators/catalog';
 import * as fs from 'fs';
 import * as path from 'path';
+import { createHash } from 'crypto';
+import { getAppReachableTargetsPath } from '../../apps';
+import { getBenchmarkCorpusId } from '../../benchmark/realworld-corpus';
+
+export interface ReachableTargetContext {
+    scenarioId: string;
+    scenarioCategory: string;
+    sourceSpec: string;
+    viewContext: string;
+    logicalKey?: string | null;
+}
 
 export interface ReachableTarget {
+    applicationId: string;
+    corpusId?: string;
+    scenarioId: string;
+    scenarioCategory: string;
+    sourceSpec: string;
+    viewContext: string;
+    logicalKey?: string | null;
     url: string;
     selector: string;
     fingerprint: {
@@ -17,54 +38,180 @@ export interface ReachableTarget {
         tagType: string;
         stableAttributes: Record<string, string>;
     };
+    oracleProtected: boolean;
+    eligible: boolean;
+    exclusionReason: string | null;
+    eligibleOperators: string[];
+    eligibleCategories: string[];
+}
+
+export interface OperatorCoverageTelemetry {
+    operator: string;
+    runtimeCategory: DomOperator['category'];
+    thesisCategory: ThesisMutationCategory;
+    candidateCount: number;
+    applicableCount: number;
+    skippedOracleCount: number;
+    notApplicableCount: number;
+    totalCheckDurationMs: number;
+    appliedCount: number;
+    applyDurationMs: number;
+    applyFailureCount: number;
+    finalOutcomeClasses: Record<string, number>;
+}
+
+interface SavedTargetRegistry {
+    metadata: {
+        applicationId: string;
+        corpusId?: string;
+        generatedAt: string;
+        totalTargets: number;
+        activeScenarioIds: string[];
+        operatorCoverage: OperatorCoverageTelemetry[];
+    };
+    targets: ReachableTarget[];
+}
+
+interface SavedScenarioSet {
+    metadata: {
+        applicationId: string;
+        corpusId?: string;
+        generatedAt: string;
+        totalCandidates: number;
+        totalEligibleCandidates: number;
+        budget: number;
+        seed: number;
+        categoryQuotas: Record<string, number>;
+        selectedCounts: Record<string, number>;
+        activeScenarioIds: string[];
+    };
+    scenarios: ReturnType<MutationCandidate['toJSON']>[];
 }
 
 export class MutantGenerator {
-    private webMutator: WebMutator;
     private page: Page;
     private appName: string;
     private targetRegistry: Map<string, ReachableTarget> = new Map();
     private registryPath: string;
+    private corpusId?: string;
+    private lastSamplingSummary: SavedScenarioSet['metadata'] | null = null;
+    private operatorCoverage: Map<string, OperatorCoverageTelemetry> = new Map();
 
     constructor(page: Page, appName: string = 'default') {
         this.page = page;
         this.appName = appName;
-        this.webMutator = new WebMutator();
-        this.registryPath = path.join(process.cwd(), 'test-results', this.appName, 'reachable-targets.json');
+        this.registryPath = getAppReachableTargetsPath(this.appName as any);
+        this.corpusId = getBenchmarkCorpusId();
         this.loadRegistryFromFile();
     }
 
+    private ensureOperatorCoverageEntry(entry: OperatorCatalogEntry): OperatorCoverageTelemetry {
+        const existing = this.operatorCoverage.get(entry.type);
+        if (existing) {
+            return existing;
+        }
+
+        const created: OperatorCoverageTelemetry = {
+            operator: entry.type,
+            runtimeCategory: entry.runtimeCategory as DomOperator['category'],
+            thesisCategory: entry.thesisCategory,
+            candidateCount: 0,
+            applicableCount: 0,
+            skippedOracleCount: 0,
+            notApplicableCount: 0,
+            totalCheckDurationMs: 0,
+            appliedCount: 0,
+            applyDurationMs: 0,
+            applyFailureCount: 0,
+            finalOutcomeClasses: {},
+        };
+        this.operatorCoverage.set(entry.type, created);
+        return created;
+    }
+
+    private getOperatorCoverageRows(): OperatorCoverageTelemetry[] {
+        return [...this.operatorCoverage.values()].sort((left, right) => left.operator.localeCompare(right.operator));
+    }
+
+    private buildTargetRegistryKey(target: ReachableTarget): string {
+        return [
+            target.applicationId,
+            target.corpusId ?? 'no-corpus',
+            target.scenarioId,
+            target.viewContext,
+            target.url,
+            target.selector,
+        ].join('::');
+    }
+
+    private buildCandidateId(target: ReachableTarget, operator: DomOperator): string {
+        return createHash('sha1')
+            .update([
+                target.applicationId,
+                target.corpusId ?? 'no-corpus',
+                target.scenarioId,
+                target.viewContext,
+                target.url,
+                target.selector,
+                operator.constructor.name,
+            ].join('::'))
+            .digest('hex');
+    }
+
+    private deterministicRank(seed: number, value: string): string {
+        return createHash('sha1').update(`${seed}::${value}`).digest('hex');
+    }
+
     private loadRegistryFromFile() {
-        if (fs.existsSync(this.registryPath)) {
-            try {
-                const data = JSON.parse(fs.readFileSync(this.registryPath, 'utf8'));
-                for (const item of data) {
-                    const key = `${item.url}|${item.selector}`;
-                    this.targetRegistry.set(key, item);
-                }
-            } catch (e) {
-                console.error('Failed to load target registry:', e);
+        if (!fs.existsSync(this.registryPath)) {
+            return;
+        }
+
+        try {
+            const data = JSON.parse(fs.readFileSync(this.registryPath, 'utf8'));
+            const targets = Array.isArray(data) ? data : data.targets;
+            const operatorCoverage = Array.isArray(data?.metadata?.operatorCoverage) ? data.metadata.operatorCoverage : [];
+            for (const row of operatorCoverage as OperatorCoverageTelemetry[]) {
+                this.operatorCoverage.set(row.operator, row);
             }
+            for (const item of targets as ReachableTarget[]) {
+                if (!item?.scenarioId || !item?.viewContext || !item?.applicationId) {
+                    continue;
+                }
+                const key = this.buildTargetRegistryKey(item);
+                this.targetRegistry.set(key, item);
+            }
+        } catch (e) {
+            console.error('Failed to load target registry:', e);
         }
     }
 
     async saveRegistryToFile() {
         const dir = path.dirname(this.registryPath);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        
-        const data = Array.from(this.targetRegistry.values());
-        fs.writeFileSync(this.registryPath, JSON.stringify(data, null, 2));
+
+        const targets = Array.from(this.targetRegistry.values());
+        const payload: SavedTargetRegistry = {
+            metadata: {
+                applicationId: this.appName,
+                corpusId: this.corpusId,
+                generatedAt: new Date().toISOString(),
+                totalTargets: targets.length,
+                activeScenarioIds: [...new Set(targets.map(target => target.scenarioId).filter(Boolean))].sort(),
+                operatorCoverage: this.getOperatorCoverageRows(),
+            },
+            targets,
+        };
+        fs.writeFileSync(this.registryPath, JSON.stringify(payload, null, 2));
     }
 
-    async collectReachableTargets(): Promise<ReachableTarget[]> {
+    async collectReachableTargets(context: ReachableTargetContext): Promise<ReachableTarget[]> {
+        if (!this.page) {
+            throw new Error('collectReachableTargets requires an active Playwright page.');
+        }
+
         const url = this.page.url();
         const foundTargets = await this.page.evaluate(() => {
-            const isOracleNodeOrContext = (el: Element): boolean => {
-                if (el.hasAttribute('data-testid')) return true;
-                if (el.querySelector('[data-testid]')) return true;
-                return false;
-            };
-
             const getFingerprint = (element: Element) => {
                 const attributes: Record<string, string> = {};
                 const stableAttrNames = ['id', 'name', 'class', 'data-testid', 'role', 'type'];
@@ -72,7 +219,7 @@ export class MutantGenerator {
                     const val = element.getAttribute(name);
                     if (val) attributes[name] = val;
                 }
-                
+
                 return {
                     role: element.getAttribute('role') || '',
                     name: element.getAttribute('name') || '',
@@ -101,20 +248,84 @@ export class MutantGenerator {
                 return path.join(' > ');
             };
 
-            const elements = Array.from(document.querySelectorAll('button, input, a, h1, h2, h3, p, div, span, li, label'));
-            return elements.filter(el => {
-                const style = window.getComputedStyle(el);
-                const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
-                return isVisible && !isOracleNodeOrContext(el);
-            }).map(el => ({
-                selector: getSelector(el),
-                fingerprint: getFingerprint(el)
-            }));
+            const elements = Array.from(document.querySelectorAll('button, input, textarea, a, h1, h2, h3, p, div, span, li, label'));
+            return elements
+                .filter(el => {
+                    const style = window.getComputedStyle(el);
+                    const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
+                    return isVisible;
+                })
+                .map(el => ({
+                    selector: getSelector(el),
+                    fingerprint: getFingerprint(el)
+                }));
         });
 
-        for (const t of foundTargets) {
-            const target: ReachableTarget = { ...t, url };
-            const key = `${url}|${target.selector}`;
+        const operatorCatalog = getBenchmarkOperatorCatalog();
+        const operators = operatorCatalog.map(entry => ({
+            entry,
+            operator: entry.factory(),
+        }));
+
+        for (const discovered of foundTargets) {
+            const locator = this.page.locator(discovered.selector).first();
+            if (await locator.count() === 0) {
+                continue;
+            }
+
+            const oracleProtected = await OracleSafety.isProtected(locator);
+            const eligibleOperators: string[] = [];
+            const eligibleCategories = new Set<string>();
+
+            for (const { entry, operator } of operators) {
+                const coverage = this.ensureOperatorCoverageEntry(entry);
+                coverage.candidateCount += 1;
+
+                if (oracleProtected) {
+                    coverage.skippedOracleCount += 1;
+                    continue;
+                }
+
+                const startedAt = Date.now();
+                try {
+                    const applicable = await operator.isApplicable(this.page, locator);
+                    coverage.totalCheckDurationMs += Date.now() - startedAt;
+                    if (applicable) {
+                        eligibleOperators.push(operator.constructor.name);
+                        eligibleCategories.add(operator.category);
+                        coverage.applicableCount += 1;
+                    } else {
+                        coverage.notApplicableCount += 1;
+                    }
+                } catch {
+                    coverage.totalCheckDurationMs += Date.now() - startedAt;
+                    coverage.notApplicableCount += 1;
+                }
+            }
+
+            const target: ReachableTarget = {
+                applicationId: this.appName,
+                corpusId: this.corpusId,
+                scenarioId: context.scenarioId,
+                scenarioCategory: context.scenarioCategory,
+                sourceSpec: context.sourceSpec,
+                viewContext: context.viewContext,
+                logicalKey: context.logicalKey ?? null,
+                url,
+                selector: discovered.selector,
+                fingerprint: discovered.fingerprint,
+                oracleProtected,
+                eligible: !oracleProtected && eligibleOperators.length > 0,
+                exclusionReason: oracleProtected
+                    ? 'oracle-protected'
+                    : eligibleOperators.length === 0
+                        ? 'no-applicable-operators'
+                        : null,
+                eligibleOperators,
+                eligibleCategories: [...eligibleCategories].sort(),
+            };
+
+            const key = this.buildTargetRegistryKey(target);
             if (!this.targetRegistry.has(key)) {
                 this.targetRegistry.set(key, target);
             }
@@ -125,26 +336,51 @@ export class MutantGenerator {
 
     async constructScenarios(targets: ReachableTarget[]): Promise<MutationCandidate[]> {
         const candidates: MutationCandidate[] = [];
-        const operators = DomOperators.getDomOperators();
+        const candidateKeys = new Set<string>();
+        const operatorCatalog = getBenchmarkOperatorCatalog();
 
         for (const target of targets) {
-            if (this.page) {
-                const locator = this.page.locator(target.selector).first();
-                if (await locator.count() === 0) continue;
+            if (!target.eligible) {
+                continue;
+            }
 
-                for (const operator of operators) {
-                    try {
-                        if (await operator.isApplicable(this.page, locator)) {
-                            candidates.push(new MutationCandidate(target.selector, operator, target.url, target.fingerprint));
-                        }
-                    } catch (e) {}
-                }
-            } else {
-                for (const operator of operators) {
-                    candidates.push(new MutationCandidate(target.selector, operator, target.url, target.fingerprint));
+            for (const operatorName of target.eligibleOperators) {
+                const operator = OperatorRegistry.createOperator(operatorName);
+                const operatorCoverage = this.operatorCoverage.get(operatorName);
+                const operatorEntry = operatorCatalog.find(entry => entry.type === operatorName);
+                const candidate = new MutationCandidate(target.selector, operator, target.url, target.fingerprint, {
+                    applicationId: target.applicationId,
+                    corpusId: target.corpusId,
+                    candidateId: this.buildCandidateId(target, operator),
+                    scenarioId: target.scenarioId,
+                    scenarioCategory: target.scenarioCategory,
+                    sourceSpec: target.sourceSpec,
+                    viewContext: target.viewContext,
+                    logicalKey: target.logicalKey ?? null,
+                    oracleProtected: target.oracleProtected,
+                    eligible: target.eligible,
+                    exclusionReason: target.exclusionReason,
+                    eligibleOperators: target.eligibleOperators,
+                    eligibleCategories: target.eligibleCategories,
+                    quotaBucket: operator.category,
+                    aggregateComparisonEligible: true,
+                    comparisonExclusionReason: null,
+                    operatorCandidateCount: operatorCoverage?.candidateCount,
+                    operatorApplicableCount: operatorCoverage?.applicableCount,
+                    operatorSkippedOracleCount: operatorCoverage?.skippedOracleCount,
+                    operatorNotApplicableCount: operatorCoverage?.notApplicableCount,
+                    operatorTotalCheckDurationMs: operatorCoverage?.totalCheckDurationMs,
+                    operatorRuntimeCategory: operatorEntry?.runtimeCategory ?? operator.category,
+                    operatorThesisCategory: operatorEntry?.thesisCategory ?? operator.category,
+                });
+
+                if (!candidateKeys.has(candidate.candidateId!)) {
+                    candidateKeys.add(candidate.candidateId!);
+                    candidates.push(candidate);
                 }
             }
         }
+
         return candidates;
     }
 
@@ -154,61 +390,134 @@ export class MutantGenerator {
     }
 
     saveScenarios(filePath: string, candidates: MutationCandidate[]) {
-        const data = candidates.map(c => c.toJSON());
         const dir = path.dirname(filePath);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+
+        const payload: SavedScenarioSet = {
+            metadata: this.lastSamplingSummary ?? {
+                applicationId: this.appName,
+                corpusId: this.corpusId,
+                generatedAt: new Date().toISOString(),
+                totalCandidates: candidates.length,
+                totalEligibleCandidates: candidates.length,
+                budget: candidates.length,
+                seed: 0,
+                categoryQuotas: {},
+                selectedCounts: {},
+                activeScenarioIds: [...new Set(candidates.map(candidate => candidate.scenarioId).filter(Boolean) as string[])].sort(),
+            },
+            scenarios: candidates.map(candidate => candidate.toJSON()),
+        };
+
+        fs.writeFileSync(filePath, JSON.stringify(payload, null, 2));
     }
 
     loadScenarios(filePath: string): MutationCandidate[] {
         if (!fs.existsSync(filePath)) return [];
-        const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        const raw = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        const data = Array.isArray(raw) ? raw : raw.scenarios;
         return data.map((d: any) => {
             const operator = OperatorRegistry.createOperator(d.operator.type, d.operator.params);
-            const candidate = new MutationCandidate(d.selector, operator, d.url, d.fingerprint);
+            const candidate = new MutationCandidate(d.selector, operator, d.url, d.fingerprint, {
+                applicationId: d.applicationId,
+                corpusId: d.corpusId,
+                candidateId: d.candidateId,
+                scenarioId: d.scenarioId,
+                scenarioCategory: d.scenarioCategory,
+                sourceSpec: d.sourceSpec,
+                viewContext: d.viewContext,
+                logicalKey: d.logicalKey ?? null,
+                oracleProtected: d.oracleProtected,
+                eligible: d.eligible,
+                exclusionReason: d.exclusionReason,
+                eligibleOperators: d.eligibleOperators,
+                eligibleCategories: d.eligibleCategories,
+                quotaBucket: d.quotaBucket,
+                selectionSeed: d.selectionSeed,
+                aggregateComparisonEligible: d.aggregateComparisonEligible,
+                comparisonExclusionReason: d.comparisonExclusionReason,
+                operatorCandidateCount: d.operatorCandidateCount,
+                operatorApplicableCount: d.operatorApplicableCount,
+                operatorSkippedOracleCount: d.operatorSkippedOracleCount,
+                operatorNotApplicableCount: d.operatorNotApplicableCount,
+                operatorTotalCheckDurationMs: d.operatorTotalCheckDurationMs,
+                operatorRuntimeCategory: d.operatorRuntimeCategory ?? null,
+                operatorThesisCategory: d.operatorThesisCategory ?? null,
+            });
             if (d.record) candidate.record = d.record;
             return candidate;
         });
     }
 
     sampleScenarios(candidates: MutationCandidate[], budget: number, seed: number): MutationCandidate[] {
-        const sampled: MutationCandidate[] = [];
-        const random = this.seededRandom(seed);
-        const stratified: Record<string, MutationCandidate[]> = {};
-        for (const c of candidates) {
-            const opName = c.operator.constructor.name;
-            if (!stratified[opName]) stratified[opName] = [];
-            stratified[opName].push(c);
+        const categoryOrder: Array<DomOperator['category']> = ['structural', 'content', 'accessibility-semantic', 'visibility'];
+        const eligibleCandidates = candidates.filter(candidate => candidate.eligible !== false && candidate.aggregateComparisonEligible !== false);
+        const pools = new Map<DomOperator['category'], MutationCandidate[]>();
+
+        for (const category of categoryOrder) {
+            pools.set(
+                category,
+                eligibleCandidates
+                    .filter(candidate => candidate.operator.category === category)
+                    .sort((left, right) => this.deterministicRank(seed, left.candidateId || '').localeCompare(this.deterministicRank(seed, right.candidateId || ''))),
+            );
         }
-        const opNames = Object.keys(stratified);
-        this.deterministicShuffle(opNames, random);
-        let currentOpIndex = 0;
-        const activeOpNames = [...opNames];
-        while (sampled.length < budget && activeOpNames.length > 0) {
-            const opName = activeOpNames[currentOpIndex % activeOpNames.length];
-            const pool = stratified[opName];
-            if (pool.length > 0) {
-                const index = Math.floor(random() * pool.length);
-                sampled.push(pool.splice(index, 1)[0]);
-                currentOpIndex++;
-            } else {
-                activeOpNames.splice(currentOpIndex % activeOpNames.length, 1);
+
+        const baseQuota = Math.floor(budget / categoryOrder.length);
+        const remainder = budget % categoryOrder.length;
+        const categoryQuotas = Object.fromEntries(
+            categoryOrder.map((category, index) => [category, baseQuota + (index < remainder ? 1 : 0)])
+        ) as Record<string, number>;
+
+        const selected: MutationCandidate[] = [];
+        const selectedCounts = Object.fromEntries(categoryOrder.map(category => [category, 0])) as Record<string, number>;
+        let leftover = 0;
+
+        for (const category of categoryOrder) {
+            const pool = pools.get(category)!;
+            const quota = categoryQuotas[category];
+            const taken = pool.slice(0, quota);
+            selected.push(...taken);
+            selectedCounts[category] = taken.length;
+            if (taken.length < quota) {
+                leftover += quota - taken.length;
             }
         }
-        return sampled;
-    }
 
-    private deterministicShuffle(array: any[], random: () => number) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
+        if (leftover > 0) {
+            for (const category of categoryOrder) {
+                const pool = pools.get(category)!;
+                while (leftover > 0 && selectedCounts[category] < pool.length) {
+                    selected.push(pool[selectedCounts[category]]);
+                    selectedCounts[category] += 1;
+                    leftover -= 1;
+                }
+            }
         }
+
+        const finalSelection = selected.slice(0, budget);
+        for (const candidate of finalSelection) {
+            candidate.selectionSeed = seed;
+            candidate.quotaBucket = candidate.operator.category;
+        }
+
+        this.lastSamplingSummary = {
+            applicationId: this.appName,
+            corpusId: this.corpusId,
+            generatedAt: new Date().toISOString(),
+            totalCandidates: candidates.length,
+            totalEligibleCandidates: eligibleCandidates.length,
+            budget,
+            seed,
+            categoryQuotas,
+            selectedCounts,
+            activeScenarioIds: [...new Set(finalSelection.map(candidate => candidate.scenarioId).filter(Boolean) as string[])].sort(),
+        };
+
+        return finalSelection;
     }
 
-    private seededRandom(seed: number) {
-        return function() {
-            const x = Math.sin(seed++) * 10000;
-            return x - Math.floor(x);
-        };
+    getSamplingSummary(): SavedScenarioSet['metadata'] | null {
+        return this.lastSamplingSummary;
     }
 }

@@ -7,7 +7,13 @@ export class OracleSafety {
      * whose mutation would invalidate oracle grounding.
      */
     static async isProtected(locator: Locator): Promise<boolean> {
-        return await locator.evaluate((node: HTMLElement) => {
+        const handle = await locator.elementHandle({ timeout: 0 }).catch(() => null);
+        if (!handle) {
+            return false;
+        }
+
+        try {
+            return await handle.evaluate((node: HTMLElement) => {
             const ORACLE_ATTR = 'data-testid';
             
             // 1. Direct oracle node protection
@@ -18,7 +24,12 @@ export class OracleSafety {
             if (node.querySelector(`[${ORACLE_ATTR}]`)) return true;
 
             return false;
-        });
+            });
+        } catch {
+            return false;
+        } finally {
+            await handle.dispose().catch(() => undefined);
+        }
     }
 
     /**

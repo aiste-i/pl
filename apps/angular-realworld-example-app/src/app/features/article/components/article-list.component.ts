@@ -28,8 +28,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
     @if (loading() === LoadingState.LOADED) {
       <div class="article-list" data-testid="article-list">
-        @for (article of results(); track article.slug) {
-          <app-article-preview [articleInput]="article" data-testid="article-preview" />
+        @for (article of results(); track article.slug; let index = $index) {
+          <app-article-preview [articleInput]="article" [previewIndex]="index + 1" data-testid="article-preview" />
         } @empty {
           <div class="article-preview empty-feed-message" data-testid="article-list-empty">
             @if (isFollowingFeed) {
@@ -45,8 +45,18 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       <nav data-testid="pagination-nav">
         <ul class="pagination" data-testid="pagination-list">
           @for (pageNumber of totalPages(); track pageNumber) {
-            <li class="page-item" [ngClass]="{ active: pageNumber === page() }" data-testid="pagination-item">
-              <button class="page-link" (click)="setPageTo(pageNumber)" data-testid="pagination-link">
+            <li
+              class="page-item"
+              [ngClass]="{ active: pageNumber === page() }"
+              [attr.aria-label]="'Page ' + pageNumber"
+              [attr.data-testid]="'pagination-item-' + pageNumber"
+            >
+              <button
+                class="page-link"
+                [attr.aria-label]="'Go to page ' + pageNumber"
+                [attr.data-testid]="'pagination-link-' + pageNumber"
+                (click)="setPageTo(pageNumber)"
+              >
                 {{ pageNumber }}
               </button>
             </li>

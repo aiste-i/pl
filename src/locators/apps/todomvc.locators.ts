@@ -49,15 +49,9 @@ export const TODO_STRATEGIES = {
 
   itemLabel: {
     'semantic-first': (item: Locator) => {
-        const l = item.getByRole('label'); // Note: 'label' is not a valid ARIA role for getByRole usually, but used here as placeholder
-        // Better:
-        const l2 = item.locator('label'); // Still semantic if it uses the tag, but thesis says getBy*
-        // Let's use getByText if possible?
-        const l3 = item.getByRole('listitem').locator('label'); // This is mixed.
-        // Thesis: "the first resolving step must use one of: getByRole, getByLabel, getByText, getByPlaceholder, getByAltText, getByTitle"
-        const l4 = item.getByRole('listitem').locator('label'); 
-        (l4 as any).semanticEntryPoint = 'getByRole';
-        return l4;
+        const l = item.getByText(/\S+/, { exact: false });
+        (l as any).semanticEntryPoint = 'getByText';
+        return l;
     }, 
     css: (item: Locator) => item.locator('css=label'),
     xpath: (item: Locator) => item.locator('xpath=./div[@class="view"]/label'),

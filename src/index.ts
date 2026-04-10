@@ -5,5 +5,6 @@ export * from './webmutator/MutationCandidate';
 export * from './webmutator/operators/dom';
 export * from './webmutator/operators/visual';
 export * from './webmutator/operators/DomOperators';
+export * from './webmutator/operators/catalog';
 export * from './webmutator/utils/RandomUtils';
 export * from './murun/runner/MutantGenerator';

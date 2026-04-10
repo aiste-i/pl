@@ -1,37 +1,43 @@
 import { Page, Locator } from 'playwright';
 import { DomOperator } from './DomOperator';
 import { MutationRecord } from '../../MutationRecord';
-import { OracleSafety } from '../../utils/OracleSafety';
+import { MutationTargetSafety } from '../../utils/MutationTargetSafety';
 
 export class SubtreeMove implements DomOperator {
     category: 'structural' = 'structural';
     
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
-        // Cannot move oracle context
-        if (await OracleSafety.isStructuralMutationUnsafe(target)) return false;
+        if (!(await MutationTargetSafety.isSafeStructuralTarget(target))) return false;
 
         return await target.evaluate((node: HTMLElement) => {
-            const containers = Array.from(document.querySelectorAll('div, span, p, section, main, footer, header'));
-            return containers.some(c => 
-                c !== node && 
-                c !== node.parentElement && 
-                !node.contains(c) &&
-                !c.hasAttribute('data-testid') && // Don't move INTO an oracle node
-                !c.querySelector('[data-testid]') // Don't move INTO an oracle context
+            if (!node.parentElement) {
+                return false;
+            }
+
+            const interactiveSelector = 'a[href], button, input, select, textarea, form, [role="button"], [role="link"], [role="textbox"]';
+            return Array.from(node.parentElement.children).some(sibling =>
+                sibling !== node &&
+                !sibling.hasAttribute('data-testid') &&
+                !sibling.querySelector('[data-testid]') &&
+                !sibling.matches(interactiveSelector) &&
+                !sibling.querySelector(interactiveSelector),
             );
         });
     }
 
     async applyOperator(page: Page, target: Locator, record: MutationRecord): Promise<void> {
         const moved = await target.evaluate((node: HTMLElement) => {
-            const containers = Array.from(document.querySelectorAll('div, span, p, section, main, footer, header'));
-            // Filter out self, parent, children, and oracle contexts
-            const available = containers.filter(c => 
-                c !== node && 
-                c !== node.parentElement && 
-                !node.contains(c) &&
-                !c.hasAttribute('data-testid') &&
-                !c.querySelector('[data-testid]')
+            if (!node.parentElement) {
+                return false;
+            }
+
+            const interactiveSelector = 'a[href], button, input, select, textarea, form, [role="button"], [role="link"], [role="textbox"]';
+            const available = Array.from(node.parentElement.children).filter(sibling =>
+                sibling !== node &&
+                !sibling.hasAttribute('data-testid') &&
+                !sibling.querySelector('[data-testid]') &&
+                !sibling.matches(interactiveSelector) &&
+                !sibling.querySelector(interactiveSelector),
             );
 
             if (available.length > 0) {

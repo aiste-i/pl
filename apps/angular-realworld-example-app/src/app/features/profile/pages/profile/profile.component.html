@@ -17,7 +17,7 @@
             <h4 data-testid="profile-username">{{ p.username }}</h4>
             <p data-testid="profile-bio">{{ p.bio ?? '' }}</p>
             @if (!isUser()) {
-              <app-follow-button [profile]="p" (toggle)="onToggleFollowing($event)" data-testid="profile-follow-btn" />
+              <app-follow-button [profile]="p" (toggle)="onToggleFollowing($event)" />
             }
             @if (isUser()) {
               <a [routerLink]="['/settings']" class="btn btn-sm btn-outline-secondary action-btn" data-testid="profile-edit-btn">
