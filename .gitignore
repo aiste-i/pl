@@ -11,6 +11,7 @@ allure-report
 allure-results
 playwright-report
 test-results
+artifacts
 
 # Logs
 logs

@@ -2,6 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { getAppResultsDir, getSelectedAppId } from '../../apps';
 import { getOperatorCatalog } from '../../webmutator/operators/catalog';
+import { createRunMetadata, writeCsvRows } from '../../benchmark/result-contract';
+import { validateBenchmarkPayload } from '../../benchmark/result-schema-validator';
 
 interface AggregatedRun {
     runId: string;
@@ -125,6 +127,13 @@ function loadResults(inputDir: string): AggregatedRun[] {
         try {
             const stat = fs.statSync(file);
             const content = JSON.parse(fs.readFileSync(file, 'utf8'));
+            const validation = validateBenchmarkPayload(content, file);
+            if (!validation.valid) {
+                const details = validation.errors
+                    .map(error => `${error.jsonPath}: ${error.message}`)
+                    .join('; ');
+                throw new Error(`Invalid benchmark result structure in ${file}: ${details}`);
+            }
             if (!content.runId || !content.locatorFamily || !content.phase) {
                 console.warn(`Skipping malformed record: ${file}`);
                 continue;
@@ -163,7 +172,7 @@ function loadResults(inputDir: string): AggregatedRun[] {
                 recordedAtMs: stat.mtimeMs,
             });
         } catch (e) {
-            console.error(`Failed to parse ${file}:`, e);
+            throw new Error(`Failed to load benchmark result ${file}: ${e instanceof Error ? e.message : String(e)}`);
         }
     }
     return dedupeRuns(runs);
@@ -171,14 +180,7 @@ function loadResults(inputDir: string): AggregatedRun[] {
 
 function writeCsv(filePath: string, data: any[]) {
     if (data.length === 0) return;
-    const headers = Object.keys(data[0]).join(',');
-    const rows = data.map(row =>
-        Object.values(row).map(val => {
-            if (typeof val === 'string' && val.includes(',')) return `"${val}"`;
-            return val;
-        }).join(',')
-    );
-    fs.writeFileSync(filePath, [headers, ...rows].join('\n'));
+    writeCsvRows(filePath, data);
 }
 
 function mean(values: number[]): number {
@@ -315,6 +317,49 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         };
     });
     writeCsv(path.join(outputDir, 'summary_by_browser.csv'), browserSummary);
+
+    const browserNames = Array.from(new Set(runs.map(run => run.browserName))).sort();
+    const summaryByBrowserFamily = [];
+    for (const browserName of browserNames) {
+        for (const family of families) {
+            const cellRuns = runs.filter(run => run.browserName === browserName && run.locatorFamily === family);
+            if (cellRuns.length === 0) continue;
+            const cellMutated = cellRuns.filter(run => run.phase === 'mutated');
+            const comparableMutated = cellMutated.filter(run => run.comparisonEligible);
+            summaryByBrowserFamily.push({
+                browserName,
+                family,
+                totalRuns: cellRuns.length,
+                baselineRuns: cellRuns.filter(run => run.phase === 'baseline').length,
+                mutatedRuns: cellMutated.length,
+                comparableMutatedRuns: comparableMutated.length,
+                failedComparableMutatedRuns: comparableMutated.filter(run => run.runStatus === 'failed').length,
+                failureRateComparableMutated: (comparableMutated.filter(run => run.runStatus === 'failed').length / comparableMutated.length || 0).toFixed(4),
+            });
+        }
+    }
+    writeCsv(path.join(outputDir, 'summary_by_browser_and_family.csv'), summaryByBrowserFamily);
+
+    const summaryByBrowserFamilyCategory = [];
+    for (const browserName of browserNames) {
+        for (const family of families) {
+            for (const category of categories) {
+                const cellRuns = mutated.filter(run => run.browserName === browserName && run.locatorFamily === family && run.changeCategory === category);
+                if (cellRuns.length === 0) continue;
+                const comparable = cellRuns.filter(run => run.comparisonEligible);
+                summaryByBrowserFamilyCategory.push({
+                    browserName,
+                    family,
+                    category,
+                    totalMutated: cellRuns.length,
+                    comparableMutated: comparable.length,
+                    failedComparableMutated: comparable.filter(run => run.runStatus === 'failed').length,
+                    failureRateComparable: (comparable.filter(run => run.runStatus === 'failed').length / comparable.length || 0).toFixed(4),
+                });
+            }
+        }
+    }
+    writeCsv(path.join(outputDir, 'summary_by_browser_family_and_category.csv'), summaryByBrowserFamilyCategory);
 
     const exclusionSummary = [
         ...unsupportedRows.map(row => ({
@@ -458,6 +503,8 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         activeScenarioIds,
         applications: appSummary,
         browsers: browserSummary,
+        summaryByBrowserFamily,
+        summaryByBrowserFamilyCategory,
         summaryByFamily,
         summaryByFamilyCategory,
         summaryByFamilyOperator,
@@ -484,6 +531,20 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         excludedUnsupported: unsupportedRows,
     };
     fs.writeFileSync(path.join(outputDir, 'aggregate_report.json'), JSON.stringify(report, null, 2));
+    const metadata = createRunMetadata({
+        runId: `aggregate-${Date.now()}`,
+        generatedAt: report.generatedAt,
+        applicationId: appsInRuns.length === 1 ? appsInRuns[0] : 'multi-app',
+        browserName: browserSummary.length === 1 ? browserSummary[0].browserName : 'chromium',
+        corpusId: corpusIds.length === 1 ? corpusIds[0] : corpusIds.join('|'),
+        browserSetUsed: browserNames,
+        selectedScenarios: activeScenarioIds,
+        selectedApps: appsInRuns,
+        selectedMutationIds: mutated.map(run => run.changeId).filter(changeId => changeId && changeId !== 'none'),
+        totalCandidatesConsidered: mutated.length,
+        executionMode: 'aggregate',
+    });
+    fs.writeFileSync(path.join(outputDir, 'run-metadata.json'), JSON.stringify(metadata, null, 2));
 
     console.log(`Aggregation complete. Results written to ${outputDir}`);
 }

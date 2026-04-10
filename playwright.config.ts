@@ -3,7 +3,7 @@ import { getSelectedAppAdapter } from './src/apps';
 
 const adapter = getSelectedAppAdapter();
 const enableWebServer = process.env.SKIP_WEB_SERVER !== '1';
-const requestedBrowsers = (process.env.PLAYWRIGHT_BROWSERS || 'chromium,firefox,webkit')
+const requestedBrowsers = (process.env.PLAYWRIGHT_BROWSERS || 'chromium')
   .split(',')
   .map(value => value.trim().toLowerCase())
   .filter(Boolean);
