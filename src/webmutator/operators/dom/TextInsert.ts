@@ -6,7 +6,10 @@ import { RandomUtils } from '../../utils/RandomUtils';
 export class TextInsert implements DomOperator {
     category: 'content' = 'content';
     
-    async isApplicable(page: Page, target: Locator): Promise<boolean> { const text = await target.innerText(); return text.trim().length > 0; }
+    async isApplicable(page: Page, target: Locator): Promise<boolean> {
+        const text = await target.textContent();
+        return !text || text.trim().length === 0;
+    }
 
     async applyOperator(page: Page, target: Locator, record: MutationRecord): Promise<void> {
         const textToInsert = RandomUtils.getRandomString(10);

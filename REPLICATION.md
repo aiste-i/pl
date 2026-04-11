@@ -85,6 +85,7 @@ npm run benchmark:prepare:app --appid=vue3-realworld-example-app --budget=20 --s
 npm run benchmark:mutate:all
 npm run validate:results
 npm run benchmark:aggregate:all
+npm run benchmark:check:yield
 npm run reports:generate:run
 ```
 
@@ -97,6 +98,7 @@ The same path is available as a manual GitHub Actions workflow:
 - default `seed`: `12345`
 
 The workflow uploads `artifacts`, `reports`, and `test-results` as a single thesis-primary artifact bundle.
+It also enforces a minimum comparable mutated-run yield after aggregation.
 
 ## Cross-Browser Dataset Generation
 
@@ -135,6 +137,13 @@ Mutation preparation:
 ```bash
 npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=20 --seed=12345
 ```
+
+`benchmark:prepare:app` now performs four stages for the selected app:
+
+- reachable-target collection
+- deterministic candidate generation
+- checkpoint-aware preflight validation on an oversampled candidate pool
+- final scenario selection from preflight-validated candidates only
 
 Mutation execution:
 

@@ -191,6 +191,12 @@ Validate structured benchmark outputs:
 npm run validate:results
 ```
 
+Check post-aggregation comparable yield:
+
+```bash
+npm run benchmark:check:yield
+```
+
 Regenerate machine-readable reports:
 
 ```bash
