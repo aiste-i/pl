@@ -296,6 +296,16 @@ export const OPERATOR_CATALOG: OperatorCatalogEntry[] = [
     factory: () => new dom.ChangeButtonLabel(),
   },
   {
+    type: 'MutateAccessibleNameText',
+    safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
+    domConditions: 'Visible non-protected text-bearing descendants that participate in a button, link, label, or heading accessible-name surface.',
+    implementationKind: 'dom',
+    benchmarkScope: 'in-scope',
+    runtimeCategory: 'accessibility-semantic',
+    thesisCategory: 'accessibility-semantic',
+    factory: () => new dom.MutateAccessibleNameText(),
+  },
+  {
     type: 'RemoveInputNames',
     safetyGuard: ACCESSIBILITY_MUTATION.safetyGuard,
     domConditions: 'Named form controls whose name attributes can be removed.',

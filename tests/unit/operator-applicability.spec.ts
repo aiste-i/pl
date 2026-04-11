@@ -8,6 +8,7 @@ import { TextReplace } from '../../src/webmutator/operators/dom/TextReplace';
 import { StyleVisibility } from '../../src/webmutator/operators/dom/StyleVisibility';
 import { TagMutator } from '../../src/webmutator/operators/dom/TagMutator';
 import { ChangeAriaLabel } from '../../src/webmutator/operators/dom/accessibility/ChangeAriaLabel';
+import { MutateAccessibleNameText } from '../../src/webmutator/operators/dom/accessibility/MutateAccessibleNameText';
 import { captureMutationSurface } from '../../src/benchmark/mutation-surface';
 
 test('each in-scope operator exposes an explicit applicability check', () => {
@@ -65,6 +66,30 @@ test('accessibility-semantic applicability accepts matching ARIA targets and rej
     applicable: false,
     reason: 'behavior-preservation-gate-failed',
   });
+});
+
+test('accessible-name descendant targets can supply semantic mutations without touching protected oracle anchors', async ({ page }) => {
+  await page.setContent(`
+    <button data-testid="favorite-button">
+      <span id="button-copy">Favorite article</span>
+    </button>
+    <p id="generic-copy">Decorative copy</p>
+  `);
+
+  const operator = new MutateAccessibleNameText();
+
+  expect(await evaluateMutationApplicability(page, page.locator('#button-copy'), operator)).toEqual({
+    applicable: true,
+    reason: null,
+  });
+  expect(await evaluateMutationApplicability(page, page.locator('#generic-copy'), operator)).toEqual({
+    applicable: false,
+    reason: 'behavior-preservation-gate-failed',
+  });
+
+  const record = await new WebMutator().applyMutation(page, '#button-copy', operator);
+  expect(record.success).toBe(true);
+  await expect(page.locator('#button-copy')).toContainText('Benchmark accessible name mutation');
 });
 
 test('visibility applicability accepts safe presentation nodes and rejects controls', async ({ page }) => {

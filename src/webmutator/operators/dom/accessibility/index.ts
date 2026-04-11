@@ -11,3 +11,4 @@ export * from './DuplicateId';
 export * from './SemanticToDiv';
 export * from './ChangeAriaLabel';
 export * from './ToggleAriaExpanded';
+export * from './MutateAccessibleNameText';
