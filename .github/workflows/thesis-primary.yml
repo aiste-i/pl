@@ -18,6 +18,7 @@ jobs:
     env:
       PLAYWRIGHT_BROWSERS: chromium
       BENCHMARK_CORPUS_ID: realworld-active
+      BENCHMARK_RETENTION: compact
 
     steps:
       - uses: actions/checkout@v4

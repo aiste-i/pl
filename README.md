@@ -265,6 +265,11 @@ Reviewer-facing copies are also version-controlled under:
 - [`reports/realworld-accessibility-summary-all-valid-runs.csv`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-accessibility-summary-all-valid-runs.csv)
 - [`reports/realworld-accessibility-scan-status-summary.csv`](/c:/Users/aiste/Desktop/benchmark/reports/realworld-accessibility-scan-status-summary.csv)
 
+Retention mode is controlled with `BENCHMARK_RETENTION=full|compact`:
+
+- `full` keeps per-run mirrors under `artifacts/<run-id>/` and detailed axe JSON under `test-results/<app-id>/realworld-active/accessibility-artifacts/`
+- `compact` keeps the aggregate dataset under `test-results/<app-id>/realworld-active/aggregate/` plus the generated reviewer-facing `reports/` outputs, then prunes raw run JSON and detailed accessibility artifacts after aggregation
+
 ## CI
 
 The repository ships two workflow layers:
