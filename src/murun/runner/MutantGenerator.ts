@@ -307,6 +307,9 @@ export class MutantGenerator {
                 })
                 .map(el => ({
                     selector: getSelector(el),
+                    stableSelector: el.getAttribute('data-testid')
+                        ? `[data-testid="${el.getAttribute('data-testid')}"]`
+                        : (el.id ? `#${el.id}` : null),
                     fingerprint: getFingerprint(el),
                     accessibleNameSurfaceSelector: closestSelector(el, accessibleMatcher),
                     actionableContainerSelector: closestSelector(el, actionableMatcher),
@@ -397,6 +400,7 @@ export class MutantGenerator {
                 const annotation = annotateTargetRelevance(
                     {
                         selector: target.selector,
+                        stableSelector: (discovered as any).stableSelector ?? null,
                         tagType: target.fingerprint.tagType,
                         role: target.fingerprint.role,
                         accessibleNameSurfaceSelector: (discovered as any).accessibleNameSurfaceSelector ?? null,

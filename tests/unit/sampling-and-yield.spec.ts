@@ -8,6 +8,7 @@ import { buildMutationPreflightPool, computeCategoryQuotas, sampleMutationCandid
 import { evaluateComparableYield } from '../../src/benchmark/comparable-yield';
 import { evaluateMutationMeaningfulness } from '../../src/benchmark/mutation-quality';
 import { ReplaceHeadingWithP } from '../../src/webmutator/operators/dom/accessibility/ReplaceHeadingWithP';
+import { annotateTargetRelevance, type ScenarioTouchpoint } from '../../src/benchmark/realworld-touchpoints';
 
 function candidatePool(): MutationCandidate[] {
   const factories = [
@@ -102,6 +103,48 @@ test('accessible-name surface candidates outrank unrelated generic accessibility
   const sampled = sampleMutationCandidates([generic, relevant], 1, 12345);
 
   expect(sampled.selected.map(candidate => candidate.candidateId)).toEqual(['accessible-relevant']);
+});
+
+test('stable selector aliases preserve exact touchpoint relevance for protected controls', () => {
+  const touchpoints: ScenarioTouchpoint[] = [
+    {
+      logicalKey: 'article.favoriteButton',
+      role: 'primary-action',
+      priority: 40,
+      resolvedTarget: {
+        selector: 'app-root > app-article-page > div > div:nth-of-type(1) > div > app-article-meta > div > span > app-favorite-button > button',
+        stableSelector: '[data-testid="article-favorite-btn"]',
+        tagType: 'button',
+        role: '',
+        accessibleNameSurfaceSelector: '[data-testid="article-favorite-btn"]',
+        actionableContainerSelector: '[data-testid="article-favorite-btn"]',
+        collectionItemSelector: null,
+      },
+      familyMeta: {
+        semantic: { logicalKey: 'article.favoriteButton', family: 'semantic-first', selector: 'getByRole(button)' } as any,
+        css: { logicalKey: 'article.favoriteButton', family: 'css', selector: '[data-testid="article-favorite-btn"]' } as any,
+        xpath: { logicalKey: 'article.favoriteButton', family: 'xpath', selector: '//button[@data-testid="article-favorite-btn"]' } as any,
+        oracle: null,
+      },
+    },
+  ];
+
+  const annotation = annotateTargetRelevance(
+    {
+      selector: '[data-testid="article-favorite-btn"]',
+      stableSelector: '[data-testid="article-favorite-btn"]',
+      tagType: 'button',
+      role: '',
+      accessibleNameSurfaceSelector: '[data-testid="article-favorite-btn"]',
+      actionableContainerSelector: '[data-testid="article-favorite-btn"]',
+      collectionItemSelector: null,
+    },
+    touchpoints,
+  );
+
+  expect(annotation.relevanceBand).toBe('exact-touchpoint');
+  expect(annotation.relevanceScore).toBeGreaterThan(0);
+  expect(annotation.touchpointLogicalKeys).toEqual(['article.favoriteButton']);
 });
 
 test('runtime category overrides raw operator category for accessibility-semantic coverage', () => {

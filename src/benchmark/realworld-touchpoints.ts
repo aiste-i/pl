@@ -21,6 +21,7 @@ export interface FamilyStressHints {
 
 export interface TouchpointElementSnapshot {
   selector: string;
+  stableSelector: string | null;
   tagType: string;
   role: string;
   accessibleNameSurfaceSelector: string | null;
@@ -49,6 +50,7 @@ export interface ScenarioTouchpoint {
 
 export interface TargetRelevanceInput {
   selector: string;
+  stableSelector: string | null;
   tagType: string;
   role: string;
   accessibleNameSurfaceSelector: string | null;
@@ -95,6 +97,27 @@ function compareSelectorPath(left: string, right: string): boolean {
   return left === right;
 }
 
+function selectorMatches(
+  candidateSelector: string | null | undefined,
+  candidateStableSelector: string | null | undefined,
+  touchpointSelector: string,
+  touchpointStableSelector: string | null | undefined,
+): boolean {
+  if (candidateSelector && compareSelectorPath(candidateSelector, touchpointSelector)) {
+    return true;
+  }
+  if (candidateSelector && touchpointStableSelector && compareSelectorPath(candidateSelector, touchpointStableSelector)) {
+    return true;
+  }
+  if (candidateStableSelector && compareSelectorPath(candidateStableSelector, touchpointSelector)) {
+    return true;
+  }
+  if (candidateStableSelector && touchpointStableSelector && compareSelectorPath(candidateStableSelector, touchpointStableSelector)) {
+    return true;
+  }
+  return false;
+}
+
 function isDescendantSelector(candidateSelector: string, touchpointSelector: string): boolean {
   return candidateSelector.startsWith(`${touchpointSelector} > `);
 }
@@ -123,7 +146,14 @@ function familyStressForBand(
 }
 
 function pickBandForTouchpoint(target: TargetRelevanceInput, touchpoint: ScenarioTouchpoint): RelevanceBand {
-  if (compareSelectorPath(target.selector, touchpoint.resolvedTarget.selector)) {
+  if (
+    selectorMatches(
+      target.selector,
+      target.stableSelector,
+      touchpoint.resolvedTarget.selector,
+      touchpoint.resolvedTarget.stableSelector,
+    )
+  ) {
     return 'exact-touchpoint';
   }
   if (isDescendantSelector(target.selector, touchpoint.resolvedTarget.selector)) {
@@ -168,6 +198,17 @@ export async function snapshotTouchpointLocator(locator: Locator): Promise<Touch
 
   try {
     return await handle.evaluate((node: Element) => {
+      const getStableSelector = (element: Element): string | null => {
+        const testId = element.getAttribute('data-testid');
+        if (testId) {
+          return `[data-testid="${testId}"]`;
+        }
+        if (element.id) {
+          return `#${element.id}`;
+        }
+        return null;
+      };
+
       const computeSelector = (element: Element): string => {
         const path: string[] = [];
         let current: Element | null = element;
@@ -185,11 +226,13 @@ export async function snapshotTouchpointLocator(locator: Locator): Promise<Touch
         return path.join(' > ');
       };
 
+      const getPreferredSelector = (element: Element): string => getStableSelector(element) ?? computeSelector(element);
+
       const closestSelector = (element: Element, matcher: (candidate: Element) => boolean): string | null => {
         let current: Element | null = element;
         while (current && current !== document.body) {
           if (matcher(current)) {
-            return computeSelector(current);
+            return getPreferredSelector(current);
           }
           current = current.parentElement;
         }
@@ -220,6 +263,7 @@ export async function snapshotTouchpointLocator(locator: Locator): Promise<Touch
 
       return {
         selector: computeSelector(node),
+        stableSelector: getStableSelector(node),
         tagType: node.tagName.toLowerCase(),
         role: node.getAttribute('role') || '',
         accessibleNameSurfaceSelector: closestSelector(node, accessibleMatcher),
