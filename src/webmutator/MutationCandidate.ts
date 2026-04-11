@@ -1,5 +1,6 @@
 import { MutationRecord } from './MutationRecord';
 import { DomOperator } from './operators/dom/DomOperator';
+import type { FamilyStressHints, RelevanceBand } from '../benchmark/realworld-touchpoints';
 
 export interface MutationCandidateMetadata {
     applicationId?: string;
@@ -26,6 +27,12 @@ export interface MutationCandidateMetadata {
     operatorTotalCheckDurationMs?: number;
     operatorRuntimeCategory?: string | null;
     operatorThesisCategory?: string | null;
+    touchpointLogicalKeys?: string[];
+    relevanceBand?: RelevanceBand;
+    familyStressHints?: FamilyStressHints;
+    relevanceScore?: number;
+    categoryAvailabilityHint?: boolean;
+    selectedForCategoryMinimum?: boolean;
 }
 
 export class MutationCandidate {
@@ -58,6 +65,12 @@ export class MutationCandidate {
     operatorTotalCheckDurationMs?: number;
     operatorRuntimeCategory?: string | null;
     operatorThesisCategory?: string | null;
+    touchpointLogicalKeys?: string[];
+    relevanceBand?: RelevanceBand;
+    familyStressHints?: FamilyStressHints;
+    relevanceScore?: number;
+    categoryAvailabilityHint?: boolean;
+    selectedForCategoryMinimum?: boolean;
 
     constructor(selector: string, operator: DomOperator, url?: string, fingerprint?: any, metadata: MutationCandidateMetadata = {}) {
         this.selector = selector;
@@ -100,6 +113,12 @@ export class MutationCandidate {
             operatorTotalCheckDurationMs: this.operatorTotalCheckDurationMs ?? null,
             operatorRuntimeCategory: this.operatorRuntimeCategory ?? null,
             operatorThesisCategory: this.operatorThesisCategory ?? null,
+            touchpointLogicalKeys: this.touchpointLogicalKeys ?? [],
+            relevanceBand: this.relevanceBand ?? 'generic',
+            familyStressHints: this.familyStressHints ?? { semantic: false, css: false, xpath: false },
+            relevanceScore: this.relevanceScore ?? 0,
+            categoryAvailabilityHint: this.categoryAvailabilityHint ?? false,
+            selectedForCategoryMinimum: this.selectedForCategoryMinimum ?? false,
             record: this.record
         };
     }

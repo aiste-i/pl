@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { MutantGenerator } from './MutantGenerator';
+import { CATEGORY_ORDER } from './sampling';
 import {
   getAppPreflightPoolPath,
   getAppPreflightResultsPath,
@@ -12,10 +13,22 @@ interface PreflightResultRow {
   scenarioId: string;
   viewContext: string;
   operator: string;
+  operatorCategory?: string;
   selector: string;
   success: boolean;
   reason: string | null;
   durationMs: number;
+  touchpointLogicalKeys?: string[];
+  relevanceBand?: string;
+  relevanceScore?: number;
+  familyStressHints?: {
+    semantic: boolean;
+    css: boolean;
+    xpath: boolean;
+  };
+  categoryAvailabilityHint?: boolean;
+  meaningfulEffect?: boolean;
+  meaningfulEffectReason?: string | null;
 }
 
 interface PreflightResultPayload {
@@ -26,8 +39,27 @@ interface PreflightResultPayload {
     seed: number;
     totalCandidates: number;
     successfulCandidates: number;
+    successfulCountsByCategory?: Record<string, number>;
+    successfulCountsByOperator?: Record<string, number>;
   };
   results: PreflightResultRow[];
+}
+
+function countByCategory(candidates: ReturnType<MutantGenerator['loadScenarios']>): Record<string, number> {
+  return Object.fromEntries(
+    CATEGORY_ORDER.map(category => [
+      category,
+      candidates.filter(candidate => candidate.operator.category === category).length,
+    ]),
+  ) as Record<string, number>;
+}
+
+function countByOperator(candidates: ReturnType<MutantGenerator['loadScenarios']>): Record<string, number> {
+  return candidates.reduce((acc, candidate) => {
+    const operatorName = candidate.operator.constructor.name;
+    acc[operatorName] = (acc[operatorName] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 }
 
 async function main() {
@@ -55,18 +87,56 @@ async function main() {
   );
   const validatedCandidates = pool.filter(candidate => candidate.candidateId && successfulCandidateIds.has(candidate.candidateId));
   const selected = generator.sampleScenarios(validatedCandidates, budget, seed);
+  const validatedCountsByCategory = countByCategory(validatedCandidates);
+  const validatedCountsByOperator = countByOperator(validatedCandidates);
+  const missingMandatoryCategories =
+    budget >= CATEGORY_ORDER.length
+      ? CATEGORY_ORDER.filter(category => (validatedCountsByCategory[category] || 0) === 0)
+      : [];
 
-  if (selected.length < budget) {
-    const availableByOperator = payload.results.reduce((acc, result) => {
-      acc[result.operator] = (acc[result.operator] || 0) + (result.success ? 1 : 0);
+  if (selected.length < budget || missingMandatoryCategories.length > 0) {
+    const availableByOperator = payload.metadata.successfulCountsByOperator ?? payload.results.reduce((acc, result) => {
+      if (result.success) {
+        acc[result.operator] = (acc[result.operator] || 0) + 1;
+      }
       return acc;
     }, {} as Record<string, number>);
+    const rankedRejectedCandidates = pool
+      .filter(candidate => candidate.candidateId && !successfulCandidateIds.has(candidate.candidateId))
+      .sort((left, right) => (right.relevanceScore ?? 0) - (left.relevanceScore ?? 0))
+      .slice(0, 8)
+      .map(candidate => {
+        const rejection = payload.results.find(result => result.candidateId === candidate.candidateId);
+        return {
+          candidateId: candidate.candidateId,
+          operator: candidate.operator.constructor.name,
+          operatorCategory: candidate.operator.category,
+          scenarioId: candidate.scenarioId,
+          relevanceBand: candidate.relevanceBand ?? 'generic',
+          relevanceScore: candidate.relevanceScore ?? 0,
+          reason: rejection?.reason ?? 'unknown',
+          meaningfulEffectReason: rejection?.meaningfulEffectReason ?? null,
+        };
+      });
     throw new Error(
       `Only ${selected.length} validated mutation candidates are available for ${appName}; requested budget ${budget}. ` +
-      `Successful preflight candidates by operator: ${JSON.stringify(availableByOperator)}`,
+      (missingMandatoryCategories.length > 0
+        ? `Missing mandatory categories: ${missingMandatoryCategories.join(', ')}. `
+        : '') +
+      `Validated counts by category: ${JSON.stringify(validatedCountsByCategory)}. ` +
+      `Validated counts by operator: ${JSON.stringify(validatedCountsByOperator)}. ` +
+      `Successful preflight candidates by operator: ${JSON.stringify(availableByOperator)}. ` +
+      `Top rejected candidates: ${JSON.stringify(rankedRejectedCandidates)}`,
     );
   }
 
+  const samplingSummary = generator.getSamplingSummary();
+  if (samplingSummary) {
+    samplingSummary.validatedCountsByCategory = validatedCountsByCategory;
+    samplingSummary.validatedCountsByOperator = validatedCountsByOperator;
+    samplingSummary.mandatoryCoverageSatisfied =
+      samplingSummary.mandatoryCoverageSatisfied && missingMandatoryCategories.length === 0;
+  }
   generator.saveScenarios(outputPath, selected);
   console.log(`Saved ${selected.length} validated scenarios to ${outputPath}`);
 }

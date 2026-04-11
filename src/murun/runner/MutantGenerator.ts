@@ -13,6 +13,13 @@ import * as path from 'path';
 import { createHash } from 'crypto';
 import { getAppReachableTargetsPath } from '../../apps';
 import { getBenchmarkCorpusId } from '../../benchmark/realworld-corpus';
+import {
+    annotateTargetRelevance,
+    categoryAvailabilityHint,
+    type FamilyStressHints,
+    type RelevanceBand,
+    type ScenarioTouchpoint,
+} from '../../benchmark/realworld-touchpoints';
 import { buildMutationPreflightPool, sampleMutationCandidates } from './sampling';
 
 export interface ReachableTargetContext {
@@ -21,6 +28,7 @@ export interface ReachableTargetContext {
     sourceSpec: string;
     viewContext: string;
     logicalKey?: string | null;
+    touchpoints?: ScenarioTouchpoint[];
 }
 
 export interface ReachableTarget {
@@ -44,6 +52,10 @@ export interface ReachableTarget {
     exclusionReason: string | null;
     eligibleOperators: string[];
     eligibleCategories: string[];
+    touchpointLogicalKeys: string[];
+    relevanceBand: RelevanceBand;
+    familyStressHints: FamilyStressHints;
+    relevanceScore: number;
 }
 
 export interface OperatorCoverageTelemetry {
@@ -84,6 +96,10 @@ interface SavedScenarioSet {
         seed: number;
         categoryQuotas: Record<string, number>;
         selectedCounts: Record<string, number>;
+        availableCountsByCategory?: Record<string, number>;
+        mandatoryCoverageSatisfied?: boolean;
+        validatedCountsByCategory?: Record<string, number>;
+        validatedCountsByOperator?: Record<string, number>;
         activeScenarioIds: string[];
     };
     scenarios: ReturnType<MutationCandidate['toJSON']>[];
@@ -249,6 +265,39 @@ export class MutantGenerator {
                 return path.join(' > ');
             };
 
+            const closestSelector = (element: Element, matcher: (candidate: Element) => boolean): string | null => {
+                let current: Element | null = element;
+                while (current && current !== document.body) {
+                    if (matcher(current)) {
+                        return getSelector(current);
+                    }
+                    current = current.parentElement;
+                }
+                return null;
+            };
+
+            const accessibleMatcher = (candidate: Element) =>
+                ['button', 'a', 'label', 'input', 'textarea', 'select', 'option'].includes(candidate.tagName.toLowerCase()) ||
+                /^h[1-6]$/.test(candidate.tagName.toLowerCase()) ||
+                candidate.hasAttribute('aria-label') ||
+                candidate.hasAttribute('aria-labelledby') ||
+                candidate.hasAttribute('placeholder') ||
+                candidate.hasAttribute('alt') ||
+                candidate.hasAttribute('title') ||
+                candidate.hasAttribute('role');
+
+            const actionableMatcher = (candidate: Element) =>
+                ['button', 'a', 'input', 'textarea', 'select', 'form'].includes(candidate.tagName.toLowerCase()) ||
+                candidate.getAttribute('role') === 'button' ||
+                candidate.getAttribute('role') === 'link';
+
+            const collectionMatcher = (candidate: Element) =>
+                ['article', 'li'].includes(candidate.tagName.toLowerCase()) ||
+                candidate.classList.contains('article-preview') ||
+                candidate.classList.contains('article-meta') ||
+                candidate.classList.contains('card') ||
+                candidate.getAttribute('data-testid')?.startsWith('comment-card-') === true;
+
             const elements = Array.from(document.querySelectorAll('button, input, textarea, a, h1, h2, h3, p, div, span, li, label'));
             return elements
                 .filter(el => {
@@ -258,7 +307,10 @@ export class MutantGenerator {
                 })
                 .map(el => ({
                     selector: getSelector(el),
-                    fingerprint: getFingerprint(el)
+                    fingerprint: getFingerprint(el),
+                    accessibleNameSurfaceSelector: closestSelector(el, accessibleMatcher),
+                    actionableContainerSelector: closestSelector(el, actionableMatcher),
+                    collectionItemSelector: closestSelector(el, collectionMatcher),
                 }));
         });
 
@@ -324,7 +376,29 @@ export class MutantGenerator {
                         : null,
                 eligibleOperators,
                 eligibleCategories: [...eligibleCategories].sort(),
+                touchpointLogicalKeys: [],
+                relevanceBand: 'generic',
+                familyStressHints: { semantic: false, css: false, xpath: false },
+                relevanceScore: 0,
             };
+
+            if (context.touchpoints?.length) {
+                const annotation = annotateTargetRelevance(
+                    {
+                        selector: target.selector,
+                        tagType: target.fingerprint.tagType,
+                        role: target.fingerprint.role,
+                        accessibleNameSurfaceSelector: (discovered as any).accessibleNameSurfaceSelector ?? null,
+                        actionableContainerSelector: (discovered as any).actionableContainerSelector ?? null,
+                        collectionItemSelector: (discovered as any).collectionItemSelector ?? null,
+                    },
+                    context.touchpoints,
+                );
+                target.touchpointLogicalKeys = annotation.touchpointLogicalKeys;
+                target.relevanceBand = annotation.relevanceBand;
+                target.familyStressHints = annotation.familyStressHints;
+                target.relevanceScore = annotation.relevanceScore;
+            }
 
             const key = this.buildTargetRegistryKey(target);
             if (!this.targetRegistry.has(key)) {
@@ -373,6 +447,18 @@ export class MutantGenerator {
                     operatorTotalCheckDurationMs: operatorCoverage?.totalCheckDurationMs,
                     operatorRuntimeCategory: operatorEntry?.runtimeCategory ?? operator.category,
                     operatorThesisCategory: operatorEntry?.thesisCategory ?? operator.category,
+                    touchpointLogicalKeys: target.touchpointLogicalKeys,
+                    relevanceBand: target.relevanceBand,
+                    familyStressHints: target.familyStressHints,
+                    relevanceScore: target.relevanceScore,
+                    categoryAvailabilityHint: categoryAvailabilityHint(operator.category, {
+                        touchpointLogicalKeys: target.touchpointLogicalKeys,
+                        relevanceBand: target.relevanceBand,
+                        familyStressHints: target.familyStressHints,
+                        relevanceScore: target.relevanceScore,
+                        tagType: target.fingerprint.tagType,
+                        role: target.fingerprint.role,
+                    }),
                 });
 
                 if (!candidateKeys.has(candidate.candidateId!)) {
@@ -444,6 +530,12 @@ export class MutantGenerator {
                 operatorTotalCheckDurationMs: d.operatorTotalCheckDurationMs,
                 operatorRuntimeCategory: d.operatorRuntimeCategory ?? null,
                 operatorThesisCategory: d.operatorThesisCategory ?? null,
+                touchpointLogicalKeys: d.touchpointLogicalKeys ?? [],
+                relevanceBand: d.relevanceBand ?? 'generic',
+                familyStressHints: d.familyStressHints ?? { semantic: false, css: false, xpath: false },
+                relevanceScore: d.relevanceScore ?? 0,
+                categoryAvailabilityHint: d.categoryAvailabilityHint ?? false,
+                selectedForCategoryMinimum: d.selectedForCategoryMinimum ?? false,
             });
             if (d.record) candidate.record = d.record;
             return candidate;
@@ -463,6 +555,8 @@ export class MutantGenerator {
             seed,
             categoryQuotas: summary.categoryQuotas,
             selectedCounts: summary.selectedCounts,
+            availableCountsByCategory: summary.availableCountsByCategory,
+            mandatoryCoverageSatisfied: summary.mandatoryCoverageSatisfied,
             activeScenarioIds: [...new Set(finalSelection.map(candidate => candidate.scenarioId).filter(Boolean) as string[])].sort(),
         };
 

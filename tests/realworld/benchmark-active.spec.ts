@@ -11,6 +11,13 @@ import {
 } from '../../src/apps';
 import { getActiveScenarioDefinitions } from './benchmark-active.scenarios';
 import { WebMutator } from '../../src/webmutator/WebMutator';
+import {
+  resolveScenarioTouchpoints,
+  type FamilyStressHints,
+  type RelevanceBand,
+  type ScenarioTouchpointInput,
+} from '../../src/benchmark/realworld-touchpoints';
+import { evaluateMutationMeaningfulness, type MutationSurfaceSnapshot } from '../../src/benchmark/mutation-quality';
 
 const APP_ID = getSelectedAppId();
 const MODE = process.env.BENCHMARK_ACTIVE_MODE || 'baseline';
@@ -29,13 +36,87 @@ interface PreflightResultRow {
   scenarioId: string;
   viewContext: string;
   operator: string;
+  operatorCategory: string;
   selector: string;
   success: boolean;
   reason: string | null;
   durationMs: number;
+  touchpointLogicalKeys: string[];
+  relevanceBand: RelevanceBand;
+  relevanceScore: number;
+  familyStressHints: FamilyStressHints;
+  categoryAvailabilityHint: boolean;
+  meaningfulEffect: boolean;
+  meaningfulEffectReason: string | null;
 }
 
 const preflightResults: PreflightResultRow[] = [];
+
+async function captureMutationSurface(page: any, selector: string): Promise<MutationSurfaceSnapshot | null> {
+  const locator = page.locator(selector).first();
+  const handle = await locator.elementHandle({ timeout: 0 }).catch(() => null);
+  if (!handle) {
+    return {
+      exists: false,
+      tagType: null,
+      textContent: null,
+      className: null,
+      style: null,
+      role: null,
+      ariaLabel: null,
+      placeholder: null,
+      alt: null,
+      title: null,
+      hidden: null,
+      childElementCount: null,
+      parentSelector: null,
+    };
+  }
+
+  try {
+    return await handle.evaluate((node: Element) => {
+      const computeSelector = (element: Element | null): string | null => {
+        if (!element) {
+          return null;
+        }
+
+        const path: string[] = [];
+        let current: Element | null = element;
+        while (current && current !== document.body) {
+          let entry = current.tagName.toLowerCase();
+          if (current.parentElement) {
+            const siblings = Array.from(current.parentElement.children).filter(child => child.tagName === current?.tagName);
+            if (siblings.length > 1) {
+              entry += `:nth-of-type(${siblings.indexOf(current) + 1})`;
+            }
+          }
+          path.unshift(entry);
+          current = current.parentElement;
+        }
+        return path.join(' > ');
+      };
+
+      const element = node as HTMLElement;
+      return {
+        exists: true,
+        tagType: element.tagName.toLowerCase(),
+        textContent: element.textContent?.trim() ?? null,
+        className: element.getAttribute('class'),
+        style: element.getAttribute('style'),
+        role: element.getAttribute('role'),
+        ariaLabel: element.getAttribute('aria-label'),
+        placeholder: element.getAttribute('placeholder'),
+        alt: element.getAttribute('alt'),
+        title: element.getAttribute('title'),
+        hidden: element.hidden,
+        childElementCount: element.childElementCount,
+        parentSelector: computeSelector(element.parentElement),
+      };
+    });
+  } finally {
+    await handle.dispose().catch(() => undefined);
+  }
+}
 
 function describeScenario(
   strategy: StrategyName,
@@ -81,15 +162,17 @@ if (MODE === 'collect') {
           oracle,
           appAdapter,
           generator,
-          async collectCheckpoint(viewContext: string) {
-            await generator.collectReachableTargets({
-              scenarioId: scenario.scenarioId,
-              scenarioCategory: scenario.category,
-              sourceSpec: scenario.sourceSpec,
-              viewContext,
-            });
-          },
-        });
+            async collectCheckpoint(viewContext: string, touchpoints: ScenarioTouchpointInput[] = []) {
+              const resolvedTouchpoints = await resolveScenarioTouchpoints(APP_ID, scenario.scenarioId, touchpoints);
+              await generator.collectReachableTargets({
+                scenarioId: scenario.scenarioId,
+                scenarioCategory: scenario.category,
+                sourceSpec: scenario.sourceSpec,
+                viewContext,
+                touchpoints: resolvedTouchpoints,
+              });
+            },
+          });
 
         await generator.saveRegistryToFile();
         expect(fs.existsSync(REACHABLE_TARGETS_FILE)).toBe(true);
@@ -132,6 +215,18 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
   const scenarios = generator.loadScenarios(PREFLIGHT_POOL_FILE);
 
   test.afterAll(async () => {
+    const successfulCountsByCategory = preflightResults.reduce((acc, result) => {
+      if (result.success) {
+        acc[result.operatorCategory] = (acc[result.operatorCategory] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+    const successfulCountsByOperator = preflightResults.reduce((acc, result) => {
+      if (result.success) {
+        acc[result.operator] = (acc[result.operator] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
     const payload = {
       metadata: {
         applicationId: APP_ID,
@@ -140,6 +235,8 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
         seed: BENCHMARK_SEED,
         totalCandidates: scenarios.length,
         successfulCandidates: preflightResults.filter(result => result.success).length,
+        successfulCountsByCategory,
+        successfulCountsByOperator,
       },
       results: preflightResults,
     };
@@ -172,6 +269,8 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
         let durationMs = 0;
         let reason: string | null = null;
         let success = false;
+        let meaningfulEffect = false;
+        let meaningfulEffectReason: string | null = null;
 
         try {
           await matchingScenario.collect({
@@ -188,11 +287,21 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
 
               checkpointReached = true;
               const mutator = new WebMutator();
+              const beforeSurface = await captureMutationSurface(page, mutationScenario.selector);
               const startedAt = Date.now();
               const record = await mutator.applyMutation(page, mutationScenario.selector, mutationScenario.operator);
               durationMs = Date.now() - startedAt;
-              success = record.success;
-              reason = record.error ?? null;
+              const afterSurface = await captureMutationSurface(page, mutationScenario.selector);
+              const meaningfulResult = evaluateMutationMeaningfulness(
+                mutationScenario.operator.category,
+                mutationScenario.relevanceBand,
+                beforeSurface,
+                afterSurface,
+              );
+              meaningfulEffect = meaningfulResult.meaningful;
+              meaningfulEffectReason = meaningfulResult.reason;
+              success = record.success && meaningfulResult.meaningful;
+              reason = record.error ?? meaningfulResult.reason ?? null;
             },
           });
         } catch (error: any) {
@@ -208,10 +317,18 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
           scenarioId: mutationScenario.scenarioId ?? matchingScenario.scenarioId,
           viewContext: mutationScenario.viewContext ?? 'unknown',
           operator: mutationScenario.operator.constructor.name,
+          operatorCategory: mutationScenario.operator.category,
           selector: mutationScenario.selector,
           success: checkpointReached && success,
           reason,
           durationMs,
+          touchpointLogicalKeys: mutationScenario.touchpointLogicalKeys ?? [],
+          relevanceBand: mutationScenario.relevanceBand ?? 'generic',
+          relevanceScore: mutationScenario.relevanceScore ?? 0,
+          familyStressHints: mutationScenario.familyStressHints ?? { semantic: false, css: false, xpath: false },
+          categoryAvailabilityHint: mutationScenario.categoryAvailabilityHint ?? false,
+          meaningfulEffect,
+          meaningfulEffectReason,
         });
       });
     }

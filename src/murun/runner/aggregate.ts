@@ -5,6 +5,7 @@ import { getOperatorCatalog } from '../../webmutator/operators/catalog';
 import { createRunMetadata, writeCsvRows } from '../../benchmark/result-contract';
 import { getBenchmarkRetention, pruneCompactBenchmarkArtifacts } from '../../benchmark/retention';
 import { validateBenchmarkPayload } from '../../benchmark/result-schema-validator';
+import { CATEGORY_ORDER } from './sampling';
 
 interface AggregatedRun {
     runId: string;
@@ -61,6 +62,42 @@ interface UnsupportedRow {
     activeInCorpus?: boolean;
     activeScenarioIds?: string[];
     specHints: string[];
+}
+
+interface ScenarioFilePayload {
+    metadata?: {
+        selectedCounts?: Record<string, number>;
+        validatedCountsByCategory?: Record<string, number>;
+        validatedCountsByOperator?: Record<string, number>;
+        mandatoryCoverageSatisfied?: boolean;
+    };
+    scenarios?: Array<{
+        candidateId?: string;
+        operator?: {
+            type?: string;
+            category?: string;
+        };
+        touchpointLogicalKeys?: string[];
+        relevanceBand?: string;
+        relevanceScore?: number;
+        selectedForCategoryMinimum?: boolean;
+    }>;
+}
+
+interface PreflightPayload {
+    metadata?: {
+        successfulCountsByCategory?: Record<string, number>;
+        successfulCountsByOperator?: Record<string, number>;
+    };
+    results?: Array<{
+        candidateId?: string;
+        operator?: string;
+        operatorCategory?: string;
+        success?: boolean;
+        touchpointLogicalKeys?: string[];
+        relevanceBand?: string;
+        meaningfulEffect?: boolean;
+    }>;
 }
 
 const CATEGORY_MAPPING: Record<string, string> = Object.fromEntries(
@@ -184,12 +221,23 @@ function writeCsv(filePath: string, data: any[]) {
     writeCsvRows(filePath, data);
 }
 
+function readJsonIfPresent<T>(filePath: string): T | null {
+    if (!fs.existsSync(filePath)) {
+        return null;
+    }
+
+    return JSON.parse(fs.readFileSync(filePath, 'utf8')) as T;
+}
+
 function mean(values: number[]): number {
     return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
 }
 
 function aggregate(runs: AggregatedRun[], outputDir: string) {
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+    const appRootDir = path.dirname(outputDir);
+    const scenarioPayload = readJsonIfPresent<ScenarioFilePayload>(path.join(appRootDir, 'scenarios.json'));
+    const preflightPayload = readJsonIfPresent<PreflightPayload>(path.join(appRootDir, 'scenario-preflight-results.json'));
 
     writeCsv(path.join(outputDir, 'benchmark_runs.csv'), runs);
 
@@ -498,6 +546,51 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     });
     writeCsv(path.join(outputDir, 'operator_telemetry_summary.csv'), operatorTelemetrySummary);
 
+    const selectedScenarios = scenarioPayload?.scenarios ?? [];
+    if (selectedScenarios.length > 0) {
+        const selectionSummaryByCategoryAndRelevance = CATEGORY_ORDER.flatMap(category => {
+            const categoryRows = selectedScenarios.filter(scenario => scenario.operator?.category === category);
+            const relevanceBands = Array.from(new Set(categoryRows.map(scenario => scenario.relevanceBand ?? 'generic'))).sort();
+            return relevanceBands.map(relevanceBand => ({
+                category,
+                relevanceBand,
+                selectedCount: categoryRows.filter(scenario => (scenario.relevanceBand ?? 'generic') === relevanceBand).length,
+                selectedForCategoryMinimumCount: categoryRows.filter(
+                    scenario => (scenario.relevanceBand ?? 'generic') === relevanceBand && scenario.selectedForCategoryMinimum === true,
+                ).length,
+            }));
+        }).filter(row => row.selectedCount > 0);
+        writeCsv(path.join(outputDir, 'selection_summary_by_category_and_relevance.csv'), selectionSummaryByCategoryAndRelevance);
+
+        const selectionTouchpointSummary = [
+            {
+                selectionType: 'selected',
+                touchpointRelevantCount: selectedScenarios.filter(scenario => (scenario.touchpointLogicalKeys ?? []).length > 0).length,
+                genericCount: selectedScenarios.filter(scenario => (scenario.touchpointLogicalKeys ?? []).length === 0).length,
+                mandatoryCoverageSatisfied: scenarioPayload?.metadata?.mandatoryCoverageSatisfied ?? false,
+            },
+        ];
+        writeCsv(path.join(outputDir, 'selection_touchpoint_summary.csv'), selectionTouchpointSummary);
+    }
+
+    const preflightResults = preflightPayload?.results ?? [];
+    if (preflightResults.length > 0) {
+        const successfulResults = preflightResults.filter(result => result.success);
+        const preflightValidatedSummary = CATEGORY_ORDER.flatMap(category => {
+            const categoryRows = successfulResults.filter(result => (result.operatorCategory ?? 'unknown') === category);
+            const relevanceBands = Array.from(new Set(categoryRows.map(result => result.relevanceBand ?? 'generic'))).sort();
+            return relevanceBands.map(relevanceBand => ({
+                category,
+                relevanceBand,
+                validatedCount: categoryRows.filter(result => (result.relevanceBand ?? 'generic') === relevanceBand).length,
+                meaningfulValidatedCount: categoryRows.filter(
+                    result => (result.relevanceBand ?? 'generic') === relevanceBand && result.meaningfulEffect !== false,
+                ).length,
+            }));
+        }).filter(row => row.validatedCount > 0);
+        writeCsv(path.join(outputDir, 'preflight_validated_summary_by_category_and_relevance.csv'), preflightValidatedSummary);
+    }
+
     const report = {
         generatedAt: new Date().toISOString(),
         corpusId: corpusIds.length === 1 ? corpusIds[0] : corpusIds,
@@ -516,6 +609,14 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
             scanStatusSummary: accessibilityScanStatusSummary,
             completedOnly: accessibilitySummaryCompletedOnly,
             allValidRuns: accessibilitySummaryAllValidRuns,
+        },
+        selectionQuality: {
+            selectedCounts: scenarioPayload?.metadata?.selectedCounts ?? null,
+            validatedCountsByCategory: scenarioPayload?.metadata?.validatedCountsByCategory ?? preflightPayload?.metadata?.successfulCountsByCategory ?? null,
+            validatedCountsByOperator: scenarioPayload?.metadata?.validatedCountsByOperator ?? preflightPayload?.metadata?.successfulCountsByOperator ?? null,
+            mandatoryCoverageSatisfied: scenarioPayload?.metadata?.mandatoryCoverageSatisfied ?? null,
+            selectedTouchpointRelevantCount: selectedScenarios.filter(scenario => (scenario.touchpointLogicalKeys ?? []).length > 0).length,
+            selectedGenericCount: selectedScenarios.filter(scenario => (scenario.touchpointLogicalKeys ?? []).length === 0).length,
         },
         mutationRunTelemetry,
         operatorTelemetrySummary,
