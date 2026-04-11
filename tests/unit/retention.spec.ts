@@ -5,9 +5,20 @@ import * as path from 'path';
 import { getBenchmarkRetention, pruneCompactBenchmarkArtifacts } from '../../src/benchmark/retention';
 
 test('retention defaults to full and accepts compact explicitly', () => {
-  expect(getBenchmarkRetention(undefined)).toBe('full');
-  expect(getBenchmarkRetention('compact')).toBe('compact');
-  expect(getBenchmarkRetention('unexpected')).toBe('full');
+  const originalRetention = process.env.BENCHMARK_RETENTION;
+  try {
+    delete process.env.BENCHMARK_RETENTION;
+
+    expect(getBenchmarkRetention()).toBe('full');
+    expect(getBenchmarkRetention('compact')).toBe('compact');
+    expect(getBenchmarkRetention('unexpected')).toBe('full');
+  } finally {
+    if (originalRetention === undefined) {
+      delete process.env.BENCHMARK_RETENTION;
+    } else {
+      process.env.BENCHMARK_RETENTION = originalRetention;
+    }
+  }
 });
 
 test('compact retention preserves aggregate outputs while pruning raw artifacts', () => {
