@@ -1,13 +1,14 @@
 import { Locator, Page } from 'playwright';
 import { MutationRecord } from '../../../MutationRecord';
+import { OracleSafety } from '../../../utils/OracleSafety';
 import { AccessibilityOperator } from './AccessibilityOperator';
 
 export class ToggleAriaExpanded extends AccessibilityOperator {
     category: 'accessibility-semantic' = 'accessibility-semantic';
-    oracleAnchorSafe = true;
 
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
         if (!await super.isApplicable(page, target)) return false;
+        if (await OracleSafety.isProtected(target)) return false;
 
         return await target.evaluate((el: HTMLElement) => {
             const current = el.getAttribute('aria-expanded');
