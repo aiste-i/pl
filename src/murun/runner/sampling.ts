@@ -17,6 +17,30 @@ export interface SamplingSummary {
   mandatoryCoverageSatisfied: boolean;
 }
 
+export function getCandidateCategory(candidate: MutationCandidate): DomOperator['category'] {
+  const runtimeCategory = candidate.operatorRuntimeCategory;
+  if (
+    runtimeCategory === 'structural' ||
+    runtimeCategory === 'content' ||
+    runtimeCategory === 'accessibility-semantic' ||
+    runtimeCategory === 'visibility'
+  ) {
+    return runtimeCategory;
+  }
+
+  const quotaBucket = candidate.quotaBucket;
+  if (
+    quotaBucket === 'structural' ||
+    quotaBucket === 'content' ||
+    quotaBucket === 'accessibility-semantic' ||
+    quotaBucket === 'visibility'
+  ) {
+    return quotaBucket;
+  }
+
+  return candidate.operator.category;
+}
+
 function deterministicRank(seed: number, value: string): string {
   return createHash('sha1').update(`${seed}::${value}`).digest('hex');
 }
@@ -38,7 +62,7 @@ function getAvailableCountsByCategory(candidates: MutationCandidate[]): Record<s
   return Object.fromEntries(
     CATEGORY_ORDER.map(category => [
       category,
-      candidates.filter(candidate => candidate.operator.category === category).length,
+      candidates.filter(candidate => getCandidateCategory(candidate) === category).length,
     ]),
   ) as Record<string, number>;
 }
@@ -99,7 +123,7 @@ export function buildCategoryPools(candidates: MutationCandidate[], seed: number
     pools.set(
       category,
       eligibleCandidates
-        .filter(candidate => candidate.operator.category === category)
+        .filter(candidate => getCandidateCategory(candidate) === category)
         .sort((left, right) => compareBaseRanking(seed, left, right)),
     );
   }
@@ -109,7 +133,7 @@ export function buildCategoryPools(candidates: MutationCandidate[], seed: number
 
 function markSelection(candidate: MutationCandidate, seed: number, selectedForCategoryMinimum: boolean): MutationCandidate {
   candidate.selectionSeed = seed;
-  candidate.quotaBucket = candidate.operator.category;
+  candidate.quotaBucket = getCandidateCategory(candidate);
   candidate.selectedForCategoryMinimum = selectedForCategoryMinimum;
   return candidate;
 }
@@ -209,7 +233,7 @@ export function sampleMutationCandidates(
     remaining.sort(candidateSelectionComparator(seed, selectedScenarioCounts, selectedOperatorCounts));
     const candidate = remaining[0];
     selected.push(markSelection(candidate, seed, false));
-    selectedCounts[candidate.operator.category] += 1;
+    selectedCounts[getCandidateCategory(candidate)] += 1;
     registerSelection(candidate, selectedScenarioCounts, selectedOperatorCounts, used);
   }
 

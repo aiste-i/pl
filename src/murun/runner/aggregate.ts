@@ -77,6 +77,8 @@ interface ScenarioFilePayload {
             type?: string;
             category?: string;
         };
+        quotaBucket?: string;
+        operatorRuntimeCategory?: string | null;
         touchpointLogicalKeys?: string[];
         relevanceBand?: string;
         relevanceScore?: number;
@@ -101,7 +103,7 @@ interface PreflightPayload {
 }
 
 const CATEGORY_MAPPING: Record<string, string> = Object.fromEntries(
-    getOperatorCatalog().map(entry => [entry.type, entry.thesisCategory === 'visibility-interaction-state' ? 'visibility-interaction-state' : entry.thesisCategory]),
+    getOperatorCatalog().map(entry => [entry.type, entry.runtimeCategory]),
 );
 
 function getCategory(operator: string, existingCategory?: string): string {
@@ -549,7 +551,9 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     const selectedScenarios = scenarioPayload?.scenarios ?? [];
     if (selectedScenarios.length > 0) {
         const selectionSummaryByCategoryAndRelevance = CATEGORY_ORDER.flatMap(category => {
-            const categoryRows = selectedScenarios.filter(scenario => scenario.operator?.category === category);
+            const categoryRows = selectedScenarios.filter(scenario =>
+                (scenario.quotaBucket ?? scenario.operatorRuntimeCategory ?? scenario.operator?.category ?? 'unknown') === category,
+            );
             const relevanceBands = Array.from(new Set(categoryRows.map(scenario => scenario.relevanceBand ?? 'generic'))).sort();
             return relevanceBands.map(relevanceBand => ({
                 category,

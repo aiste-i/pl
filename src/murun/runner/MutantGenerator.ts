@@ -20,7 +20,7 @@ import {
     type RelevanceBand,
     type ScenarioTouchpoint,
 } from '../../benchmark/realworld-touchpoints';
-import { buildMutationPreflightPool, sampleMutationCandidates } from './sampling';
+import { buildMutationPreflightPool, getCandidateCategory, sampleMutationCandidates } from './sampling';
 
 export interface ReachableTargetContext {
     scenarioId: string;
@@ -345,7 +345,7 @@ export class MutantGenerator {
                     coverage.totalCheckDurationMs += Date.now() - startedAt;
                     if (applicable) {
                         eligibleOperators.push(operator.constructor.name);
-                        eligibleCategories.add(operator.category);
+                        eligibleCategories.add(entry.runtimeCategory);
                         coverage.applicableCount += 1;
                     } else {
                         coverage.notApplicableCount += 1;
@@ -423,6 +423,8 @@ export class MutantGenerator {
                 const operator = OperatorRegistry.createOperator(operatorName);
                 const operatorCoverage = this.operatorCoverage.get(operatorName);
                 const operatorEntry = operatorCatalog.find(entry => entry.type === operatorName);
+                const runtimeCategory = operatorEntry?.runtimeCategory ?? operator.category;
+                const thesisCategory = operatorEntry?.thesisCategory ?? operator.category;
                 const candidate = new MutationCandidate(target.selector, operator, target.url, target.fingerprint, {
                     applicationId: target.applicationId,
                     corpusId: target.corpusId,
@@ -437,7 +439,7 @@ export class MutantGenerator {
                     exclusionReason: target.exclusionReason,
                     eligibleOperators: target.eligibleOperators,
                     eligibleCategories: target.eligibleCategories,
-                    quotaBucket: operator.category,
+                    quotaBucket: runtimeCategory,
                     aggregateComparisonEligible: true,
                     comparisonExclusionReason: null,
                     operatorCandidateCount: operatorCoverage?.candidateCount,
@@ -445,13 +447,13 @@ export class MutantGenerator {
                     operatorSkippedOracleCount: operatorCoverage?.skippedOracleCount,
                     operatorNotApplicableCount: operatorCoverage?.notApplicableCount,
                     operatorTotalCheckDurationMs: operatorCoverage?.totalCheckDurationMs,
-                    operatorRuntimeCategory: operatorEntry?.runtimeCategory ?? operator.category,
-                    operatorThesisCategory: operatorEntry?.thesisCategory ?? operator.category,
+                    operatorRuntimeCategory: runtimeCategory,
+                    operatorThesisCategory: thesisCategory,
                     touchpointLogicalKeys: target.touchpointLogicalKeys,
                     relevanceBand: target.relevanceBand,
                     familyStressHints: target.familyStressHints,
                     relevanceScore: target.relevanceScore,
-                    categoryAvailabilityHint: categoryAvailabilityHint(operator.category, {
+                    categoryAvailabilityHint: categoryAvailabilityHint(runtimeCategory, {
                         touchpointLogicalKeys: target.touchpointLogicalKeys,
                         relevanceBand: target.relevanceBand,
                         familyStressHints: target.familyStressHints,
@@ -545,6 +547,9 @@ export class MutantGenerator {
     sampleScenarios(candidates: MutationCandidate[], budget: number, seed: number): MutationCandidate[] {
         const { selected: finalSelection, summary } = sampleMutationCandidates(candidates, budget, seed);
         const eligibleCandidates = candidates.filter(candidate => candidate.eligible !== false && candidate.aggregateComparisonEligible !== false);
+        for (const candidate of finalSelection) {
+            candidate.quotaBucket = getCandidateCategory(candidate);
+        }
         this.lastSamplingSummary = {
             applicationId: this.appName,
             corpusId: this.corpusId,

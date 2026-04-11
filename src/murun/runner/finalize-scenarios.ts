@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { MutantGenerator } from './MutantGenerator';
-import { CATEGORY_ORDER } from './sampling';
+import { CATEGORY_ORDER, getCandidateCategory } from './sampling';
 import {
   getAppPreflightPoolPath,
   getAppPreflightResultsPath,
@@ -49,7 +49,7 @@ function countByCategory(candidates: ReturnType<MutantGenerator['loadScenarios']
   return Object.fromEntries(
     CATEGORY_ORDER.map(category => [
       category,
-      candidates.filter(candidate => candidate.operator.category === category).length,
+      candidates.filter(candidate => getCandidateCategory(candidate) === category).length,
     ]),
   ) as Record<string, number>;
 }
@@ -110,7 +110,7 @@ async function main() {
         return {
           candidateId: candidate.candidateId,
           operator: candidate.operator.constructor.name,
-          operatorCategory: candidate.operator.category,
+          operatorCategory: getCandidateCategory(candidate),
           scenarioId: candidate.scenarioId,
           relevanceBand: candidate.relevanceBand ?? 'generic',
           relevanceScore: candidate.relevanceScore ?? 0,

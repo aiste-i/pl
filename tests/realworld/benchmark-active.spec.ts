@@ -19,6 +19,7 @@ import {
 } from '../../src/benchmark/realworld-touchpoints';
 import { evaluateMutationMeaningfulness, type MutationSurfaceSnapshot } from '../../src/benchmark/mutation-quality';
 import { captureMutationSurface } from '../../src/benchmark/mutation-surface';
+import { getCandidateCategory } from '../../src/murun/runner/sampling';
 
 const APP_ID = getSelectedAppId();
 const MODE = process.env.BENCHMARK_ACTIVE_MODE || 'baseline';
@@ -227,8 +228,9 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
               const record = await mutator.applyMutation(page, mutationScenario.selector, mutationScenario.operator);
               durationMs = Date.now() - startedAt;
               const afterSurface = await captureMutationSurface(page, mutationScenario.selector);
+              const operatorCategory = getCandidateCategory(mutationScenario);
               const meaningfulResult = evaluateMutationMeaningfulness(
-                mutationScenario.operator.category,
+                operatorCategory,
                 mutationScenario.relevanceBand,
                 beforeSurface,
                 afterSurface,
@@ -252,7 +254,7 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
           scenarioId: mutationScenario.scenarioId ?? matchingScenario.scenarioId,
           viewContext: mutationScenario.viewContext ?? 'unknown',
           operator: mutationScenario.operator.constructor.name,
-          operatorCategory: mutationScenario.operator.category,
+          operatorCategory: getCandidateCategory(mutationScenario),
           selector: mutationScenario.selector,
           success: checkpointReached && success,
           reason,

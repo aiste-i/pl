@@ -7,6 +7,7 @@ import { ChangeAriaLabel } from '../../src/webmutator/operators/dom/accessibilit
 import { buildMutationPreflightPool, computeCategoryQuotas, sampleMutationCandidates } from '../../src/murun/runner/sampling';
 import { evaluateComparableYield } from '../../src/benchmark/comparable-yield';
 import { evaluateMutationMeaningfulness } from '../../src/benchmark/mutation-quality';
+import { ReplaceHeadingWithP } from '../../src/webmutator/operators/dom/accessibility/ReplaceHeadingWithP';
 
 function candidatePool(): MutationCandidate[] {
   const factories = [
@@ -101,6 +102,49 @@ test('accessible-name surface candidates outrank unrelated generic accessibility
   const sampled = sampleMutationCandidates([generic, relevant], 1, 12345);
 
   expect(sampled.selected.map(candidate => candidate.candidateId)).toEqual(['accessible-relevant']);
+});
+
+test('runtime category overrides raw operator category for accessibility-semantic coverage', () => {
+  const runtimeAccessibilityCandidate = new MutationCandidate('#heading', new ReplaceHeadingWithP(), 'http://example.test', { tagType: 'h1' }, {
+    candidateId: 'runtime-accessibility',
+    scenarioId: 'scenario-a',
+    eligible: true,
+    aggregateComparisonEligible: true,
+    operatorRuntimeCategory: 'accessibility-semantic',
+    quotaBucket: 'accessibility-semantic',
+    relevanceBand: 'exact-touchpoint',
+    relevanceScore: 700,
+    categoryAvailabilityHint: true,
+    familyStressHints: { semantic: true, css: true, xpath: true },
+  });
+  const structural = new MutationCandidate('#container', new SubtreeDelete(), 'http://example.test', { tagType: 'div' }, {
+    candidateId: 'structural',
+    scenarioId: 'scenario-b',
+    eligible: true,
+    aggregateComparisonEligible: true,
+  });
+  const content = new MutationCandidate('#copy', new TextReplace('mutated'), 'http://example.test', { tagType: 'p' }, {
+    candidateId: 'content',
+    scenarioId: 'scenario-c',
+    eligible: true,
+    aggregateComparisonEligible: true,
+  });
+  const visibility = new MutationCandidate('#visible', new StyleVisibility(), 'http://example.test', { tagType: 'div' }, {
+    candidateId: 'visibility',
+    scenarioId: 'scenario-d',
+    eligible: true,
+    aggregateComparisonEligible: true,
+  });
+
+  const sampled = sampleMutationCandidates(
+    [runtimeAccessibilityCandidate, structural, content, visibility],
+    4,
+    12345,
+  );
+
+  expect(sampled.summary.mandatoryCoverageSatisfied).toBe(true);
+  expect(sampled.summary.selectedCounts['accessibility-semantic']).toBe(1);
+  expect(sampled.selected.map(candidate => candidate.candidateId)).toContain('runtime-accessibility');
 });
 
 test('budget >= 4 marks mandatory coverage unsatisfied when accessibility-semantic candidates are missing', () => {

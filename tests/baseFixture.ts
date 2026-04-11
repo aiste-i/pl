@@ -27,6 +27,7 @@ import {
     shouldWriteDetailedAccessibilityArtifacts,
     shouldWriteMirroredRunArtifacts,
 } from '../src/benchmark/retention';
+import { getCandidateCategory } from '../src/murun/runner/sampling';
 
 const BENCHMARK_ACTIVE_MODE = process.env.BENCHMARK_ACTIVE_MODE || 'baseline';
 
@@ -418,6 +419,7 @@ export const test = base.extend<TestOptions & {
     const scenarioId = testInfo.titlePath.join(' > ');
     const runId = uuidv4();
     const phase = mutation ? 'mutated' : 'baseline';
+    const mutationCategory = mutation ? getCandidateCategory(mutation) : 'none';
     const generatedAt = new Date().toISOString();
     const startTime = Date.now();
     const mutationBudget = parseOptionalInteger(process.env.BENCHMARK_BUDGET || process.env.npm_config_budget);
@@ -463,7 +465,7 @@ export const test = base.extend<TestOptions & {
         mutation: {
             mutationId: mutation?.candidateId || 'baseline',
             operatorId: mutation ? mutation.operator.constructor.name : 'none',
-            operatorCategory: mutation ? mutation.operator.category : 'none',
+            operatorCategory: mutationCategory,
             candidateId: mutation?.candidateId ?? null,
             seed: mutationSeed,
             phase,
@@ -516,15 +518,15 @@ export const test = base.extend<TestOptions & {
     if (mutation) {
         benchmarkResult.changeId = mutation.candidateId || mutation.selector;
         benchmarkResult.changeOperator = mutation.operator.constructor.name;
-        benchmarkResult.changeCategory = mutation.operator.category;
-        benchmarkResult.quotaBucket = mutation.quotaBucket;
+        benchmarkResult.changeCategory = mutationCategory;
+        benchmarkResult.quotaBucket = mutation.quotaBucket ?? mutationCategory;
         benchmarkResult.comparisonEligible = mutation.aggregateComparisonEligible !== false;
         benchmarkResult.comparisonExclusionReason = mutation.comparisonExclusionReason;
         benchmarkResult.mutationTelemetry = {
             selectedCandidateId: mutation.candidateId ?? null,
             selectedTargetSelector: mutation.selector ?? null,
             selectedTargetTagType: mutation.fingerprint?.tagType ?? null,
-            operatorRuntimeCategory: mutation.operatorRuntimeCategory ?? mutation.operator.category,
+            operatorRuntimeCategory: mutation.operatorRuntimeCategory ?? mutationCategory,
             operatorThesisCategory: mutation.operatorThesisCategory ?? mutation.operator.category,
             operatorConsideredCandidateCount: mutation.operatorCandidateCount ?? null,
             operatorCandidateCount: mutation.operatorCandidateCount ?? null,
