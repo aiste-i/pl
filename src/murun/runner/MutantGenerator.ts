@@ -326,7 +326,8 @@ export class MutantGenerator {
                 continue;
             }
 
-            const oracleProtected = await OracleSafety.isProtected(locator);
+            const protectionKind = await OracleSafety.getProtectionKind(locator);
+            const oracleProtected = protectionKind !== 'none';
             const eligibleOperators: string[] = [];
             const eligibleCategories = new Set<string>();
 
@@ -334,7 +335,12 @@ export class MutantGenerator {
                 const coverage = this.ensureOperatorCoverageEntry(entry);
                 coverage.candidateCount += 1;
 
-                if (oracleProtected) {
+                const directAnchorAllowed = protectionKind === 'direct-anchor' && operator.oracleAnchorSafe === true;
+                const blockedByOracle =
+                    protectionKind === 'contains-anchor-descendant' ||
+                    (protectionKind === 'direct-anchor' && !directAnchorAllowed);
+
+                if (blockedByOracle) {
                     coverage.skippedOracleCount += 1;
                     continue;
                 }
@@ -369,11 +375,11 @@ export class MutantGenerator {
                 fingerprint: discovered.fingerprint,
                 oracleProtected,
                 eligible: !oracleProtected && eligibleOperators.length > 0,
-                exclusionReason: oracleProtected
-                    ? 'oracle-protected'
-                    : eligibleOperators.length === 0
-                        ? 'no-applicable-operators'
-                        : null,
+                exclusionReason: eligibleOperators.length === 0
+                    ? oracleProtected
+                        ? 'oracle-protected'
+                        : 'no-applicable-operators'
+                    : null,
                 eligibleOperators,
                 eligibleCategories: [...eligibleCategories].sort(),
                 touchpointLogicalKeys: [],
@@ -381,6 +387,11 @@ export class MutantGenerator {
                 familyStressHints: { semantic: false, css: false, xpath: false },
                 relevanceScore: 0,
             };
+
+            target.eligible = eligibleOperators.length > 0;
+            if (protectionKind === 'direct-anchor' && eligibleOperators.length > 0) {
+                target.exclusionReason = null;
+            }
 
             if (context.touchpoints?.length) {
                 const annotation = annotateTargetRelevance(

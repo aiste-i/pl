@@ -12,6 +12,7 @@ import { MutateAccessibleNameText } from '../../src/webmutator/operators/dom/acc
 import { MutatePlaceholderText } from '../../src/webmutator/operators/dom/accessibility/MutatePlaceholderText';
 import { RemovePlaceholderText } from '../../src/webmutator/operators/dom/accessibility/RemovePlaceholderText';
 import { captureMutationSurface } from '../../src/benchmark/mutation-surface';
+import { MutantGenerator } from '../../src/murun/runner/MutantGenerator';
 
 test('each in-scope operator exposes an explicit applicability check', () => {
   for (const entry of getBenchmarkOperatorCatalog()) {
@@ -137,6 +138,29 @@ test('placeholder mutations can target protected form controls without breaking 
   expect(removeRecord.success).toBe(true);
   await expect(page.locator('#email')).toHaveAttribute('placeholder', 'Benchmark placeholder mutation');
   await expect(page.locator('#comment')).not.toHaveAttribute('placeholder', /.+/);
+});
+
+test('reachable-target collection keeps direct-anchor-safe accessibility operators on protected touchpoints', async ({ page }) => {
+  await page.setContent(`
+    <form>
+      <button id="favorite-button" data-testid="favorite-button" aria-label="Favorite article">Favorite article</button>
+      <input id="email-input" data-testid="email-input" type="email" placeholder="Email address" />
+    </form>
+  `);
+
+  const generator = new MutantGenerator(page, 'angular-realworld-example-app');
+  const targets = await generator.collectReachableTargets({
+    scenarioId: 'test-scenario',
+    scenarioCategory: 'test',
+    sourceSpec: 'unit',
+    viewContext: 'unit',
+  });
+  const candidates = await generator.constructScenarios(targets);
+  const candidateOperators = candidates.map(candidate => `${candidate.selector}::${candidate.operator.constructor.name}`);
+
+  expect(candidateOperators.some(value => value.endsWith('::ChangeAriaLabel'))).toBe(true);
+  expect(candidateOperators.some(value => value.endsWith('::MutatePlaceholderText'))).toBe(true);
+  expect(candidateOperators.some(value => value.endsWith('::RemovePlaceholderText'))).toBe(true);
 });
 
 test('visibility applicability accepts safe presentation nodes and rejects controls', async ({ page }) => {
