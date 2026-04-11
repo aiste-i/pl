@@ -3,8 +3,10 @@ import { getBenchmarkOperatorCatalog } from '../../src/webmutator/operators/cata
 import { evaluateMutationApplicability } from '../../src/webmutator/operators/applicability';
 import { WebMutator } from '../../src/webmutator/WebMutator';
 import { SubtreeDelete } from '../../src/webmutator/operators/dom/SubtreeDelete';
+import { SubtreeMove } from '../../src/webmutator/operators/dom/SubtreeMove';
 import { TextReplace } from '../../src/webmutator/operators/dom/TextReplace';
 import { StyleVisibility } from '../../src/webmutator/operators/dom/StyleVisibility';
+import { TagMutator } from '../../src/webmutator/operators/dom/TagMutator';
 import { ChangeAriaLabel } from '../../src/webmutator/operators/dom/accessibility/ChangeAriaLabel';
 
 test('each in-scope operator exposes an explicit applicability check', () => {
@@ -97,4 +99,21 @@ test('behavior-preservation gate failures surface as stable mutation skip reason
 
   expect(record.success).toBe(false);
   expect(record.error).toContain('behavior-preservation-gate-failed');
+});
+
+test('structural mutations that move or replace the target do not hang during post-apply marking', async ({ page }) => {
+  await page.setContent(`
+    <div id="container">
+      <div id="sibling">Sibling</div>
+      <p id="move-target">Move me</p>
+      <p id="tag-target">Replace me</p>
+    </div>
+  `);
+
+  const mutator = new WebMutator();
+  const moveRecord = await mutator.applyMutation(page, '#move-target', new SubtreeMove());
+  const tagRecord = await mutator.applyMutation(page, '#tag-target', new TagMutator());
+
+  expect(moveRecord.success).toBe(true);
+  expect(tagRecord.success).toBe(true);
 });
