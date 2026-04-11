@@ -576,6 +576,8 @@ export const test = base.extend<TestOptions & {
         }
     }
 
+    const benchmarkMutationExecution = BENCHMARK_ACTIVE_MODE === 'mutate' && Boolean(mutation);
+
     try {
         await use(page);
     } catch (error) {
@@ -584,7 +586,10 @@ export const test = base.extend<TestOptions & {
              Object.assign(benchmarkResult, classification);
              benchmarkResult.instrumentationPathUsed = benchmarkResult.instrumentationPathUsed === 'fallback' ? 'fallback' : 'mixed';
         }
-        throw error;
+
+        if (!benchmarkMutationExecution) {
+            throw error;
+        }
     } finally {
         benchmarkResult.durationMs = Date.now() - startTime;
         if (BENCHMARK_ACTIVE_MODE === 'preflight') {
