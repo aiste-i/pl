@@ -22,7 +22,9 @@ export async function evaluateMutationApplicability(
     return { applicable: false, reason: 'target-not-found' };
   }
 
-  if (await OracleSafety.isProtected(target)) {
+  const protectionKind = await OracleSafety.getProtectionKind(target);
+  const directAnchorAllowed = protectionKind === 'direct-anchor' && operator.oracleAnchorSafe === true;
+  if (protectionKind === 'contains-anchor-descendant' || (protectionKind === 'direct-anchor' && !directAnchorAllowed)) {
     return { applicable: false, reason: 'oracle-protected' };
   }
 

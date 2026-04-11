@@ -1,7 +1,6 @@
 import { Locator, Page } from 'playwright';
 import { AccessibilityOperator } from './AccessibilityOperator';
 import { MutationRecord } from '../../../MutationRecord';
-import { OracleSafety } from '../../../utils/OracleSafety';
 
 const ACCESSIBLE_NAME_SURFACE_SELECTOR = [
   'button',
@@ -19,14 +18,12 @@ const ACCESSIBLE_NAME_SURFACE_SELECTOR = [
 
 export class MutateAccessibleNameText extends AccessibilityOperator {
   category: 'accessibility-semantic' = 'accessibility-semantic';
+  oracleAnchorSafe = true;
 
   async isApplicable(page: Page, target: Locator): Promise<boolean> {
     if (!await super.isApplicable(page, target)) return false;
-    if (await OracleSafety.isProtected(target)) return false;
 
     return await target.evaluate((el: HTMLElement, surfaceSelector: string) => {
-      if (el.hasAttribute('data-testid')) return false;
-
       const surface = el.matches(surfaceSelector)
         ? el
         : el.closest(surfaceSelector);

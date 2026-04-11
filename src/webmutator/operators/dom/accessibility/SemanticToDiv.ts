@@ -4,6 +4,7 @@ import { MutationRecord } from '../../../MutationRecord';
 
 export class SemanticToDiv extends AccessibilityOperator {
     category: 'structural' = 'structural';
+    oracleAnchorSafe = true;
     private semanticTags = ['HEADER', 'FOOTER', 'NAV', 'MAIN', 'SECTION', 'ARTICLE', 'ASIDE'];
 
     async isApplicable(page: Page, target: Locator): Promise<boolean> {

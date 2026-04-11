@@ -9,6 +9,8 @@ import { StyleVisibility } from '../../src/webmutator/operators/dom/StyleVisibil
 import { TagMutator } from '../../src/webmutator/operators/dom/TagMutator';
 import { ChangeAriaLabel } from '../../src/webmutator/operators/dom/accessibility/ChangeAriaLabel';
 import { MutateAccessibleNameText } from '../../src/webmutator/operators/dom/accessibility/MutateAccessibleNameText';
+import { MutatePlaceholderText } from '../../src/webmutator/operators/dom/accessibility/MutatePlaceholderText';
+import { RemovePlaceholderText } from '../../src/webmutator/operators/dom/accessibility/RemovePlaceholderText';
 import { captureMutationSurface } from '../../src/benchmark/mutation-surface';
 
 test('each in-scope operator exposes an explicit applicability check', () => {
@@ -90,6 +92,51 @@ test('accessible-name descendant targets can supply semantic mutations without t
   const record = await new WebMutator().applyMutation(page, '#button-copy', operator);
   expect(record.success).toBe(true);
   await expect(page.locator('#button-copy')).toContainText('Benchmark accessible name mutation');
+});
+
+test('direct oracle anchors can accept safe accessibility-semantic mutations while oracle ancestors stay protected', async ({ page }) => {
+  await page.setContent(`
+    <div id="wrapper">
+      <button id="favorite-button" data-testid="favorite-button" aria-label="Favorite article">Favorite article</button>
+    </div>
+  `);
+
+  const operator = new ChangeAriaLabel();
+
+  expect(await evaluateMutationApplicability(page, page.locator('#favorite-button'), operator)).toEqual({
+    applicable: true,
+    reason: null,
+  });
+  expect(await evaluateMutationApplicability(page, page.locator('#wrapper'), operator)).toEqual({
+    applicable: false,
+    reason: 'oracle-protected',
+  });
+});
+
+test('placeholder mutations can target protected form controls without breaking oracle grounding', async ({ page }) => {
+  await page.setContent(`
+    <form>
+      <input id="email" data-testid="email-input" type="email" placeholder="Email address" />
+      <textarea id="comment" data-testid="comment-box" placeholder="Write a comment..."></textarea>
+    </form>
+  `);
+
+  expect(await evaluateMutationApplicability(page, page.locator('#email'), new MutatePlaceholderText())).toEqual({
+    applicable: true,
+    reason: null,
+  });
+  expect(await evaluateMutationApplicability(page, page.locator('#comment'), new RemovePlaceholderText())).toEqual({
+    applicable: true,
+    reason: null,
+  });
+
+  const mutateRecord = await new WebMutator().applyMutation(page, '#email', new MutatePlaceholderText());
+  const removeRecord = await new WebMutator().applyMutation(page, '#comment', new RemovePlaceholderText());
+
+  expect(mutateRecord.success).toBe(true);
+  expect(removeRecord.success).toBe(true);
+  await expect(page.locator('#email')).toHaveAttribute('placeholder', 'Benchmark placeholder mutation');
+  await expect(page.locator('#comment')).not.toHaveAttribute('placeholder', /.+/);
 });
 
 test('visibility applicability accepts safe presentation nodes and rejects controls', async ({ page }) => {

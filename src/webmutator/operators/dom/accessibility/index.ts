@@ -12,3 +12,5 @@ export * from './SemanticToDiv';
 export * from './ChangeAriaLabel';
 export * from './ToggleAriaExpanded';
 export * from './MutateAccessibleNameText';
+export * from './MutatePlaceholderText';
+export * from './RemovePlaceholderText';

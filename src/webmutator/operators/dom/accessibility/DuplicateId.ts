@@ -4,6 +4,7 @@ import { MutationRecord } from '../../../MutationRecord';
 
 export class DuplicateId extends AccessibilityOperator {
     category: 'accessibility-semantic' = 'accessibility-semantic';
+    oracleAnchorSafe = true;
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
         if (!await super.isApplicable(page, target)) return false;
 
