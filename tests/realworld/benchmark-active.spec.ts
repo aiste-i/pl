@@ -21,6 +21,7 @@ const REACHABLE_TARGETS_FILE = getAppReachableTargetsPath(APP_ID);
 const MUTATION_LIMIT = Number(process.env.MUTATION_LIMIT || process.env.npm_config_limit || Number.MAX_SAFE_INTEGER);
 const BENCHMARK_BUDGET = Number(process.env.BENCHMARK_BUDGET || process.env.npm_config_budget || 20);
 const BENCHMARK_SEED = Number(process.env.BENCHMARK_SEED || process.env.npm_config_seed || 12345);
+const PREFLIGHT_TEST_TIMEOUT_MS = Number(process.env.PREFLIGHT_TEST_TIMEOUT_MS || 60000);
 const ACTIVE_SCENARIOS = getActiveScenarioDefinitions();
 
 interface PreflightResultRow {
@@ -160,6 +161,7 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
         appAdapter,
         setScenarioMetadata,
       }) => {
+        test.setTimeout(PREFLIGHT_TEST_TIMEOUT_MS);
         setScenarioMetadata({
           activeScenarioId: matchingScenario.scenarioId,
           activeScenarioCategory: matchingScenario.category,
