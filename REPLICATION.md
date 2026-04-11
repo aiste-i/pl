@@ -99,6 +99,7 @@ The same path is available as a manual GitHub Actions workflow:
 
 The workflow uploads `artifacts`, `reports`, and `test-results` as a single thesis-primary artifact bundle.
 It also enforces a minimum comparable mutated-run yield after aggregation.
+The manual thesis workflow sets `BENCHMARK_RETENTION=compact`, so aggregate reports and aggregate accessibility summaries are preserved while bulky raw per-run mirrors are not retained in the final artifact bundle.
 
 ## Cross-Browser Dataset Generation
 
@@ -222,3 +223,8 @@ Accessibility scan failures:
 - Failed scans are recorded as `scanStatus: "failed"` with `scanError`.
 - Skipped scans are explicit and normally indicate invalid setup or mutation application.
 - Accessibility summaries should distinguish completed-scan-only summaries from all-valid-run scan coverage.
+
+Retention mode:
+
+- `BENCHMARK_RETENTION=full` keeps raw benchmark run JSON, detailed axe artifacts, and per-run mirrors under `artifacts/<run-id>/`.
+- `BENCHMARK_RETENTION=compact` keeps `aggregate/*.csv`, `aggregate_report.json`, `aggregate/run-metadata.json`, and the generated `reports/realworld-accessibility-*.csv` outputs, then prunes `benchmark-runs/` and `accessibility-artifacts/` after aggregation.

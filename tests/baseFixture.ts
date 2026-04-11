@@ -22,6 +22,11 @@ import {
     inferExecutionMode,
     writeCsvRows,
 } from '../src/benchmark/result-contract';
+import {
+    getBenchmarkRetention,
+    shouldWriteDetailedAccessibilityArtifacts,
+    shouldWriteMirroredRunArtifacts,
+} from '../src/benchmark/retention';
 
 const BENCHMARK_ACTIVE_MODE = process.env.BENCHMARK_ACTIVE_MODE || 'baseline';
 
@@ -417,6 +422,7 @@ export const test = base.extend<TestOptions & {
     const startTime = Date.now();
     const mutationBudget = parseOptionalInteger(process.env.BENCHMARK_BUDGET || process.env.npm_config_budget);
     const mutationSeed = mutation?.selectionSeed ?? parseOptionalInteger(process.env.BENCHMARK_SEED || process.env.npm_config_seed);
+    const retention = getBenchmarkRetention();
     const runMetadata = createRunMetadata({
         runId,
         generatedAt,
@@ -615,42 +621,44 @@ export const test = base.extend<TestOptions & {
 
                 // 4. Persist Detailed Artifact
                 const artifactsDir = path.join(getAppResultsDir(appName as any), 'accessibility-artifacts');
-                if (!fs.existsSync(artifactsDir)) fs.mkdirSync(artifactsDir, { recursive: true });
-                
-                const artifactStem = createArtifactStem(benchmarkResult.activeScenarioId || scenarioId, runId);
-                const artifactName = `${artifactStem}_axe.json`;
-                const artifactPath = path.join(artifactsDir, artifactName);
-                
-                // Full mirrored metadata for standalone artifact consumption
-                const artifactContent = {
-                    metadata: {
-                        schemaVersion: BENCHMARK_SCHEMA_VERSION,
-                        datasetVersion: BENCHMARK_DATASET_VERSION,
-                        runId: runId,
-                        applicationId: appName,
-                        browserName,
-                        browserChannel,
-                        scenarioId: scenarioId,
-                        locatorFamily: locatorStrategy,
-                        semanticEntryPoint: benchmarkResult.semanticEntryPoint,
-                        phase: phase,
-                        changeId: benchmarkResult.changeId,
-                        changeCategory: benchmarkResult.changeCategory,
-                        changeOperator: benchmarkResult.changeOperator,
-                        scanStatus: benchmarkResult.accessibility.scanStatus,
-                        scanTimestamp: benchmarkResult.accessibility.scanTimestamp,
-                        benchmarkRunStatus: benchmarkResult.runStatus,
-                        formatVersion: '1.1.0'
-                    },
-                    axeResults: results
-                };
+                if (shouldWriteDetailedAccessibilityArtifacts(retention)) {
+                    if (!fs.existsSync(artifactsDir)) fs.mkdirSync(artifactsDir, { recursive: true });
 
-                fs.writeFileSync(artifactPath, JSON.stringify(artifactContent, null, 2));
-                
-                // 5. Normalize Path (POSIX relative)
-                benchmarkResult.accessibility.artifactPath = path.relative(process.cwd(), artifactPath).split(path.sep).join('/');
-                benchmarkResult.axeArtifactPath = benchmarkResult.accessibility.artifactPath;
-                benchmarkResult.accessibility.detailedArtifactWritten = true;
+                    const artifactStem = createArtifactStem(benchmarkResult.activeScenarioId || scenarioId, runId);
+                    const artifactName = `${artifactStem}_axe.json`;
+                    const artifactPath = path.join(artifactsDir, artifactName);
+
+                    // Full mirrored metadata for standalone artifact consumption
+                    const artifactContent = {
+                        metadata: {
+                            schemaVersion: BENCHMARK_SCHEMA_VERSION,
+                            datasetVersion: BENCHMARK_DATASET_VERSION,
+                            runId: runId,
+                            applicationId: appName,
+                            browserName,
+                            browserChannel,
+                            scenarioId: scenarioId,
+                            locatorFamily: locatorStrategy,
+                            semanticEntryPoint: benchmarkResult.semanticEntryPoint,
+                            phase: phase,
+                            changeId: benchmarkResult.changeId,
+                            changeCategory: benchmarkResult.changeCategory,
+                            changeOperator: benchmarkResult.changeOperator,
+                            scanStatus: benchmarkResult.accessibility.scanStatus,
+                            scanTimestamp: benchmarkResult.accessibility.scanTimestamp,
+                            benchmarkRunStatus: benchmarkResult.runStatus,
+                            formatVersion: '1.1.0'
+                        },
+                        axeResults: results
+                    };
+
+                    fs.writeFileSync(artifactPath, JSON.stringify(artifactContent, null, 2));
+
+                    // 5. Normalize Path (POSIX relative)
+                    benchmarkResult.accessibility.artifactPath = path.relative(process.cwd(), artifactPath).split(path.sep).join('/');
+                    benchmarkResult.axeArtifactPath = benchmarkResult.accessibility.artifactPath;
+                    benchmarkResult.accessibility.detailedArtifactWritten = true;
+                }
                 
             } catch (axeError: any) {
                 benchmarkResult.accessibility.scanStatus = 'failed';
@@ -666,12 +674,6 @@ export const test = base.extend<TestOptions & {
         if (!fs.existsSync(resultsDir)) fs.mkdirSync(resultsDir, { recursive: true });
         const artifactStem = createArtifactStem(benchmarkResult.activeScenarioId || scenarioId, runId);
         const resultPath = path.join(resultsDir, `${artifactStem}.json`);
-        const rootArtifactDir = path.join(process.cwd(), 'artifacts', runId);
-        if (!fs.existsSync(rootArtifactDir)) fs.mkdirSync(rootArtifactDir, { recursive: true });
-        const metadataPath = path.join(rootArtifactDir, 'run-metadata.json');
-        const rootResultsJsonPath = path.join(rootArtifactDir, 'results.json');
-        const rootResultsCsvPath = path.join(rootArtifactDir, 'results.csv');
-        benchmarkResult.metadataPath = path.relative(process.cwd(), metadataPath).split(path.sep).join('/');
         const finalizedRunMetadata = {
             ...runMetadata,
             selectedScenarios: benchmarkResult.activeScenarioId ? [benchmarkResult.activeScenarioId] : runMetadata.selectedScenarios,
@@ -679,10 +681,22 @@ export const test = base.extend<TestOptions & {
             totalCandidatesConsidered: mutation?.operatorCandidateCount ?? runMetadata.totalCandidatesConsidered,
         };
 
+        if (shouldWriteMirroredRunArtifacts(retention)) {
+            const metadataPath = path.join(process.cwd(), 'artifacts', runId, 'run-metadata.json');
+            benchmarkResult.metadataPath = path.relative(process.cwd(), metadataPath).split(path.sep).join('/');
+        }
         fs.writeFileSync(resultPath, JSON.stringify(benchmarkResult, null, 2));
-        fs.writeFileSync(metadataPath, JSON.stringify(finalizedRunMetadata, null, 2));
-        fs.writeFileSync(rootResultsJsonPath, JSON.stringify(benchmarkResult, null, 2));
-        writeCsvRows(rootResultsCsvPath, [flattenResultForCsv(benchmarkResult)]);
+        if (shouldWriteMirroredRunArtifacts(retention)) {
+            const rootArtifactDir = path.join(process.cwd(), 'artifacts', runId);
+            if (!fs.existsSync(rootArtifactDir)) fs.mkdirSync(rootArtifactDir, { recursive: true });
+            const metadataPath = path.join(rootArtifactDir, 'run-metadata.json');
+            const rootResultsJsonPath = path.join(rootArtifactDir, 'results.json');
+            const rootResultsCsvPath = path.join(rootArtifactDir, 'results.csv');
+            benchmarkResult.metadataPath = path.relative(process.cwd(), metadataPath).split(path.sep).join('/');
+            fs.writeFileSync(metadataPath, JSON.stringify(finalizedRunMetadata, null, 2));
+            fs.writeFileSync(rootResultsJsonPath, JSON.stringify(benchmarkResult, null, 2));
+            writeCsvRows(rootResultsCsvPath, [flattenResultForCsv(benchmarkResult)]);
+        }
     }
   },
 });

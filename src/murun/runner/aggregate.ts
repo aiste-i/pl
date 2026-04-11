@@ -3,6 +3,7 @@ import * as path from 'path';
 import { getAppResultsDir, getSelectedAppId } from '../../apps';
 import { getOperatorCatalog } from '../../webmutator/operators/catalog';
 import { createRunMetadata, writeCsvRows } from '../../benchmark/result-contract';
+import { getBenchmarkRetention, pruneCompactBenchmarkArtifacts } from '../../benchmark/retention';
 import { validateBenchmarkPayload } from '../../benchmark/result-schema-validator';
 
 interface AggregatedRun {
@@ -567,3 +568,15 @@ if (runs.length === 0) {
 }
 
 aggregate(runs, outputDir);
+
+const retention = getBenchmarkRetention();
+const cleanup = pruneCompactBenchmarkArtifacts({
+    inputDir,
+    outputDir,
+    additionalDirs: [path.join(path.dirname(inputDir), 'accessibility-artifacts')],
+    retention,
+});
+
+if (cleanup.removedPaths.length > 0) {
+    console.log(`Compact retention pruned raw benchmark artifacts: ${cleanup.removedPaths.join(', ')}`);
+}
