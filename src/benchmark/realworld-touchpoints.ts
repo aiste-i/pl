@@ -2,6 +2,7 @@ import type { Locator } from '@playwright/test';
 import { getAppAdapter } from '../apps';
 import type { SupportedAppId } from '../apps/types';
 import { getByLogicalKey, getLocatorMeta, type LocatorFamilyMeta } from '../locators/apps/shared-realworld';
+import { getImmediateElementHandle } from '../utils/locator-handles';
 
 export type RelevanceBand =
   | 'exact-touchpoint'
@@ -160,7 +161,7 @@ function scoreBand(band: RelevanceBand): number {
 }
 
 export async function snapshotTouchpointLocator(locator: Locator): Promise<TouchpointElementSnapshot | null> {
-  const handle = await locator.elementHandle({ timeout: 0 }).catch(() => null);
+  const handle = await getImmediateElementHandle(locator);
   if (!handle) {
     return null;
   }

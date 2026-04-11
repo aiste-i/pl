@@ -1,9 +1,10 @@
 import type { Page } from '@playwright/test';
 import type { MutationSurfaceSnapshot } from './mutation-quality';
+import { getImmediateElementHandle } from '../utils/locator-handles';
 
 export async function captureMutationSurface(page: Page, selector: string): Promise<MutationSurfaceSnapshot | null> {
   const locator = page.locator(selector).first();
-  const handle = await locator.elementHandle({ timeout: 0 }).catch(() => null);
+  const handle = await getImmediateElementHandle(locator);
   if (!handle) {
     return {
       exists: false,

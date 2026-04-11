@@ -1,4 +1,5 @@
 import { Locator } from '@playwright/test';
+import { getImmediateElementHandle } from '../../utils/locator-handles';
 
 export class OracleSafety {
     /**
@@ -7,7 +8,7 @@ export class OracleSafety {
      * whose mutation would invalidate oracle grounding.
      */
     static async isProtected(locator: Locator): Promise<boolean> {
-        const handle = await locator.elementHandle({ timeout: 0 }).catch(() => null);
+        const handle = await getImmediateElementHandle(locator);
         if (!handle) {
             return false;
         }

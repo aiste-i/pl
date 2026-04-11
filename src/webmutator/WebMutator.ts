@@ -3,6 +3,7 @@ import { MutationMode } from './MutationMode';
 import { MutationRecord } from './MutationRecord';
 import { DomOperator } from './operators/dom/DomOperator';
 import { evaluateMutationApplicability } from './operators/applicability';
+import { getImmediateElementHandle } from '../utils/locator-handles';
 
 export class WebMutator {
     mutationMode: MutationMode;
@@ -19,7 +20,7 @@ export class WebMutator {
                 return MutationRecord.fromError(`Mutation skipped: ${applicability.reason} for selector ${selector}`);
             }
 
-            const targetHandle = await target.elementHandle({ timeout: 0 }).catch(() => null);
+            const targetHandle = await getImmediateElementHandle(target);
 
             const record = new MutationRecord(true);
             record.originalXpath = selector; // Using selector as identifier for now

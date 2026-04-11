@@ -8,6 +8,7 @@ import { TextReplace } from '../../src/webmutator/operators/dom/TextReplace';
 import { StyleVisibility } from '../../src/webmutator/operators/dom/StyleVisibility';
 import { TagMutator } from '../../src/webmutator/operators/dom/TagMutator';
 import { ChangeAriaLabel } from '../../src/webmutator/operators/dom/accessibility/ChangeAriaLabel';
+import { captureMutationSurface } from '../../src/benchmark/mutation-surface';
 
 test('each in-scope operator exposes an explicit applicability check', () => {
   for (const entry of getBenchmarkOperatorCatalog()) {
@@ -116,4 +117,26 @@ test('structural mutations that move or replace the target do not hang during po
 
   expect(moveRecord.success).toBe(true);
   expect(tagRecord.success).toBe(true);
+});
+
+test('missing selectors return an immediate empty mutation surface snapshot', async ({ page }) => {
+  await page.setContent('<div id="root"><p>hello</p></div>');
+
+  const snapshot = await captureMutationSurface(page, '#does-not-exist');
+
+  expect(snapshot).toEqual({
+    exists: false,
+    tagType: null,
+    textContent: null,
+    className: null,
+    style: null,
+    role: null,
+    ariaLabel: null,
+    placeholder: null,
+    alt: null,
+    title: null,
+    hidden: null,
+    childElementCount: null,
+    parentSelector: null,
+  });
 });
