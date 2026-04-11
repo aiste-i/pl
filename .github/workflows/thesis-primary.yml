@@ -66,6 +66,9 @@ jobs:
       - name: Aggregate reports
         run: npm run benchmark:aggregate:all
 
+      - name: Check comparable yield
+        run: npm run benchmark:check:yield
+
       - name: Generate run-derived reports
         run: npm run reports:generate:run
 

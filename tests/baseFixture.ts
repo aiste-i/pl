@@ -23,6 +23,8 @@ import {
     writeCsvRows,
 } from '../src/benchmark/result-contract';
 
+const BENCHMARK_ACTIVE_MODE = process.env.BENCHMARK_ACTIVE_MODE || 'baseline';
+
 // Define custom options for our tests
 export type TestOptions = {
   locatorStrategy: StrategyName;
@@ -577,6 +579,9 @@ export const test = base.extend<TestOptions & {
         throw error;
     } finally {
         benchmarkResult.durationMs = Date.now() - startTime;
+        if (BENCHMARK_ACTIVE_MODE === 'preflight') {
+            return;
+        }
         // Run accessibility scan at the end of the scenario
         // Policy: Skip scan if the page was never correctly navigated or crashed early
         const skipScan =

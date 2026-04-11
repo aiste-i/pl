@@ -56,3 +56,11 @@ export function getAppScenariosPath(appId: SupportedAppId): string {
 export function getAppReachableTargetsPath(appId: SupportedAppId): string {
   return path.join(getAppResultsDir(appId), 'reachable-targets.json');
 }
+
+export function getAppPreflightPoolPath(appId: SupportedAppId): string {
+  return path.join(getAppResultsDir(appId), 'scenario-preflight-pool.json');
+}
+
+export function getAppPreflightResultsPath(appId: SupportedAppId): string {
+  return path.join(getAppResultsDir(appId), 'scenario-preflight-results.json');
+}

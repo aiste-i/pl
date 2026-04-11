@@ -13,6 +13,7 @@ import * as path from 'path';
 import { createHash } from 'crypto';
 import { getAppReachableTargetsPath } from '../../apps';
 import { getBenchmarkCorpusId } from '../../benchmark/realworld-corpus';
+import { buildMutationPreflightPool, sampleMutationCandidates } from './sampling';
 
 export interface ReachableTargetContext {
     scenarioId: string;
@@ -450,57 +451,8 @@ export class MutantGenerator {
     }
 
     sampleScenarios(candidates: MutationCandidate[], budget: number, seed: number): MutationCandidate[] {
-        const categoryOrder: Array<DomOperator['category']> = ['structural', 'content', 'accessibility-semantic', 'visibility'];
+        const { selected: finalSelection, summary } = sampleMutationCandidates(candidates, budget, seed);
         const eligibleCandidates = candidates.filter(candidate => candidate.eligible !== false && candidate.aggregateComparisonEligible !== false);
-        const pools = new Map<DomOperator['category'], MutationCandidate[]>();
-
-        for (const category of categoryOrder) {
-            pools.set(
-                category,
-                eligibleCandidates
-                    .filter(candidate => candidate.operator.category === category)
-                    .sort((left, right) => this.deterministicRank(seed, left.candidateId || '').localeCompare(this.deterministicRank(seed, right.candidateId || ''))),
-            );
-        }
-
-        const baseQuota = Math.floor(budget / categoryOrder.length);
-        const remainder = budget % categoryOrder.length;
-        const categoryQuotas = Object.fromEntries(
-            categoryOrder.map((category, index) => [category, baseQuota + (index < remainder ? 1 : 0)])
-        ) as Record<string, number>;
-
-        const selected: MutationCandidate[] = [];
-        const selectedCounts = Object.fromEntries(categoryOrder.map(category => [category, 0])) as Record<string, number>;
-        let leftover = 0;
-
-        for (const category of categoryOrder) {
-            const pool = pools.get(category)!;
-            const quota = categoryQuotas[category];
-            const taken = pool.slice(0, quota);
-            selected.push(...taken);
-            selectedCounts[category] = taken.length;
-            if (taken.length < quota) {
-                leftover += quota - taken.length;
-            }
-        }
-
-        if (leftover > 0) {
-            for (const category of categoryOrder) {
-                const pool = pools.get(category)!;
-                while (leftover > 0 && selectedCounts[category] < pool.length) {
-                    selected.push(pool[selectedCounts[category]]);
-                    selectedCounts[category] += 1;
-                    leftover -= 1;
-                }
-            }
-        }
-
-        const finalSelection = selected.slice(0, budget);
-        for (const candidate of finalSelection) {
-            candidate.selectionSeed = seed;
-            candidate.quotaBucket = candidate.operator.category;
-        }
-
         this.lastSamplingSummary = {
             applicationId: this.appName,
             corpusId: this.corpusId,
@@ -509,12 +461,16 @@ export class MutantGenerator {
             totalEligibleCandidates: eligibleCandidates.length,
             budget,
             seed,
-            categoryQuotas,
-            selectedCounts,
+            categoryQuotas: summary.categoryQuotas,
+            selectedCounts: summary.selectedCounts,
             activeScenarioIds: [...new Set(finalSelection.map(candidate => candidate.scenarioId).filter(Boolean) as string[])].sort(),
         };
 
         return finalSelection;
+    }
+
+    buildPreflightPool(candidates: MutationCandidate[], budget: number, seed: number, oversampleFactor = 3): MutationCandidate[] {
+        return buildMutationPreflightPool(candidates, budget, seed, oversampleFactor);
     }
 
     getSamplingSummary(): SavedScenarioSet['metadata'] | null {

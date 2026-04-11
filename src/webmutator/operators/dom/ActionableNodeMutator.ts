@@ -1,10 +1,26 @@
 import { Page, Locator } from 'playwright';
 import { DomOperator } from './DomOperator';
 import { MutationRecord } from '../../MutationRecord';
+import { OracleSafety } from '../../utils/OracleSafety';
 
 export class ActionableNodeMutator implements DomOperator {
     category: 'accessibility-semantic' = 'accessibility-semantic';
-    async isApplicable(page: Page, target: Locator): Promise<boolean> { return true; }
+    async isApplicable(page: Page, target: Locator): Promise<boolean> {
+        if (await OracleSafety.isProtected(target)) return false;
+
+        return await target.evaluate((node: HTMLElement) => {
+            const tag = node.tagName.toLowerCase();
+            if (tag === 'a') {
+                return Boolean(node.getAttribute('href') || (node.textContent || '').trim().length > 0);
+            }
+
+            if (tag === 'input' || tag === 'button') {
+                return ['id', 'class', 'title'].some(attr => Boolean(node.getAttribute(attr)));
+            }
+
+            return false;
+        });
+    }
 
     async applyOperator(page: Page, target: Locator, record: MutationRecord): Promise<void> {
         const result = await target.evaluate((node: HTMLElement) => {
