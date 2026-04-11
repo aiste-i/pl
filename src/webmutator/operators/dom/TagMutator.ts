@@ -2,9 +2,11 @@ import { Page, Locator } from 'playwright';
 import { DomOperator } from './DomOperator';
 import { MutationRecord } from '../../MutationRecord';
 import { MutationTargetSafety } from '../../utils/MutationTargetSafety';
+import { OracleSafety } from '../../utils/OracleSafety';
 
 export class TagMutator implements DomOperator {
     category: 'structural' = 'structural';
+    oracleAnchorSafe = true;
     private switchMap: { [key: string]: string } = {
         "h2": "h3",
         "h1": "h2",
@@ -21,7 +23,11 @@ export class TagMutator implements DomOperator {
     };
 
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
-        if (!(await MutationTargetSafety.isSafeStructuralTarget(target))) return false;
+        const protectionKind = await OracleSafety.getProtectionKind(target);
+        if (protectionKind === 'contains-anchor-descendant') return false;
+        if (protectionKind === 'direct-anchor' && !this.oracleAnchorSafe) return false;
+        if (await MutationTargetSafety.isInteractiveOrEssential(target)) return false;
+        if (await MutationTargetSafety.containsInteractiveOrEssentialDescendants(target)) return false;
         const tag = await target.evaluate(n => n.tagName.toLowerCase());
         return !!this.switchMap[tag];
     }

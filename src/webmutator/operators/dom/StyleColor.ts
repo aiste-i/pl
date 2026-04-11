@@ -4,6 +4,7 @@ import { MutationRecord } from '../../MutationRecord';
 
 export class StyleColor implements DomOperator {
     category: 'visibility' = 'visibility';
+    oracleAnchorSafe = true;
     private color: string;
 
     constructor(color: string = "red") {

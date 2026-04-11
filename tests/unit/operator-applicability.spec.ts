@@ -5,8 +5,12 @@ import { WebMutator } from '../../src/webmutator/WebMutator';
 import { SubtreeDelete } from '../../src/webmutator/operators/dom/SubtreeDelete';
 import { SubtreeMove } from '../../src/webmutator/operators/dom/SubtreeMove';
 import { TextReplace } from '../../src/webmutator/operators/dom/TextReplace';
+import { TextDelete } from '../../src/webmutator/operators/dom/TextDelete';
+import { TextNodeMutator } from '../../src/webmutator/operators/dom/TextNodeMutator';
 import { StyleVisibility } from '../../src/webmutator/operators/dom/StyleVisibility';
+import { StyleColor } from '../../src/webmutator/operators/dom/StyleColor';
 import { TagMutator } from '../../src/webmutator/operators/dom/TagMutator';
+import { ContainerNodeMutator } from '../../src/webmutator/operators/dom/ContainerNodeMutator';
 import { ChangeAriaLabel } from '../../src/webmutator/operators/dom/accessibility/ChangeAriaLabel';
 import { MutateAccessibleNameText } from '../../src/webmutator/operators/dom/accessibility/MutateAccessibleNameText';
 import { MutatePlaceholderText } from '../../src/webmutator/operators/dom/accessibility/MutatePlaceholderText';
@@ -138,6 +142,37 @@ test('placeholder mutations can target protected form controls without breaking 
   expect(removeRecord.success).toBe(true);
   await expect(page.locator('#email')).toHaveAttribute('placeholder', 'Benchmark placeholder mutation');
   await expect(page.locator('#comment')).not.toHaveAttribute('placeholder', /.+/);
+});
+
+test('selected non-semantic operators can target protected direct anchors while preserving oracle grounding', async ({ page }) => {
+  await page.setContent(`
+    <div>
+      <button id="favorite" data-testid="favorite-button">Favorite article</button>
+      <p id="description" data-testid="article-description">Article description</p>
+      <span id="counter" data-testid="article-favorite-count">12</span>
+    </div>
+  `);
+
+  expect(await evaluateMutationApplicability(page, page.locator('#favorite'), new TextDelete())).toEqual({
+    applicable: true,
+    reason: null,
+  });
+  expect(await evaluateMutationApplicability(page, page.locator('#favorite'), new TextNodeMutator())).toEqual({
+    applicable: true,
+    reason: null,
+  });
+  expect(await evaluateMutationApplicability(page, page.locator('#favorite'), new StyleColor())).toEqual({
+    applicable: true,
+    reason: null,
+  });
+  expect(await evaluateMutationApplicability(page, page.locator('#description'), new TagMutator())).toEqual({
+    applicable: true,
+    reason: null,
+  });
+  expect(await evaluateMutationApplicability(page, page.locator('#counter'), new ContainerNodeMutator())).toEqual({
+    applicable: true,
+    reason: null,
+  });
 });
 
 test('reachable-target collection keeps direct-anchor-safe accessibility operators on protected touchpoints', async ({ page }) => {

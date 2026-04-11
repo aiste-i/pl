@@ -4,6 +4,7 @@ import { MutationRecord } from '../../MutationRecord';
 
 export class TextDelete implements DomOperator {
     category: 'content' = 'content';
+    oracleAnchorSafe = true;
     
     async isApplicable(page: Page, target: Locator): Promise<boolean> { const text = await target.innerText(); return text.trim().length > 0; }
 
