@@ -7,6 +7,10 @@ export function getActiveBenchmarkTimeoutMs(): number {
   return getSelectedAppId() === 'vue3-realworld-example-app' ? 30000 : 10000;
 }
 
+export function getActiveBenchmarkTestTimeoutMs(): number {
+  return Math.max(getActiveBenchmarkTimeoutMs() + 15000, 30000);
+}
+
 async function readCommentIds(oracle: any): Promise<number[]> {
   const ids = await oracle.comments.cards().raw.evaluateAll(cards =>
     cards

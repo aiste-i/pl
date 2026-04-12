@@ -20,6 +20,7 @@ import {
 import { evaluateMutationMeaningfulness, type MutationSurfaceSnapshot } from '../../src/benchmark/mutation-quality';
 import { captureMutationSurface } from '../../src/benchmark/mutation-surface';
 import { getCandidateCategory } from '../../src/murun/runner/sampling';
+import { getActiveBenchmarkTestTimeoutMs } from './helpers/benchmark-active';
 
 const APP_ID = getSelectedAppId();
 const MODE = process.env.BENCHMARK_ACTIVE_MODE || 'baseline';
@@ -60,6 +61,7 @@ function describeScenario(
   testTitle = `${scenario.displayName} [${strategy}]`,
 ) {
   test(testTitle, async ({ page, request, locators, oracle, appAdapter, applyDeferredMutation, setScenarioMetadata }) => {
+    test.setTimeout(getActiveBenchmarkTestTimeoutMs());
     setScenarioMetadata({
       activeScenarioId: scenario.scenarioId,
       activeScenarioCategory: scenario.category,
