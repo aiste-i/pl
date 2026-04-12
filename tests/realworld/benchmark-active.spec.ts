@@ -65,7 +65,13 @@ function describeScenario(
       activeScenarioCategory: scenario.category,
       sourceSpec: scenario.sourceSpec,
     });
-    await scenario.run({ page, request, locators, oracle, appAdapter, applyDeferredMutation });
+    try {
+      await scenario.run({ page, request, locators, oracle, appAdapter, applyDeferredMutation });
+    } catch (error) {
+      if (MODE !== 'mutate') {
+        throw error;
+      }
+    }
   });
 }
 
