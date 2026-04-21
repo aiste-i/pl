@@ -25,6 +25,8 @@ export interface MutationCandidateMetadata {
     operatorSkippedOracleCount?: number;
     operatorNotApplicableCount?: number;
     operatorTotalCheckDurationMs?: number;
+    operatorSelectedCount?: number;
+    operatorSelectedApplicableRatio?: number;
     operatorRuntimeCategory?: string | null;
     operatorThesisCategory?: string | null;
     touchpointLogicalKeys?: string[];
@@ -63,6 +65,8 @@ export class MutationCandidate {
     operatorSkippedOracleCount?: number;
     operatorNotApplicableCount?: number;
     operatorTotalCheckDurationMs?: number;
+    operatorSelectedCount?: number;
+    operatorSelectedApplicableRatio?: number;
     operatorRuntimeCategory?: string | null;
     operatorThesisCategory?: string | null;
     touchpointLogicalKeys?: string[];
@@ -111,6 +115,8 @@ export class MutationCandidate {
             operatorSkippedOracleCount: this.operatorSkippedOracleCount ?? null,
             operatorNotApplicableCount: this.operatorNotApplicableCount ?? null,
             operatorTotalCheckDurationMs: this.operatorTotalCheckDurationMs ?? null,
+            operatorSelectedCount: this.operatorSelectedCount ?? null,
+            operatorSelectedApplicableRatio: this.operatorSelectedApplicableRatio ?? null,
             operatorRuntimeCategory: this.operatorRuntimeCategory ?? null,
             operatorThesisCategory: this.operatorThesisCategory ?? null,
             touchpointLogicalKeys: this.touchpointLogicalKeys ?? [],

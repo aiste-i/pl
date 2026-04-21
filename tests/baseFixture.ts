@@ -148,6 +148,8 @@ export interface BenchmarkResult {
     operatorApplicableCount: number | null;
     operatorSkippedOracleCount: number | null;
     operatorNotApplicableCount: number | null;
+    operatorSelectedCount: number | null;
+    operatorSelectedApplicableRatio: number | null;
     operatorCheckDurationMs: number | null;
     applyDurationMs: number | null;
     applyFailureCount: number;
@@ -533,6 +535,8 @@ export const test = base.extend<TestOptions & {
             operatorApplicableCount: mutation.operatorApplicableCount ?? null,
             operatorSkippedOracleCount: mutation.operatorSkippedOracleCount ?? null,
             operatorNotApplicableCount: mutation.operatorNotApplicableCount ?? null,
+            operatorSelectedCount: mutation.operatorSelectedCount ?? null,
+            operatorSelectedApplicableRatio: mutation.operatorSelectedApplicableRatio ?? null,
             operatorCheckDurationMs: mutation.operatorTotalCheckDurationMs ?? null,
             applyDurationMs: null,
             applyFailureCount: 0,

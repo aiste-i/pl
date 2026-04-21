@@ -7,6 +7,7 @@ export { getTodoMVCLocators, getTodoMVCOracle, TodoMVCLocators } from './apps/to
 export * from './realworld/types';
 export * from './realworld/keys';
 export * from './realworld/coverage';
+export * from './realworld/css-xpath-audit';
 
 export function getAppLocators(adapter: AppAdapter, strategy: StrategyName) {
   return adapter.getLocators(strategy);

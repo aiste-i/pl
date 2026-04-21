@@ -7,9 +7,8 @@ async function main() {
     const appName = (process.argv[2] || process.env.APP_ID || process.env.npm_config_appid || getSelectedAppId()) as any;
     const budget = parseInt(process.argv[3] || process.env.BENCHMARK_BUDGET || process.env.npm_config_budget || '20', 10);
     const seed = parseInt(process.argv[4] || process.env.BENCHMARK_SEED || process.env.npm_config_seed || '12345', 10);
-    const oversampleFactor = parseInt(process.argv[5] || process.env.PREFLIGHT_OVERSAMPLE_FACTOR || '3', 10);
 
-    console.log(`Generating scenarios for app: ${appName} (budget: ${budget}, seed: ${seed}, preflight oversample factor: ${oversampleFactor})`);
+    console.log(`Generating scenarios for app: ${appName} (budget: ${budget}, seed: ${seed})`);
 
     const generator = new MutantGenerator(null as any, appName);
     
@@ -19,7 +18,7 @@ async function main() {
 
     // 2. Sample
     const sampled = generator.sampleScenarios(allScenarios, budget, seed);
-    const preflightPool = generator.buildPreflightPool(allScenarios, budget, seed, oversampleFactor);
+    const preflightPool = generator.buildPreflightPool(allScenarios, budget, seed);
     console.log(`Sampled ${sampled.length} scenarios.`);
     console.log(`Prepared ${preflightPool.length} deterministic preflight candidates.`);
     const summary = generator.getSamplingSummary();

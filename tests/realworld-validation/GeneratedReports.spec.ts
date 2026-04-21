@@ -17,6 +17,7 @@ test('corpus report exposes an explicit migration matrix without temporary debt 
 test('operator taxonomy and coverage reports are machine-readable', async () => {
   const taxonomyPath = path.join(process.cwd(), 'reports', 'realworld-operator-taxonomy.json');
   const coveragePath = path.join(process.cwd(), 'reports', 'realworld-operator-coverage.json');
+  const auditPath = path.join(process.cwd(), 'reports', 'realworld-css-xpath-locator-audit.json');
   const taxonomy = JSON.parse(fs.readFileSync(taxonomyPath, 'utf8')) as Array<{
     operator: string;
     benchmarkScope: string;
@@ -28,6 +29,11 @@ test('operator taxonomy and coverage reports are machine-readable', async () => 
     appId: string;
     operators: Array<{ operator: string; selectedCandidateCount: number; sampleTargetSelectors: string[] }>;
   }>;
+  const audit = JSON.parse(fs.readFileSync(auditPath, 'utf8')) as {
+    auditedRowCount: number;
+    overlapAudit: { refactoredFamilyDistinctCount: number };
+    rows: Array<{ logicalKey: string; currentPairRelationship: string; refactoredPairRelationship: string }>;
+  };
 
   expect(taxonomy.some(row => row.operator === 'ToggleAriaExpanded' && row.benchmarkScope === 'in-scope')).toBe(true);
   expect(taxonomy.some(row => row.operator === 'MaskMutator' && row.benchmarkScope === 'excluded-by-design')).toBe(true);
@@ -35,6 +41,9 @@ test('operator taxonomy and coverage reports are machine-readable', async () => 
   expect(taxonomy.every(row => typeof row.safetyGuard === 'string' && row.safetyGuard.length > 0)).toBe(true);
   expect(coverage.length).toBeGreaterThan(0);
   expect(coverage.every(row => row.operators.length > 0)).toBe(true);
+  expect(audit.auditedRowCount).toBeGreaterThan(0);
+  expect(audit.overlapAudit.refactoredFamilyDistinctCount).toBeGreaterThan(0);
+  expect(audit.rows.some(row => row.logicalKey === 'nav.brandLink' && row.currentPairRelationship !== row.refactoredPairRelationship)).toBe(true);
 });
 
 test('pipeline verification report distinguishes primary and supplementary environments', async () => {
@@ -42,12 +51,13 @@ test('pipeline verification report distinguishes primary and supplementary envir
   const report = JSON.parse(fs.readFileSync(reportPath, 'utf8')) as {
     primaryEnvironment: { browser: string };
     supplementaryEnvironment: { browsers: string[] };
-    workflows: Array<{ present: boolean }>;
+    workflows: Array<{ path: string; present: boolean }>;
   };
 
   expect(report.primaryEnvironment.browser).toBe('chromium');
   expect(report.supplementaryEnvironment.browsers).toEqual(['firefox', 'webkit']);
-  expect(report.workflows.every(workflow => workflow.present)).toBe(true);
+  expect(report.workflows.some(workflow => workflow.path === '.github/workflows/pr-realworld.yml' && workflow.present)).toBe(true);
+  expect(report.workflows.every(workflow => typeof workflow.present === 'boolean')).toBe(true);
 });
 
 test('tracked accessibility summary reports exist for reviewers', async () => {

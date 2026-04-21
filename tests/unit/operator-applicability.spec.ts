@@ -263,11 +263,15 @@ test('missing selectors return an immediate empty mutation surface snapshot', as
     style: null,
     role: null,
     ariaLabel: null,
+    ariaLabelledBy: null,
+    id: null,
     placeholder: null,
     alt: null,
     title: null,
+    htmlFor: null,
     hidden: null,
     childElementCount: null,
+    textNodeCount: null,
     parentSelector: null,
   });
 });

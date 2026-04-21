@@ -1,26 +1,53 @@
 # Replication Guide
 
-This guide is for reviewers reproducing the Playwright RealWorld locator-robustness benchmark from a clean checkout.
+This guide describes the current end-to-end workflow for reproducing the Playwright RealWorld locator-robustness benchmark from a clean checkout.
 
 ## Purpose
 
-The benchmark compares exactly three Playwright locator families under controlled non-breaking UI mutation:
+The benchmark compares exactly three locator families under controlled non-breaking DOM/accessibility mutation:
 
 - `semantic-first`
 - `css`
 - `xpath`
 
-The oracle is a separate ground-truth layer and is not part of the benchmark comparison. Scenario logic is shared across locator families; only locator construction differs. Chromium is the thesis-primary browser unless an explicit multi-browser dataset is generated.
+The oracle is a separate ground-truth layer implemented through dedicated oracle locators. It is not one of the compared families.
+
+The thesis-primary dataset is Chromium-based unless an explicit cross-browser run is requested.
+
+## Current Corpus Status
+
+The active corpus is `realworld-active`.
+
+It currently contains 12 active shared scenarios across:
+
+- Angular RealWorld
+- Svelte RealWorld (`realworld`)
+- Vue 3 RealWorld
+
+Corpus metadata is defined in:
+
+- [`realworld-corpus.ts`](/c:/Users/aiste/Desktop/benchmark/src/benchmark/realworld-corpus.ts)
+
+The corpus also tracks excluded-by-design and excluded-methodological scenarios so coverage decisions remain explicit.
 
 ## System Requirements
 
-- Node.js 20.x for CI-equivalent reproduction. The current local workspace may run newer Node versions, but reviewer reproduction should use Node 20 unless intentionally testing toolchain drift.
-- npm matching the Node 20 distribution, or a compatible newer npm.
-- Playwright `1.58.2`, pinned through `package-lock.json`.
-- Browsers installed through Playwright:
-  - Chromium for thesis-primary runs.
-  - Chromium, Firefox, and WebKit for cross-browser dataset generation.
-- Linux is the primary CI platform. Windows and macOS can run the pipeline, but artifact paths and browser dependencies may differ.
+- Node.js 20.x for CI-equivalent reproduction
+- npm compatible with the Node 20 toolchain
+- Playwright `1.58.2`, pinned through `package-lock.json`
+- Playwright browsers installed locally
+
+Primary browser install:
+
+```bash
+npx playwright install --with-deps chromium
+```
+
+Cross-browser install:
+
+```bash
+npx playwright install --with-deps chromium firefox webkit
+```
 
 ## Clean Install
 
@@ -32,13 +59,7 @@ npm run install:apps
 npx playwright install --with-deps chromium
 ```
 
-For cross-browser reproduction:
-
-```bash
-npx playwright install --with-deps chromium firefox webkit
-```
-
-## Validation And Unit Tests
+## Validation Before Benchmark Runs
 
 ```bash
 npm run lint
@@ -47,11 +68,17 @@ npm run test:unit
 npm run validate:realworld
 ```
 
-`test:unit` covers schema validation, deterministic mutation selection, and operator applicability without running the full browser benchmark corpus.
+`test:unit` now covers:
+
+- schema validation
+- deterministic mutation selection
+- operator applicability and oracle-safety edge cases
+- retention behavior
+- touchpoint-aware sampling and comparable-yield checks
 
 ## Minimal Reproduction
 
-This runs one app with a one-mutation sample:
+One app, one selected mutation:
 
 ```bash
 npm run benchmark:baseline:app --appid=angular-realworld-example-app
@@ -61,21 +88,23 @@ npm run validate:results -- test-results/angular-realworld-example-app/realworld
 npm run benchmark:aggregate:app -- test-results/angular-realworld-example-app/realworld-active/benchmark-runs test-results/angular-realworld-example-app/realworld-active/aggregate
 ```
 
-Expected outputs:
+Expected app-level outputs now include:
 
-- `test-results/angular-realworld-example-app/realworld-active/benchmark-runs/*.json`
-- `test-results/angular-realworld-example-app/realworld-active/accessibility-artifacts/*_axe.json`
-- `test-results/angular-realworld-example-app/realworld-active/reachable-targets.json`
-- `test-results/angular-realworld-example-app/realworld-active/scenarios.json`
-- `test-results/angular-realworld-example-app/realworld-active/aggregate/*.csv`
-- `test-results/angular-realworld-example-app/realworld-active/aggregate/aggregate_report.json`
-- `artifacts/<run-id>/run-metadata.json`
-- `artifacts/<run-id>/results.json`
-- `artifacts/<run-id>/results.csv`
+- `reachable-targets.json`
+- `scenario-preflight-pool.json`
+- `scenario-preflight-results.json`
+- `scenarios.json`
+- `benchmark-runs/*.json`
+- `aggregate/*.csv`
+- `aggregate/aggregate_report.json`
+- `aggregate/run-metadata.json`
+
+Under `BENCHMARK_RETENTION=full`, you should also see:
+
+- `accessibility-artifacts/*_axe.json`
+- mirrored per-run artifacts under `artifacts/<run-id>/`
 
 ## Thesis-Primary Chromium Run
-
-Chromium is the primary dataset dimension for thesis claims:
 
 ```bash
 npm run benchmark:baseline:primary
@@ -89,21 +118,82 @@ npm run benchmark:check:yield
 npm run reports:generate:run
 ```
 
-Use the same seed and budget to reproduce the same selected mutation IDs. The generated `scenarios.json` files contain the sampled mutations and their `selectionSeed`.
+This is the thesis-primary path for repo-level claims unless you intentionally generate a broader browser dataset.
 
-The same path is available as a manual GitHub Actions workflow:
+## What `benchmark:prepare:app` Does Now
 
-- `Thesis Primary Chromium Dataset`
-- default `budget`: `10`
-- default `seed`: `12345`
+`benchmark:prepare:app` is a multi-stage wrapper around:
 
-The workflow uploads `artifacts`, `reports`, and `test-results` as a single thesis-primary artifact bundle.
-It also enforces a minimum comparable mutated-run yield after aggregation.
-The manual thesis workflow sets `BENCHMARK_RETENTION=compact`, so aggregate reports and aggregate accessibility summaries are preserved while bulky raw per-run mirrors are not retained in the final artifact bundle.
+1. reachable-target collection
+2. deterministic candidate generation
+3. preflight execution on an oversampled candidate pool
+4. scenario finalization from preflight-validated candidates only
 
-## Cross-Browser Dataset Generation
+Important current behavior:
 
-Baseline cross-browser dataset:
+- default mutation budget is `20`
+- default seed is `12345`
+- preflight oversample factors default to `3,5,8,12,16`
+- finalization can fail if the validated pool does not satisfy the requested budget or mandatory category coverage
+
+Relevant controls:
+
+- `BENCHMARK_BUDGET`
+- `BENCHMARK_SEED`
+- `PREFLIGHT_OVERSAMPLE_FACTORS`
+- `PREFLIGHT_TEST_TIMEOUT_MS`
+
+## Mutation Execution Semantics
+
+Mutation runs are expected to produce all three kinds of benchmark outcomes:
+
+- `passed`
+- `failed`
+- `invalid`
+
+In mutate mode, genuine locator-family failures are recorded as benchmark outcomes and should not be interpreted as a broken CI job by themselves. The meaningful post-run checks are:
+
+- structured run JSON
+- result validation
+- aggregate summaries
+- comparable-yield checks
+
+## Aggregation
+
+Single app:
+
+```bash
+npm run benchmark:aggregate:app -- test-results/angular-realworld-example-app/realworld-active/benchmark-runs test-results/angular-realworld-example-app/realworld-active/aggregate
+```
+
+All thesis-primary apps:
+
+```bash
+npm run benchmark:aggregate:all
+```
+
+Aggregation now emits:
+
+- family/category/operator summaries
+- cross-browser summaries when applicable
+- exclusion and denominator summaries
+- accessibility scan summaries
+- mutation telemetry summaries
+- selection-quality summaries when preflight metadata is present
+
+## Determinism Check
+
+```bash
+npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=8 --seed=12345
+cp test-results/angular-realworld-example-app/realworld-active/scenarios.json test-results/angular-realworld-example-app/realworld-active/scenarios.seed-12345.a.json
+npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=8 --seed=12345
+```
+
+Compare the `candidateId` sequence in both `scenarios.json` files. It must match for the same seed and budget. Changing the seed should change the sequence.
+
+## Cross-Browser Runs
+
+Baseline cross-browser:
 
 ```bash
 npx playwright install --with-deps chromium firefox webkit
@@ -112,7 +202,7 @@ npm run validate:results
 npm run benchmark:aggregate:all
 ```
 
-Optional full cross-browser mutation dataset:
+Optional mutation dataset:
 
 ```bash
 npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=20 --seed=12345
@@ -123,108 +213,48 @@ npm run validate:results
 npm run benchmark:aggregate:all
 ```
 
-Cross-browser records include `browserName` in structured JSON, CSV exports, aggregate summaries, and metadata. Browser identity is not inferred from filenames.
-
-## Pipeline Stages
-
-Baseline benchmark:
-
-```bash
-npm run benchmark:baseline:primary
-```
-
-Mutation preparation:
-
-```bash
-npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=20 --seed=12345
-```
-
-`benchmark:prepare:app` now performs four stages for the selected app:
-
-- reachable-target collection
-- deterministic candidate generation
-- checkpoint-aware preflight validation on an oversampled candidate pool
-- final scenario selection from preflight-validated candidates only
-
-Mutation execution:
-
-```bash
-npm run benchmark:mutate:all
-```
-
-Aggregation:
-
-```bash
-npm run benchmark:aggregate:all
-```
-
-Result validation:
-
-```bash
-npm run validate:results
-```
-
-Report regeneration:
-
-```bash
-npm run reports:generate
-```
-
-## Determinism Check
-
-To verify deterministic selection:
-
-```bash
-npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=8 --seed=12345
-cp test-results/angular-realworld-example-app/realworld-active/scenarios.json test-results/angular-realworld-example-app/realworld-active/scenarios.seed-12345.a.json
-npm run benchmark:prepare:app --appid=angular-realworld-example-app --budget=8 --seed=12345
-```
-
-Compare the `scenarios` arrays in both files. The selected `candidateId` sequence must match. Changing `--seed` should change the sequence.
-
-## Docker
-
-No Dockerfile is currently required for CI. If adding Docker support, use the official Playwright base image matching Playwright `1.58.2`, run `npm ci`, then run the same commands above. Do not use Docker to change benchmark semantics or browser defaults.
+Cross-browser evidence is supplementary unless the methodology is explicitly broadened beyond the thesis-primary Chromium framing.
 
 ## Troubleshooting
 
-Missing browsers:
+### Missing browsers
 
 ```bash
 npx playwright install --with-deps chromium
 ```
 
-For cross-browser:
+or
 
 ```bash
 npx playwright install --with-deps chromium firefox webkit
 ```
 
-App startup timing:
+### App startup issues
 
-- Ensure `npm run install:apps` completed.
-- Check that no local process is already using ports `4300`, `4301`, or `4302`.
-- Keep `workers: 1`; the benchmark assumes controlled app startup and serial execution.
+- run `npm run install:apps`
+- keep execution serial; the benchmark assumes `workers: 1`
+- ensure local ports used by app fixtures are free
 
-Schema validation errors:
+### Result validation errors
 
-- Run `npm run validate:results -- <path>`.
-- The validator prints JSON path and message.
-- Do not aggregate invalid records; aggregation validates records before consuming them.
+- run `npm run validate:results -- <path>`
+- fix schema violations before aggregation
 
-Skipped mutations:
+### Finalize/preparation failures
 
-- `oracle-protected` means the candidate would corrupt oracle grounding.
-- `behavior-preservation-gate-failed` means the operator rejected the target as unsafe or inapplicable.
-- `checkpoint-not-reached` means the scenario did not reach the planned mutation point.
+Common causes:
 
-Accessibility scan failures:
+- insufficient validated candidates for the requested budget
+- missing mandatory category coverage
+- too many candidates rejected as `oracle-protected`, `relevance-too-weak`, or non-meaningful
 
-- Failed scans are recorded as `scanStatus: "failed"` with `scanError`.
-- Skipped scans are explicit and normally indicate invalid setup or mutation application.
-- Accessibility summaries should distinguish completed-scan-only summaries from all-valid-run scan coverage.
+Inspect:
 
-Retention mode:
+- `scenario-preflight-results.json`
+- `scenario-preflight-pool.json`
+- `scenarios.json`
 
-- `BENCHMARK_RETENTION=full` keeps raw benchmark run JSON, detailed axe artifacts, and per-run mirrors under `artifacts/<run-id>/`.
-- `BENCHMARK_RETENTION=compact` keeps `aggregate/*.csv`, `aggregate_report.json`, `aggregate/run-metadata.json`, and the generated `reports/realworld-accessibility-*.csv` outputs, then prunes `benchmark-runs/` and `accessibility-artifacts/` after aggregation.
+### Accessibility retention
+
+- `BENCHMARK_RETENTION=full` keeps raw run JSON and detailed axe artifacts
+- `BENCHMARK_RETENTION=compact` keeps aggregate outputs and prunes raw benchmark run and accessibility-artifact directories after aggregation

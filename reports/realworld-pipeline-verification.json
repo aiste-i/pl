@@ -22,8 +22,8 @@
     "reportsCheckSource": "node scripts/check-source-reports-freshness.js",
     "reportsCheck": "node scripts/check-reports-freshness.js",
     "baselineChromium": "cross-env APP_ID=angular-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=baseline npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env APP_ID=realworld BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=baseline npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env APP_ID=vue3-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=baseline npx playwright test tests/realworld/benchmark-active.spec.ts",
-    "baselineCrossBrowserSmoke": "cross-env PLAYWRIGHT_BROWSERS=chromium,firefox,webkit npm run benchmark:baseline:all",
-    "mutationPrepareApp": "npm run benchmark:collect:app && npm run benchmark:generate:app",
+    "baselineCrossBrowserSmoke": "npm run benchmark:baseline:cross-browser",
+    "mutationPrepareApp": "cross-env BENCHMARK_CORPUS_ID=realworld-active npx ts-node --transpile-only src/murun/runner/prepare-scenarios.ts",
     "mutationSelected": "cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=angular-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=realworld BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=vue3-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate npx playwright test tests/realworld/benchmark-active.spec.ts",
     "mutationSample": "cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=angular-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate MUTATION_LIMIT=1 npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=realworld BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate MUTATION_LIMIT=1 npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=vue3-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate MUTATION_LIMIT=1 npx playwright test tests/realworld/benchmark-active.spec.ts",
     "aggregateAll": "npx ts-node --transpile-only src/murun/runner/aggregate.ts test-results/angular-realworld-example-app/realworld-active/benchmark-runs test-results/angular-realworld-example-app/realworld-active/aggregate && npx ts-node --transpile-only src/murun/runner/aggregate.ts test-results/realworld/realworld-active/benchmark-runs test-results/realworld/realworld-active/aggregate && npx ts-node --transpile-only src/murun/runner/aggregate.ts test-results/vue3-realworld-example-app/realworld-active/benchmark-runs test-results/vue3-realworld-example-app/realworld-active/aggregate"
@@ -35,7 +35,7 @@
     },
     {
       "path": ".github/workflows/scheduled-realworld.yml",
-      "present": true
+      "present": false
     }
   ],
   "notes": [

@@ -14,11 +14,15 @@ export async function captureMutationSurface(page: Page, selector: string): Prom
       style: null,
       role: null,
       ariaLabel: null,
+      ariaLabelledBy: null,
       placeholder: null,
       alt: null,
       title: null,
+      id: null,
+      htmlFor: null,
       hidden: null,
       childElementCount: null,
+      textNodeCount: null,
       parentSelector: null,
     };
   }
@@ -47,6 +51,7 @@ export async function captureMutationSurface(page: Page, selector: string): Prom
       };
 
       const element = node as HTMLElement;
+      const textNodeCount = Array.from(element.childNodes).filter(child => child.nodeType === Node.TEXT_NODE && (child.textContent?.trim().length ?? 0) > 0).length;
       return {
         exists: true,
         tagType: element.tagName.toLowerCase(),
@@ -55,11 +60,15 @@ export async function captureMutationSurface(page: Page, selector: string): Prom
         style: element.getAttribute('style'),
         role: element.getAttribute('role'),
         ariaLabel: element.getAttribute('aria-label'),
+        ariaLabelledBy: element.getAttribute('aria-labelledby'),
         placeholder: element.getAttribute('placeholder'),
         alt: element.getAttribute('alt'),
         title: element.getAttribute('title'),
+        id: element.getAttribute('id'),
+        htmlFor: element.tagName.toLowerCase() === 'label' ? element.getAttribute('for') : null,
         hidden: element.hidden,
         childElementCount: element.childElementCount,
+        textNodeCount,
         parentSelector: computeSelector(element.parentElement),
       };
     });

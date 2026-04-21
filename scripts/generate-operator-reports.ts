@@ -70,7 +70,16 @@ function main() {
   const coverageReport = REALWORLD_APP_IDS.map(appId => {
     const appDir = path.join(process.cwd(), 'test-results', appId, 'realworld-active');
     const reachableTargets = safeReadJson<ReachableTargetsFile>(path.join(appDir, 'reachable-targets.json'));
-    const scenarios = safeReadJson<{ scenarios?: Array<{ operator?: { type?: string } }> }>(path.join(appDir, 'scenarios.json'));
+    const scenarios = safeReadJson<{
+      metadata?: {
+        availableCountsByOperator?: Record<string, number>;
+        selectedCountsByOperator?: Record<string, number>;
+        selectedApplicableRatiosByOperator?: Record<string, number>;
+        applicableButUnselectedOperators?: Record<string, string[]>;
+        heavilyBlockedByOracleOperators?: string[];
+      };
+      scenarios?: Array<{ operator?: { type?: string } }>;
+    }>(path.join(appDir, 'scenarios.json'));
     const mutatedRuns = loadMutatedRuns(path.join(appDir, 'benchmark-runs'));
 
     const selectedCounts = new Map<string, number>();
@@ -136,7 +145,11 @@ function main() {
         notApplicableCount: operatorCoverage.get(entry.operator)?.notApplicableCount ?? 0,
         totalCheckDurationMs: operatorCoverage.get(entry.operator)?.totalCheckDurationMs ?? 0,
         selectedMutationCount: selectedCounts.get(entry.operator) ?? 0,
-        selectedCandidateCount: selectedCandidateIds.get(entry.operator)?.size ?? 0,
+        selectedCandidateCount: scenarios?.metadata?.selectedCountsByOperator?.[entry.operator] ?? selectedCandidateIds.get(entry.operator)?.size ?? 0,
+        selectedApplicableRatio: scenarios?.metadata?.selectedApplicableRatiosByOperator?.[entry.operator] ?? 0,
+        applicableButUnselected:
+          Object.values(scenarios?.metadata?.applicableButUnselectedOperators ?? {}).some(operators => operators.includes(entry.operator)),
+        heavilyBlockedByOracle: (scenarios?.metadata?.heavilyBlockedByOracleOperators ?? []).includes(entry.operator),
         appliedMutationCount: appliedCounts.get(entry.operator) ?? 0,
         sampleTargetSelectors: [...(selectedTargetSelectors.get(entry.operator) ?? new Set<string>())].slice(0, 5),
         selectedTargetTagTypes: [...(selectedTargetTagTypes.get(entry.operator) ?? new Set<string>())].sort(),

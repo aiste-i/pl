@@ -19,6 +19,10 @@ test('dom operator list includes the expanded RealWorld benchmark stressors', as
 
   expect(operatorNames).toContain('ReverseChildrenOrder');
   expect(operatorNames).toContain('SwapAdjacentSiblings');
+  expect(operatorNames).toContain('NeutralWrapperInsert');
+  expect(operatorNames).toContain('AncestorSink');
+  expect(operatorNames).toContain('LabelMechanismRewrite');
+  expect(operatorNames).toContain('AccessibleNameSourceSwap');
   expect(operatorNames).toContain('ChangeAriaLabel');
   expect(operatorNames).toContain('ToggleAriaExpanded');
   expect(operatorNames).toContain('ToggleCssClass');
@@ -29,6 +33,8 @@ test('operator catalog makes in-scope and excluded-by-design coverage explicit',
   const fullCatalog = getOperatorCatalog();
 
   expect(benchmarkOperators).toContain('ToggleAriaExpanded');
+  expect(benchmarkOperators).toContain('NeutralWrapperRemove');
+  expect(benchmarkOperators).toContain('NonTargetDuplicateControlInsert');
   expect(benchmarkOperators).not.toContain('DistortMutator');
   expect(benchmarkOperators).not.toContain('MaskMutator');
 
@@ -40,6 +46,8 @@ test('operator catalog makes in-scope and excluded-by-design coverage explicit',
 test('operator registry can recreate the expanded operator set', async () => {
   expect(OperatorRegistry.createOperator('ReverseChildrenOrder').constructor.name).toBe('ReverseChildrenOrder');
   expect(OperatorRegistry.createOperator('SwapAdjacentSiblings').constructor.name).toBe('SwapAdjacentSiblings');
+  expect(OperatorRegistry.createOperator('NeutralWrapperInsert').constructor.name).toBe('NeutralWrapperInsert');
+  expect(OperatorRegistry.createOperator('LabelMechanismRewrite').constructor.name).toBe('LabelMechanismRewrite');
   expect(OperatorRegistry.createOperator('ChangeAriaLabel').constructor.name).toBe('ChangeAriaLabel');
   expect(OperatorRegistry.createOperator('ToggleAriaExpanded').constructor.name).toBe('ToggleAriaExpanded');
   expect(OperatorRegistry.createOperator('ToggleCssClass').constructor.name).toBe('ToggleCssClass');

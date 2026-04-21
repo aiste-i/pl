@@ -14,6 +14,10 @@ export interface SamplingSummary {
   categoryQuotas: Record<string, number>;
   selectedCounts: Record<string, number>;
   availableCountsByCategory: Record<string, number>;
+  availableCountsByOperator: Record<string, number>;
+  selectedCountsByOperator: Record<string, number>;
+  selectedApplicableRatiosByOperator: Record<string, number>;
+  applicableButUnselectedOperators: Record<string, string[]>;
   mandatoryCoverageSatisfied: boolean;
 }
 
@@ -45,6 +49,10 @@ function deterministicRank(seed: number, value: string): string {
   return createHash('sha1').update(`${seed}::${value}`).digest('hex');
 }
 
+function operatorSeedRank(seed: number, category: DomOperator['category'], operatorName: string): string {
+  return deterministicRank(seed, `${category}::${operatorName}`);
+}
+
 export function getEligibleCandidates(candidates: MutationCandidate[]): MutationCandidate[] {
   return candidates.filter(candidate => candidate.eligible !== false && candidate.aggregateComparisonEligible !== false);
 }
@@ -65,6 +73,14 @@ function getAvailableCountsByCategory(candidates: MutationCandidate[]): Record<s
       candidates.filter(candidate => getCandidateCategory(candidate) === category).length,
     ]),
   ) as Record<string, number>;
+}
+
+function getAvailableCountsByOperator(candidates: MutationCandidate[]): Record<string, number> {
+  return candidates.reduce((acc, candidate) => {
+    const operatorName = candidate.operator.constructor.name;
+    acc[operatorName] = (acc[operatorName] ?? 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 }
 
 function rankCandidateBase(seed: number, candidate: MutationCandidate): [number, number, string] {
@@ -131,6 +147,30 @@ export function buildCategoryPools(candidates: MutationCandidate[], seed: number
   return pools;
 }
 
+function buildCategoryOperatorPools(
+  candidates: MutationCandidate[],
+  seed: number,
+): Map<DomOperator['category'], Map<string, MutationCandidate[]>> {
+  const eligibleCandidates = getEligibleCandidates(candidates);
+  const categoryPools = new Map<DomOperator['category'], Map<string, MutationCandidate[]>>();
+
+  for (const category of CATEGORY_ORDER) {
+    const operatorPools = new Map<string, MutationCandidate[]>();
+    for (const candidate of eligibleCandidates.filter(item => getCandidateCategory(item) === category)) {
+      const operatorName = candidate.operator.constructor.name;
+      const pool = operatorPools.get(operatorName) ?? [];
+      pool.push(candidate);
+      operatorPools.set(operatorName, pool);
+    }
+    for (const [operatorName, pool] of operatorPools.entries()) {
+      operatorPools.set(operatorName, pool.sort((left, right) => compareBaseRanking(seed, left, right)));
+    }
+    categoryPools.set(category, operatorPools);
+  }
+
+  return categoryPools;
+}
+
 function markSelection(candidate: MutationCandidate, seed: number, selectedForCategoryMinimum: boolean): MutationCandidate {
   candidate.selectionSeed = seed;
   candidate.quotaBucket = getCandidateCategory(candidate);
@@ -171,14 +211,78 @@ function registerSelection(
   selectedOperatorCounts.set(candidate.operator.constructor.name, (selectedOperatorCounts.get(candidate.operator.constructor.name) ?? 0) + 1);
 }
 
+function selectOperatorByLowestRatio(
+  seed: number,
+  category: DomOperator['category'],
+  operatorPools: Map<string, MutationCandidate[]>,
+  availableCountsByOperator: Record<string, number>,
+  selectedOperatorCounts: Map<string, number>,
+  used: Set<string>,
+): string | null {
+  const availableOperators = [...operatorPools.entries()]
+    .filter(([, pool]) => pool.some(candidate => !used.has(candidate.candidateId || candidate.selector)))
+    .map(([operatorName]) => operatorName);
+
+  if (availableOperators.length === 0) {
+    return null;
+  }
+
+  availableOperators.sort((left, right) => {
+    const leftSelected = selectedOperatorCounts.get(left) ?? 0;
+    const rightSelected = selectedOperatorCounts.get(right) ?? 0;
+    const leftAvailable = availableCountsByOperator[left] ?? 1;
+    const rightAvailable = availableCountsByOperator[right] ?? 1;
+    const leftRatio = leftSelected / leftAvailable;
+    const rightRatio = rightSelected / rightAvailable;
+
+    return (
+      leftRatio - rightRatio ||
+      leftSelected - rightSelected ||
+      operatorSeedRank(seed, category, left).localeCompare(operatorSeedRank(seed, category, right))
+    );
+  });
+
+  return availableOperators[0] ?? null;
+}
+
+function summarizeSelectedOperators(
+  availableCountsByOperator: Record<string, number>,
+  selectedOperatorCounts: Map<string, number>,
+): {
+  selectedCountsByOperator: Record<string, number>;
+  selectedApplicableRatiosByOperator: Record<string, number>;
+} {
+  const selectedCountsByOperator = Object.fromEntries(
+    Object.keys(availableCountsByOperator)
+      .sort()
+      .map(operatorName => [operatorName, selectedOperatorCounts.get(operatorName) ?? 0]),
+  ) as Record<string, number>;
+
+  const selectedApplicableRatiosByOperator = Object.fromEntries(
+    Object.entries(availableCountsByOperator)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([operatorName, availableCount]) => [
+        operatorName,
+        availableCount > 0 ? (selectedCountsByOperator[operatorName] ?? 0) / availableCount : 0,
+      ]),
+  ) as Record<string, number>;
+
+  return {
+    selectedCountsByOperator,
+    selectedApplicableRatiosByOperator,
+  };
+}
+
 export function sampleMutationCandidates(
   candidates: MutationCandidate[],
   budget: number,
   seed: number,
 ): { selected: MutationCandidate[]; summary: SamplingSummary } {
-  const pools = buildCategoryPools(candidates, seed);
+  const eligibleCandidates = getEligibleCandidates(candidates);
   const categoryQuotas = computeCategoryQuotas(budget);
-  const availableCountsByCategory = getAvailableCountsByCategory(getEligibleCandidates(candidates));
+  const availableCountsByCategory = getAvailableCountsByCategory(eligibleCandidates);
+  const availableCountsByOperator = getAvailableCountsByOperator(eligibleCandidates);
+  const operatorPoolsByCategory = buildCategoryOperatorPools(candidates, seed);
   const selected: MutationCandidate[] = [];
   const selectedCounts = Object.fromEntries(CATEGORY_ORDER.map(category => [category, 0])) as Record<string, number>;
   const requireMandatoryCoverage = budget >= CATEGORY_ORDER.length;
@@ -186,10 +290,20 @@ export function sampleMutationCandidates(
   const selectedOperatorCounts = new Map<string, number>();
   const used = new Set<string>();
 
-  if (requireMandatoryCoverage) {
-    for (const category of CATEGORY_ORDER) {
+  for (const category of CATEGORY_ORDER) {
+    const quota = categoryQuotas[category];
+    const operatorPools = operatorPoolsByCategory.get(category) ?? new Map<string, MutationCandidate[]>();
+    const operatorOrder = [...operatorPools.keys()].sort((left, right) =>
+      operatorSeedRank(seed, category, left).localeCompare(operatorSeedRank(seed, category, right)),
+    );
+
+    for (const operatorName of operatorOrder) {
+      if (selectedCounts[category] >= quota || selected.length >= budget) {
+        break;
+      }
+
       const candidate = pickCandidateFromPool(
-        pools.get(category) ?? [],
+        operatorPools.get(operatorName) ?? [],
         used,
         seed,
         selectedScenarioCounts,
@@ -199,26 +313,37 @@ export function sampleMutationCandidates(
       if (!candidate) {
         continue;
       }
+
       selected.push(markSelection(candidate, seed, true));
       selectedCounts[category] += 1;
       registerSelection(candidate, selectedScenarioCounts, selectedOperatorCounts, used);
     }
-  }
 
-  for (const category of CATEGORY_ORDER) {
-    const quota = categoryQuotas[category];
     while (selectedCounts[category] < quota && selected.length < budget) {
+      const operatorName = selectOperatorByLowestRatio(
+        seed,
+        category,
+        operatorPools,
+        availableCountsByOperator,
+        selectedOperatorCounts,
+        used,
+      );
+      if (!operatorName) {
+        break;
+      }
+
       const candidate = pickCandidateFromPool(
-        pools.get(category) ?? [],
+        operatorPools.get(operatorName) ?? [],
         used,
         seed,
         selectedScenarioCounts,
         selectedOperatorCounts,
-        selectedCounts[category] === 0,
+        false,
       );
       if (!candidate) {
         break;
       }
+
       selected.push(markSelection(candidate, seed, false));
       selectedCounts[category] += 1;
       registerSelection(candidate, selectedScenarioCounts, selectedOperatorCounts, used);
@@ -226,7 +351,7 @@ export function sampleMutationCandidates(
   }
 
   while (selected.length < budget) {
-    const remaining = getEligibleCandidates(candidates).filter(candidate => !used.has(candidate.candidateId || candidate.selector));
+    const remaining = eligibleCandidates.filter(candidate => !used.has(candidate.candidateId || candidate.selector));
     if (remaining.length === 0) {
       break;
     }
@@ -237,7 +362,24 @@ export function sampleMutationCandidates(
     registerSelection(candidate, selectedScenarioCounts, selectedOperatorCounts, used);
   }
 
-  const mandatoryCoverageSatisfied = !requireMandatoryCoverage || CATEGORY_ORDER.every(category => selectedCounts[category] > 0);
+  const { selectedCountsByOperator, selectedApplicableRatiosByOperator } = summarizeSelectedOperators(
+    availableCountsByOperator,
+    selectedOperatorCounts,
+  );
+
+  const applicableButUnselectedOperators = Object.fromEntries(
+    CATEGORY_ORDER.map(category => {
+      const operatorPools = operatorPoolsByCategory.get(category) ?? new Map<string, MutationCandidate[]>();
+      const operators = [...operatorPools.keys()]
+        .filter(operatorName => (availableCountsByOperator[operatorName] ?? 0) > 0 && (selectedCountsByOperator[operatorName] ?? 0) === 0)
+        .sort((left, right) => left.localeCompare(right));
+      return [category, operators];
+    }),
+  ) as Record<string, string[]>;
+
+  const mandatoryCoverageSatisfied =
+    !requireMandatoryCoverage ||
+    CATEGORY_ORDER.every(category => availableCountsByCategory[category] === 0 || selectedCounts[category] > 0);
 
   return {
     selected: selected.slice(0, budget),
@@ -245,27 +387,102 @@ export function sampleMutationCandidates(
       categoryQuotas,
       selectedCounts,
       availableCountsByCategory,
+      availableCountsByOperator,
+      selectedCountsByOperator,
+      selectedApplicableRatiosByOperator,
+      applicableButUnselectedOperators,
       mandatoryCoverageSatisfied,
     },
   };
+}
+
+function buildPreflightCategorySelection(
+  category: DomOperator['category'],
+  operatorPools: Map<string, MutationCandidate[]>,
+  categoryQuota: number,
+  seed: number,
+): MutationCandidate[] {
+  const selected = new Map<string, MutationCandidate>();
+  const applicableCounts = Object.fromEntries(
+    [...operatorPools.entries()].map(([operatorName, pool]) => [operatorName, pool.length]),
+  ) as Record<string, number>;
+  const selectedOperatorCounts = new Map<string, number>();
+  const selectedScenarioCounts = new Map<string, number>();
+  const used = new Set<string>();
+  const operatorOrder = [...operatorPools.keys()].sort((left, right) =>
+    operatorSeedRank(seed, category, left).localeCompare(operatorSeedRank(seed, category, right)),
+  );
+  const targetCount = Math.min(
+    [...operatorPools.values()].reduce((sum, pool) => sum + pool.length, 0),
+    categoryQuota + operatorOrder.length,
+  );
+
+  for (const operatorName of operatorOrder) {
+    const candidate = pickCandidateFromPool(
+      operatorPools.get(operatorName) ?? [],
+      used,
+      seed,
+      selectedScenarioCounts,
+      selectedOperatorCounts,
+      true,
+    );
+    if (!candidate) {
+      continue;
+    }
+    selected.set(candidate.candidateId || candidate.selector, candidate);
+    registerSelection(candidate, selectedScenarioCounts, selectedOperatorCounts, used);
+  }
+
+  while (selected.size < targetCount) {
+    const operatorName = selectOperatorByLowestRatio(
+      seed,
+      category,
+      operatorPools,
+      applicableCounts,
+      selectedOperatorCounts,
+      used,
+    );
+    if (!operatorName) {
+      break;
+    }
+
+    const candidate = pickCandidateFromPool(
+      operatorPools.get(operatorName) ?? [],
+      used,
+      seed,
+      selectedScenarioCounts,
+      selectedOperatorCounts,
+      false,
+    );
+    if (!candidate) {
+      break;
+    }
+
+    selected.set(candidate.candidateId || candidate.selector, candidate);
+    registerSelection(candidate, selectedScenarioCounts, selectedOperatorCounts, used);
+  }
+
+  return [...selected.values()];
 }
 
 export function buildMutationPreflightPool(
   candidates: MutationCandidate[],
   budget: number,
   seed: number,
-  oversampleFactor = 3,
 ): MutationCandidate[] {
-  const pools = buildCategoryPools(candidates, seed);
   const categoryQuotas = computeCategoryQuotas(budget);
+  const operatorPoolsByCategory = buildCategoryOperatorPools(candidates, seed);
+  const categoryPools = buildCategoryPools(candidates, seed);
   const selected = new Map<string, MutationCandidate>();
 
   for (const category of CATEGORY_ORDER) {
-    const pool = pools.get(category) ?? [];
-    const preferredPool = pool.filter(candidate => candidate.categoryAvailabilityHint !== false);
-    const effectivePool = preferredPool.length > 0 ? preferredPool : pool;
-    const targetCount = Math.min(effectivePool.length, Math.max(1, categoryQuotas[category] * oversampleFactor));
-    for (const candidate of effectivePool.slice(0, targetCount)) {
+    const categorySelection = buildPreflightCategorySelection(
+      category,
+      operatorPoolsByCategory.get(category) ?? new Map<string, MutationCandidate[]>(),
+      categoryQuotas[category],
+      seed,
+    );
+    for (const candidate of categorySelection) {
       if (candidate.candidateId) {
         selected.set(candidate.candidateId, candidate);
       }
@@ -273,6 +490,8 @@ export function buildMutationPreflightPool(
   }
 
   return CATEGORY_ORDER.flatMap(category =>
-    (pools.get(category) ?? []).filter(candidate => candidate.candidateId && selected.has(candidate.candidateId)),
+    (categoryPools.get(category) ?? []).filter(
+      candidate => candidate.candidateId && selected.has(candidate.candidateId),
+    ),
   );
 }

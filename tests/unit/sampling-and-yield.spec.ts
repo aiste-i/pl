@@ -31,13 +31,13 @@ function candidatePool(): MutationCandidate[] {
   });
 }
 
-test('preflight pool oversamples each mutation category deterministically', () => {
+test('preflight pool keeps deterministic operator-diverse coverage per category', () => {
   const candidates = candidatePool();
-  const preflightPool = buildMutationPreflightPool(candidates, 10, 12345, 3);
+  const preflightPool = buildMutationPreflightPool(candidates, 10, 12345);
 
-  expect(preflightPool).toHaveLength(24);
+  expect(preflightPool).toHaveLength(14);
   expect(preflightPool.map(candidate => candidate.candidateId)).toEqual(
-    buildMutationPreflightPool(candidates, 10, 12345, 3).map(candidate => candidate.candidateId),
+    buildMutationPreflightPool(candidates, 10, 12345).map(candidate => candidate.candidateId),
   );
 });
 
@@ -190,11 +190,11 @@ test('runtime category overrides raw operator category for accessibility-semanti
   expect(sampled.selected.map(candidate => candidate.candidateId)).toContain('runtime-accessibility');
 });
 
-test('budget >= 4 marks mandatory coverage unsatisfied when accessibility-semantic candidates are missing', () => {
+test('budget >= 4 still counts mandatory coverage as satisfied when a category has no eligible candidates', () => {
   const candidates = candidatePool().filter(candidate => candidate.operator.category !== 'accessibility-semantic');
   const sampled = sampleMutationCandidates(candidates, 8, 12345);
 
-  expect(sampled.summary.mandatoryCoverageSatisfied).toBe(false);
+  expect(sampled.summary.mandatoryCoverageSatisfied).toBe(true);
   expect(sampled.summary.selectedCounts['accessibility-semantic']).toBe(0);
 });
 
@@ -221,11 +221,15 @@ test('meaningfulness checks reject weak generic no-op mutations and accept relev
         style: null,
         role: null,
         ariaLabel: null,
+        ariaLabelledBy: null,
+        id: null,
         placeholder: null,
         alt: null,
         title: null,
+        htmlFor: null,
         hidden: false,
         childElementCount: 0,
+        textNodeCount: 1,
         parentSelector: 'div > p',
       },
       {
@@ -236,11 +240,15 @@ test('meaningfulness checks reject weak generic no-op mutations and accept relev
         style: null,
         role: null,
         ariaLabel: null,
+        ariaLabelledBy: null,
+        id: null,
         placeholder: null,
         alt: null,
         title: null,
+        htmlFor: null,
         hidden: false,
         childElementCount: 0,
+        textNodeCount: 1,
         parentSelector: 'div > p',
       },
     ),
@@ -261,11 +269,15 @@ test('meaningfulness checks reject weak generic no-op mutations and accept relev
         style: null,
         role: 'button',
         ariaLabel: 'Delete comment',
+        ariaLabelledBy: null,
+        id: null,
         placeholder: null,
         alt: null,
         title: null,
+        htmlFor: null,
         hidden: false,
         childElementCount: 1,
+        textNodeCount: 1,
         parentSelector: 'div > button',
       },
       {
@@ -276,11 +288,15 @@ test('meaningfulness checks reject weak generic no-op mutations and accept relev
         style: null,
         role: 'button',
         ariaLabel: 'Remove comment',
+        ariaLabelledBy: null,
+        id: null,
         placeholder: null,
         alt: null,
         title: null,
+        htmlFor: null,
         hidden: false,
         childElementCount: 1,
+        textNodeCount: 1,
         parentSelector: 'div > button',
       },
     ),

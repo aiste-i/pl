@@ -43,6 +43,8 @@ interface AggregatedRun {
         operatorApplicableCount: number | null;
         operatorSkippedOracleCount: number | null;
         operatorNotApplicableCount: number | null;
+        operatorSelectedCount: number | null;
+        operatorSelectedApplicableRatio: number | null;
         operatorCheckDurationMs: number | null;
         applyDurationMs: number | null;
         applyFailureCount: number;
@@ -69,6 +71,11 @@ interface ScenarioFilePayload {
         selectedCounts?: Record<string, number>;
         validatedCountsByCategory?: Record<string, number>;
         validatedCountsByOperator?: Record<string, number>;
+        availableCountsByOperator?: Record<string, number>;
+        selectedCountsByOperator?: Record<string, number>;
+        selectedApplicableRatiosByOperator?: Record<string, number>;
+        applicableButUnselectedOperators?: Record<string, string[]>;
+        heavilyBlockedByOracleOperators?: string[];
         mandatoryCoverageSatisfied?: boolean;
     };
     scenarios?: Array<{
@@ -84,6 +91,19 @@ interface ScenarioFilePayload {
         relevanceScore?: number;
         selectedForCategoryMinimum?: boolean;
     }>;
+}
+
+interface ReachableTargetsPayload {
+    metadata?: {
+        operatorCoverage?: Array<{
+            operator: string;
+            candidateCount: number;
+            applicableCount: number;
+            skippedOracleCount: number;
+            notApplicableCount: number;
+            totalCheckDurationMs: number;
+        }>;
+    };
 }
 
 interface PreflightPayload {
@@ -235,11 +255,35 @@ function mean(values: number[]): number {
     return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
 }
 
+function outcomeSignature(run: AggregatedRun): string {
+    if (run.runStatus === 'passed') {
+        return 'passed';
+    }
+    if (run.runStatus === 'failed') {
+        return `failed:${run.failureClass || 'unknown'}`;
+    }
+    return `invalid:${run.comparisonExclusionReason || run.failureClass || 'unknown'}`;
+}
+
+function pairKey(run: AggregatedRun): string {
+    return [
+        run.applicationId,
+        run.browserName,
+        run.activeScenarioId,
+        run.changeId,
+    ].join('|');
+}
+
+function isCssOrXpathFamily(family: string): family is 'css' | 'xpath' {
+    return family === 'css' || family === 'xpath';
+}
+
 function aggregate(runs: AggregatedRun[], outputDir: string) {
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
     const appRootDir = path.dirname(outputDir);
     const scenarioPayload = readJsonIfPresent<ScenarioFilePayload>(path.join(appRootDir, 'scenarios.json'));
     const preflightPayload = readJsonIfPresent<PreflightPayload>(path.join(appRootDir, 'scenario-preflight-results.json'));
+    const reachableTargetsPayload = readJsonIfPresent<ReachableTargetsPayload>(path.join(appRootDir, 'reachable-targets.json'));
 
     writeCsv(path.join(outputDir, 'benchmark_runs.csv'), runs);
 
@@ -511,6 +555,8 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         operatorApplicableCount: run.mutationTelemetry?.operatorApplicableCount ?? null,
         operatorSkippedOracleCount: run.mutationTelemetry?.operatorSkippedOracleCount ?? null,
         operatorNotApplicableCount: run.mutationTelemetry?.operatorNotApplicableCount ?? null,
+        operatorSelectedCount: run.mutationTelemetry?.operatorSelectedCount ?? null,
+        operatorSelectedApplicableRatio: run.mutationTelemetry?.operatorSelectedApplicableRatio ?? null,
         operatorCheckDurationMs: run.mutationTelemetry?.operatorCheckDurationMs ?? null,
         applyDurationMs: run.mutationTelemetry?.applyDurationMs ?? null,
         applyFailureCount: run.mutationTelemetry?.applyFailureCount ?? 0,
@@ -518,18 +564,24 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     }));
     writeCsv(path.join(outputDir, 'mutation_run_telemetry.csv'), mutationRunTelemetry);
 
+    const operatorCoverageRows = reachableTargetsPayload?.metadata?.operatorCoverage ?? [];
+    const operatorCoverageByName = new Map(operatorCoverageRows.map(row => [row.operator, row]));
+    const heavilyBlockedByOracleOperators = new Set(scenarioPayload?.metadata?.heavilyBlockedByOracleOperators ?? []);
+    const applicableButUnselectedOperators = scenarioPayload?.metadata?.applicableButUnselectedOperators ?? {};
+
     const operatorTelemetrySummary = operators.map(operator => {
         const operatorRuns = mutated.filter(run => run.changeOperator === operator);
+        const coverage = operatorCoverageByName.get(operator);
         return {
             operator,
             totalMutatedRuns: operatorRuns.length,
             distinctSelectedCandidates: new Set(operatorRuns.map(run => run.mutationTelemetry?.selectedCandidateId).filter(Boolean)).size,
-            totalCandidateCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorCandidateCount ?? 0), 0),
+            totalCandidateCount: coverage?.candidateCount ?? 0,
             totalConsideredCandidateCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorConsideredCandidateCount ?? 0), 0),
-            totalApplicableCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorApplicableCount ?? 0), 0),
-            totalSkippedOracleCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorSkippedOracleCount ?? 0), 0),
-            totalNotApplicableCount: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorNotApplicableCount ?? 0), 0),
-            totalCheckDurationMs: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.operatorCheckDurationMs ?? 0), 0),
+            totalApplicableCount: coverage?.applicableCount ?? 0,
+            totalSkippedOracleCount: coverage?.skippedOracleCount ?? 0,
+            totalNotApplicableCount: coverage?.notApplicableCount ?? 0,
+            totalCheckDurationMs: coverage?.totalCheckDurationMs ?? 0,
             totalApplyDurationMs: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.applyDurationMs ?? 0), 0),
             totalApplyFailures: operatorRuns.reduce((sum, run) => sum + (run.mutationTelemetry?.applyFailureCount ?? 0), 0),
             sampledTargetSelectors: JSON.stringify(
@@ -547,6 +599,91 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         };
     });
     writeCsv(path.join(outputDir, 'operator_telemetry_summary.csv'), operatorTelemetrySummary);
+
+    const cssXpathPairs = [...mutated.reduce((acc, run) => {
+        if (!run.comparisonEligible || !isCssOrXpathFamily(run.locatorFamily)) {
+            return acc;
+        }
+        const key = pairKey(run);
+        const bucket = acc.get(key) ?? {};
+        bucket[run.locatorFamily] = run;
+        acc.set(key, bucket);
+        return acc;
+    }, new Map<string, Partial<Record<'css' | 'xpath', AggregatedRun>>>()).entries()]
+        .map(([key, pair]) => ({ key, css: pair.css, xpath: pair.xpath }))
+        .filter((pair): pair is { key: string; css: AggregatedRun; xpath: AggregatedRun } => Boolean(pair.css && pair.xpath));
+
+    const cssXpathDiscordanceRows = cssXpathPairs.map(pair => {
+        const cssOutcome = outcomeSignature(pair.css);
+        const xpathOutcome = outcomeSignature(pair.xpath);
+        return {
+            applicationId: pair.css.applicationId,
+            browserName: pair.css.browserName,
+            activeScenarioId: pair.css.activeScenarioId,
+            changeId: pair.css.changeId,
+            changeCategory: pair.css.changeCategory,
+            changeOperator: pair.css.changeOperator,
+            cssOutcome,
+            xpathOutcome,
+            discordant: cssOutcome !== xpathOutcome,
+        };
+    });
+    writeCsv(path.join(outputDir, 'css_xpath_discordance.csv'), cssXpathDiscordanceRows);
+
+    const summarizeDiscordance = (rows: typeof cssXpathDiscordanceRows, dimension: 'overall' | 'changeCategory' | 'changeOperator') => {
+        const groups = new Map<string, typeof cssXpathDiscordanceRows>();
+        for (const row of rows) {
+            const key = dimension === 'overall' ? 'overall' : String(row[dimension]);
+            const bucket = groups.get(key) ?? [];
+            bucket.push(row);
+            groups.set(key, bucket);
+        }
+        return [...groups.entries()].map(([key, bucket]) => ({
+            [dimension]: key,
+            pairedRuns: bucket.length,
+            discordantPairs: bucket.filter(row => row.discordant).length,
+            discordanceRate: (bucket.filter(row => row.discordant).length / bucket.length || 0).toFixed(4),
+        }));
+    };
+
+    writeCsv(path.join(outputDir, 'css_xpath_discordance_summary.csv'), summarizeDiscordance(cssXpathDiscordanceRows, 'overall'));
+    writeCsv(path.join(outputDir, 'css_xpath_discordance_by_category.csv'), summarizeDiscordance(cssXpathDiscordanceRows, 'changeCategory'));
+    writeCsv(path.join(outputDir, 'css_xpath_discordance_by_operator.csv'), summarizeDiscordance(cssXpathDiscordanceRows, 'changeOperator'));
+
+    const operatorDiversitySummary = [...new Set([...operators, ...Object.keys(scenarioPayload?.metadata?.availableCountsByOperator ?? {})])]
+        .sort()
+        .map(operator => {
+            const applicableCount = scenarioPayload?.metadata?.availableCountsByOperator?.[operator] ?? operatorCoverageByName.get(operator)?.applicableCount ?? 0;
+            const selectedCount = scenarioPayload?.metadata?.selectedCountsByOperator?.[operator] ?? 0;
+            const selectedApplicableRatio =
+                scenarioPayload?.metadata?.selectedApplicableRatiosByOperator?.[operator] ??
+                (applicableCount > 0 ? selectedCount / applicableCount : 0);
+            const unselectedCategories = Object.entries(applicableButUnselectedOperators)
+                .filter(([, operatorsForCategory]) => operatorsForCategory.includes(operator))
+                .map(([category]) => category)
+                .sort();
+            const pairedRuns = cssXpathDiscordanceRows.filter(row => row.changeOperator === operator).length;
+            const discordantPairs = cssXpathDiscordanceRows.filter(
+                row => row.changeOperator === operator && row.discordant,
+            ).length;
+
+            return {
+                operator,
+                applicableCandidateCount: applicableCount,
+                selectedCandidateCount: selectedCount,
+                selectedApplicableRatio: selectedApplicableRatio.toFixed(4),
+                candidateCount: operatorCoverageByName.get(operator)?.candidateCount ?? 0,
+                skippedOracleCount: operatorCoverageByName.get(operator)?.skippedOracleCount ?? 0,
+                notApplicableCount: operatorCoverageByName.get(operator)?.notApplicableCount ?? 0,
+                applicableButUnselected: selectedCount === 0 && applicableCount > 0,
+                unselectedCategories: JSON.stringify(unselectedCategories),
+                heavilyBlockedByOracle: heavilyBlockedByOracleOperators.has(operator),
+                pairedRuns,
+                discordantPairs,
+                discordanceRate: (discordantPairs / pairedRuns || 0).toFixed(4),
+            };
+        });
+    writeCsv(path.join(outputDir, 'operator_diversity_summary.csv'), operatorDiversitySummary);
 
     const selectedScenarios = scenarioPayload?.scenarios ?? [];
     if (selectedScenarios.length > 0) {
@@ -616,6 +753,11 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         },
         selectionQuality: {
             selectedCounts: scenarioPayload?.metadata?.selectedCounts ?? null,
+            availableCountsByOperator: scenarioPayload?.metadata?.availableCountsByOperator ?? null,
+            selectedCountsByOperator: scenarioPayload?.metadata?.selectedCountsByOperator ?? null,
+            selectedApplicableRatiosByOperator: scenarioPayload?.metadata?.selectedApplicableRatiosByOperator ?? null,
+            applicableButUnselectedOperators: scenarioPayload?.metadata?.applicableButUnselectedOperators ?? null,
+            heavilyBlockedByOracleOperators: scenarioPayload?.metadata?.heavilyBlockedByOracleOperators ?? null,
             validatedCountsByCategory: scenarioPayload?.metadata?.validatedCountsByCategory ?? preflightPayload?.metadata?.successfulCountsByCategory ?? null,
             validatedCountsByOperator: scenarioPayload?.metadata?.validatedCountsByOperator ?? preflightPayload?.metadata?.successfulCountsByOperator ?? null,
             mandatoryCoverageSatisfied: scenarioPayload?.metadata?.mandatoryCoverageSatisfied ?? null,
@@ -624,6 +766,13 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         },
         mutationRunTelemetry,
         operatorTelemetrySummary,
+        operatorDiversitySummary,
+        cssXpathDiscordance: {
+            pairedRuns: cssXpathDiscordanceRows.length,
+            discordantPairs: cssXpathDiscordanceRows.filter(row => row.discordant).length,
+            overallRate: (cssXpathDiscordanceRows.filter(row => row.discordant).length / cssXpathDiscordanceRows.length || 0).toFixed(4),
+            rows: cssXpathDiscordanceRows,
+        },
         operatorCounts: operators.map(operator => ({
             operator,
             totalMutated: mutated.filter(run => run.changeOperator === operator).length,

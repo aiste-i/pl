@@ -97,6 +97,11 @@ interface SavedScenarioSet {
         categoryQuotas: Record<string, number>;
         selectedCounts: Record<string, number>;
         availableCountsByCategory?: Record<string, number>;
+        availableCountsByOperator?: Record<string, number>;
+        selectedCountsByOperator?: Record<string, number>;
+        selectedApplicableRatiosByOperator?: Record<string, number>;
+        applicableButUnselectedOperators?: Record<string, string[]>;
+        heavilyBlockedByOracleOperators?: string[];
         mandatoryCoverageSatisfied?: boolean;
         validatedCountsByCategory?: Record<string, number>;
         validatedCountsByOperator?: Record<string, number>;
@@ -173,10 +178,6 @@ export class MutantGenerator {
                 operator.constructor.name,
             ].join('::'))
             .digest('hex');
-    }
-
-    private deterministicRank(seed: number, value: string): string {
-        return createHash('sha1').update(`${seed}::${value}`).digest('hex');
     }
 
     private loadRegistryFromFile() {
@@ -545,6 +546,8 @@ export class MutantGenerator {
                 operatorSkippedOracleCount: d.operatorSkippedOracleCount,
                 operatorNotApplicableCount: d.operatorNotApplicableCount,
                 operatorTotalCheckDurationMs: d.operatorTotalCheckDurationMs,
+                operatorSelectedCount: d.operatorSelectedCount,
+                operatorSelectedApplicableRatio: d.operatorSelectedApplicableRatio,
                 operatorRuntimeCategory: d.operatorRuntimeCategory ?? null,
                 operatorThesisCategory: d.operatorThesisCategory ?? null,
                 touchpointLogicalKeys: d.touchpointLogicalKeys ?? [],
@@ -564,7 +567,14 @@ export class MutantGenerator {
         const eligibleCandidates = candidates.filter(candidate => candidate.eligible !== false && candidate.aggregateComparisonEligible !== false);
         for (const candidate of finalSelection) {
             candidate.quotaBucket = getCandidateCategory(candidate);
+            const operatorName = candidate.operator.constructor.name;
+            candidate.operatorSelectedCount = summary.selectedCountsByOperator[operatorName] ?? 0;
+            candidate.operatorSelectedApplicableRatio = summary.selectedApplicableRatiosByOperator[operatorName] ?? 0;
         }
+        const heavilyBlockedByOracleOperators = this.getOperatorCoverageRows()
+            .filter(row => row.candidateCount > 0 && row.skippedOracleCount / row.candidateCount >= 0.5)
+            .map(row => row.operator)
+            .sort();
         this.lastSamplingSummary = {
             applicationId: this.appName,
             corpusId: this.corpusId,
@@ -576,6 +586,11 @@ export class MutantGenerator {
             categoryQuotas: summary.categoryQuotas,
             selectedCounts: summary.selectedCounts,
             availableCountsByCategory: summary.availableCountsByCategory,
+            availableCountsByOperator: summary.availableCountsByOperator,
+            selectedCountsByOperator: summary.selectedCountsByOperator,
+            selectedApplicableRatiosByOperator: summary.selectedApplicableRatiosByOperator,
+            applicableButUnselectedOperators: summary.applicableButUnselectedOperators,
+            heavilyBlockedByOracleOperators,
             mandatoryCoverageSatisfied: summary.mandatoryCoverageSatisfied,
             activeScenarioIds: [...new Set(finalSelection.map(candidate => candidate.scenarioId).filter(Boolean) as string[])].sort(),
         };
@@ -583,8 +598,8 @@ export class MutantGenerator {
         return finalSelection;
     }
 
-    buildPreflightPool(candidates: MutationCandidate[], budget: number, seed: number, oversampleFactor = 3): MutationCandidate[] {
-        return buildMutationPreflightPool(candidates, budget, seed, oversampleFactor);
+    buildPreflightPool(candidates: MutationCandidate[], budget: number, seed: number): MutationCandidate[] {
+        return buildMutationPreflightPool(candidates, budget, seed);
     }
 
     getSamplingSummary(): SavedScenarioSet['metadata'] | null {

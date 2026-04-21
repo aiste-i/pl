@@ -8,11 +8,15 @@ export interface MutationSurfaceSnapshot {
   style: string | null;
   role: string | null;
   ariaLabel: string | null;
+  ariaLabelledBy: string | null;
   placeholder: string | null;
   alt: string | null;
   title: string | null;
+  id: string | null;
+  htmlFor: string | null;
   hidden: boolean | null;
   childElementCount: number | null;
+  textNodeCount: number | null;
   parentSelector: string | null;
 }
 
@@ -70,7 +74,10 @@ export function evaluateMutationMeaningfulness(
   }
 
   if (category === 'content') {
-    const changed = before.textContent !== after.textContent;
+    const changed =
+      before.textContent !== after.textContent ||
+      before.textNodeCount !== after.textNodeCount ||
+      before.childElementCount !== after.childElementCount;
     return {
       meaningful: changed,
       reason: changed ? null : 'content-no-op',
@@ -94,9 +101,12 @@ export function evaluateMutationMeaningfulness(
       before.tagType !== after.tagType ||
       before.role !== after.role ||
       before.ariaLabel !== after.ariaLabel ||
+      before.ariaLabelledBy !== after.ariaLabelledBy ||
       before.placeholder !== after.placeholder ||
       before.alt !== after.alt ||
       before.title !== after.title ||
+      before.id !== after.id ||
+      before.htmlFor !== after.htmlFor ||
       before.textContent !== after.textContent;
     return {
       meaningful: changed,

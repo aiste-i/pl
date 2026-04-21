@@ -14,3 +14,7 @@ export * from './ToggleAriaExpanded';
 export * from './MutateAccessibleNameText';
 export * from './MutatePlaceholderText';
 export * from './RemovePlaceholderText';
+export * from './LabelMechanismRewrite';
+export * from './AccessibleNameSourceSwap';
+export * from './PlaceholderToLabelPromotion';
+export * from './LabelToPlaceholderFallback';

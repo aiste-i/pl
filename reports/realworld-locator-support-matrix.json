@@ -39,7 +39,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "nav.navbar a.navbar-brand"
+    "selector": ".navbar .navbar-brand"
   },
   {
     "app": "angular-realworld-example-app",
@@ -60,7 +60,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[contains(@class,\"navbar\")]//a[contains(@class,\"navbar-brand\")])[1]"
+    "selector": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]//a[normalize-space()=\"conduit\"])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -144,7 +144,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[contains(@class,\"navbar\")])[1]"
+    "selector": "(//nav[.//a[normalize-space()=\"conduit\"]])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -228,7 +228,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//input[@name=\"email\"])[1]"
+    "selector": "(//div[contains(@class,\"auth-page\")]//input[@name=\"email\"])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -312,7 +312,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//input[@name=\"password\"])[1]"
+    "selector": "(//div[contains(@class,\"auth-page\")]//input[@name=\"password\"])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -396,7 +396,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//button[@type=\"submit\"])[1]"
+    "selector": "(//form//button[normalize-space()=\"Sign in\" or normalize-space()=\"Sign up\"])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -467,7 +467,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".feed-toggle a.nav-link[href=\"/\"]"
+    "selector": ".feed-toggle .nav-link[href=\"/\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -492,7 +492,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"feed-toggle\")]//a[contains(@class,\"nav-link\") and @href=\"/\"])[1]"
+    "selector": "(//div[contains(@class,\"feed-toggle\")]//a[normalize-space()=\"Global Feed\"])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -563,7 +563,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".article-list > app-article-preview:first-of-type a.preview-link"
+    "selector": ".article-list > app-article-preview:first-of-type .preview-link"
   },
   {
     "app": "angular-realworld-example-app",
@@ -586,7 +586,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "((//div[contains(@class,\"article-list\")]/app-article-preview)[1]//a[contains(@class,\"preview-link\")])[1]"
+    "selector": "((//div[contains(@class,\"article-list\")]/app-article-preview)[1]//a[contains(@class,\"preview-link\") and .//h1])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -651,7 +651,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "form.comment-form textarea[placeholder=\"Write a comment...\"]"
+    "selector": ".comment-form .card-block > textarea.form-control[placeholder=\"Write a comment...\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -672,7 +672,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//textarea[contains(@placeholder,\"Write a comment\")])[1]"
+    "selector": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-block\")]//textarea[contains(@placeholder,\"Write a comment\")])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -735,7 +735,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "form.comment-form button[type=\"submit\"]"
+    "selector": ".comment-form .card-footer > button.btn.btn-primary[type=\"submit\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -756,7 +756,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//button[@type=\"submit\"])[1]"
+    "selector": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-footer\")]//button[normalize-space()=\"Post Comment\"])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -819,7 +819,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "form textarea[name=\"bio\"]"
+    "selector": "form textarea.form-control[name=\"bio\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -840,7 +840,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//textarea[@name=\"bio\"])[1]"
+    "selector": "(//div[contains(@class,\"settings-page\")]//textarea[@name=\"bio\" and contains(@placeholder,\"Short bio\")])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -903,7 +903,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "form button[type=\"submit\"]"
+    "selector": "form .btn.btn-primary.pull-xs-right[type=\"submit\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -924,7 +924,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//button[@type=\"submit\"])[1]"
+    "selector": "(//div[contains(@class,\"settings-page\")]//button[normalize-space()=\"Update Settings\"])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -987,7 +987,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".article-page .banner button[aria-label=\"Favorite article\"]"
+    "selector": ".banner .article-meta .btn[aria-label=\"Favorite article\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1008,7 +1008,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//button[@aria-label=\"Favorite article\"]"
+    "selector": "//div[contains(@class,\"banner\")]//app-article-meta//*[self::button or self::a][@aria-label=\"Favorite article\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1071,7 +1071,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "a.preview-link > p"
+    "selector": ".preview-link > p[role=\"note\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1092,7 +1092,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(.//a[contains(@class,\"preview-link\")]//p)[1]"
+    "selector": "(.//a[contains(@class,\"preview-link\")]/descendant::p[@role=\"note\" or @aria-label=\"Article preview description\"])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1155,7 +1155,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "button[aria-label=\"Delete comment\"]"
+    "selector": ".card-footer button[aria-label=\"Delete comment\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1176,7 +1176,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".//button[@aria-label=\"Delete comment\"]"
+    "selector": ".//div[contains(@class,\"card-footer\")]//button[@aria-label=\"Delete comment\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1260,7 +1260,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1)[1]"
+    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1[normalize-space()])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1323,7 +1323,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".pagination button.page-link[aria-label]"
+    "selector": ".pagination .page-item > button.page-link[aria-label]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1344,7 +1344,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "//ul[contains(@class,\"pagination\")]//button[@aria-label=\"Go to page N\"]"
+    "selector": "//ul[contains(@class,\"pagination\")]/li[.//button[@aria-label=\"Go to page N\"]]//button[@aria-label=\"Go to page N\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1407,7 +1407,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".pagination li.page-item"
+    "selector": ".pagination .page-item:has(> button.page-link[aria-label])"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1491,7 +1491,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button[aria-label=\"Follow user\"]"
+    "selector": ".user-info .btn.action-btn[aria-label=\"Follow user\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1575,7 +1575,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button[aria-label=\"Unfollow user\"]"
+    "selector": ".user-info .btn.action-btn[aria-label=\"Unfollow user\"]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1811,7 +1811,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "nav.navbar a.navbar-brand"
+    "selector": ".navbar .navbar-brand"
   },
   {
     "app": "realworld",
@@ -1832,7 +1832,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[contains(@class,\"navbar\")]//a[contains(@class,\"navbar-brand\")])[1]"
+    "selector": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]//a[normalize-space()=\"conduit\"])[1]"
   },
   {
     "app": "realworld",
@@ -1916,7 +1916,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[contains(@class,\"navbar\")])[1]"
+    "selector": "(//nav[.//a[normalize-space()=\"conduit\"]])[1]"
   },
   {
     "app": "realworld",
@@ -2000,7 +2000,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//input[@name=\"email\"])[1]"
+    "selector": "(//div[contains(@class,\"auth-page\")]//input[@name=\"email\"])[1]"
   },
   {
     "app": "realworld",
@@ -2084,7 +2084,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//input[@name=\"password\"])[1]"
+    "selector": "(//div[contains(@class,\"auth-page\")]//input[@name=\"password\"])[1]"
   },
   {
     "app": "realworld",
@@ -2168,7 +2168,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//button[@type=\"submit\"])[1]"
+    "selector": "(//form//button[normalize-space()=\"Sign in\" or normalize-space()=\"Sign up\"])[1]"
   },
   {
     "app": "realworld",
@@ -2239,7 +2239,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".feed-toggle a.nav-link[href=\"/?tab=all\"]"
+    "selector": ".feed-toggle .nav-link[href=\"/?tab=all\"]"
   },
   {
     "app": "realworld",
@@ -2264,7 +2264,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"feed-toggle\")]//a[contains(@class,\"nav-link\") and @href=\"/?tab=all\"])[1]"
+    "selector": "(//div[contains(@class,\"feed-toggle\")]//a[normalize-space()=\"Global Feed\"])[1]"
   },
   {
     "app": "realworld",
@@ -2335,7 +2335,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".article-preview:first-of-type a.preview-link"
+    "selector": ".article-list .article-preview:first-of-type .preview-link[href^=\"/article/\"]"
   },
   {
     "app": "realworld",
@@ -2358,7 +2358,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"article-preview\")])[1]//a[contains(@class,\"preview-link\")]"
+    "selector": "((//div[contains(@class,\"article-preview\")])[1]//a[contains(@class,\"preview-link\") and descendant::h1])[1]"
   },
   {
     "app": "realworld",
@@ -2423,7 +2423,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "form.comment-form textarea[name=\"comment\"]"
+    "selector": ".comment-form .form-control[name=\"comment\"]"
   },
   {
     "app": "realworld",
@@ -2444,7 +2444,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//textarea[@name=\"comment\"])[1]"
+    "selector": "(//form[contains(@class,\"comment-form\")]//textarea[@name=\"comment\" and contains(@placeholder,\"Write a comment\")])[1]"
   },
   {
     "app": "realworld",
@@ -2507,7 +2507,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "form.comment-form button[type=\"submit\"]"
+    "selector": ".comment-form .card-footer > button.btn.btn-primary[type=\"submit\"]"
   },
   {
     "app": "realworld",
@@ -2528,7 +2528,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//button[@type=\"submit\"])[1]"
+    "selector": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-footer\")]//button[normalize-space()=\"Post Comment\"])[1]"
   },
   {
     "app": "realworld",
@@ -2591,7 +2591,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "form textarea[name=\"bio\"]"
+    "selector": ".settings-page textarea.form-control[name=\"bio\"]"
   },
   {
     "app": "realworld",
@@ -2612,7 +2612,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//textarea[@name=\"bio\"])[1]"
+    "selector": "(//div[contains(@class,\"settings-page\")]//textarea[@name=\"bio\" and contains(@placeholder,\"Short bio\")])[1]"
   },
   {
     "app": "realworld",
@@ -2675,7 +2675,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "form button.btn-primary"
+    "selector": "form .btn.btn-primary.pull-xs-right"
   },
   {
     "app": "realworld",
@@ -2696,7 +2696,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//button[contains(@class,\"btn-primary\")])[1]"
+    "selector": "(//div[contains(@class,\"settings-page\")]//button[normalize-space()=\"Update Settings\"])[1]"
   },
   {
     "app": "realworld",
@@ -2759,7 +2759,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".article-page button[aria-label=\"Favorite article\"]"
+    "selector": ".article-page .article-meta .btn[aria-label=\"Favorite article\"]"
   },
   {
     "app": "realworld",
@@ -2780,7 +2780,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "//div[contains(@class,\"article-page\")]//button[@aria-label=\"Favorite article\"]"
+    "selector": "//div[contains(@class,\"article-page\")]//div[contains(@class,\"article-meta\")]//*[self::button or self::a][@aria-label=\"Favorite article\"]"
   },
   {
     "app": "realworld",
@@ -2843,7 +2843,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "a.preview-link > p"
+    "selector": ".preview-link > p[role=\"note\"]"
   },
   {
     "app": "realworld",
@@ -2864,7 +2864,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(.//a[contains(@class,\"preview-link\")]//p)[1]"
+    "selector": "(.//a[contains(@class,\"preview-link\")]/descendant::p[@role=\"note\" or @aria-label=\"Article preview description\"])[1]"
   },
   {
     "app": "realworld",
@@ -2927,7 +2927,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "button[aria-label=\"Delete comment\"]"
+    "selector": ".card-footer button[aria-label=\"Delete comment\"]"
   },
   {
     "app": "realworld",
@@ -2948,7 +2948,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".//button[@aria-label=\"Delete comment\"]"
+    "selector": ".//div[contains(@class,\"card-footer\")]//button[@aria-label=\"Delete comment\"]"
   },
   {
     "app": "realworld",
@@ -3032,7 +3032,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1)[1]"
+    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1[normalize-space()])[1]"
   },
   {
     "app": "realworld",
@@ -3095,7 +3095,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".pagination a.page-link[aria-label]"
+    "selector": ".pagination .page-item > a.page-link[aria-label]"
   },
   {
     "app": "realworld",
@@ -3116,7 +3116,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "//ul[contains(@class,\"pagination\")]//a[@aria-label=\"Go to page N\"]"
+    "selector": "//ul[contains(@class,\"pagination\")]/li[.//a[@aria-label=\"Go to page N\"]]//a[@aria-label=\"Go to page N\"]"
   },
   {
     "app": "realworld",
@@ -3179,7 +3179,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".pagination li.page-item"
+    "selector": ".pagination .page-item:has(> a.page-link[aria-label])"
   },
   {
     "app": "realworld",
@@ -3263,7 +3263,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button[aria-label=\"Follow user\"]"
+    "selector": ".user-info .btn.action-btn[aria-label=\"Follow user\"]"
   },
   {
     "app": "realworld",
@@ -3347,7 +3347,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button[aria-label=\"Unfollow user\"]"
+    "selector": ".user-info .btn.action-btn[aria-label=\"Unfollow user\"]"
   },
   {
     "app": "realworld",
@@ -3583,7 +3583,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "nav.navbar a.navbar-brand"
+    "selector": ".navbar .navbar-brand"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -3604,7 +3604,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[contains(@class,\"navbar\")]//a[contains(@class,\"navbar-brand\")])[1]"
+    "selector": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]//a[normalize-space()=\"conduit\"])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -3688,7 +3688,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[contains(@class,\"navbar\")])[1]"
+    "selector": "(//nav[.//a[normalize-space()=\"conduit\"]])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -3772,7 +3772,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//input[@type=\"email\" and @placeholder=\"Email\"])[1]"
+    "selector": "(//div[contains(@class,\"auth-page\")]//fieldset[.//input[@type=\"email\"]]//input[@type=\"email\"])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -3856,7 +3856,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//input[@type=\"password\" and @placeholder=\"Password\"])[1]"
+    "selector": "(//div[contains(@class,\"auth-page\")]//fieldset[.//input[@type=\"password\"]]//input[@type=\"password\"])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -3940,7 +3940,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//button[@type=\"submit\"])[1]"
+    "selector": "(//form//button[normalize-space()=\"Sign in\" or normalize-space()=\"Sign up\"])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4011,7 +4011,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "nav a.nav-link[href=\"#/\"]"
+    "selector": ".articles-toggle .nav-link[href=\"#/\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4036,7 +4036,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav//a[contains(@class,\"nav-link\") and @href=\"#/\"])[1]"
+    "selector": "(//div[contains(@class,\"articles-toggle\")]//a[normalize-space()=\"Global Feed\"])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4107,7 +4107,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".article-list .article-preview:first-of-type a[href^=\"#/article/\"]"
+    "selector": ".article-list .article-preview:first-of-type .preview-link[href^=\"#/article/\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4130,7 +4130,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "((//div[contains(@class,\"article-list\")]//*[contains(@class,\"article-preview\")])[1]//a[starts-with(@href,\"#/article/\")])[1]"
+    "selector": "((//div[contains(@class,\"article-list\")]//*[contains(@class,\"article-preview\")])[1]//a[contains(@class,\"preview-link\") and descendant::h1])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4195,7 +4195,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "form.comment-form textarea[placeholder=\"Write a comment...\"]"
+    "selector": ".comment-form .form-control[placeholder=\"Write a comment...\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4279,7 +4279,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "form.comment-form button[type=\"submit\"]"
+    "selector": ".comment-form .card-footer > button[type=\"submit\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4300,7 +4300,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//button[@type=\"submit\"])[1]"
+    "selector": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-footer\")]//button[@aria-label=\"Submit\"])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4384,7 +4384,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//textarea[@aria-label=\"Bio\"])[1]"
+    "selector": "(//div[contains(@class,\"settings-page\")]//textarea[@aria-label=\"Bio\"])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4468,7 +4468,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//button[@type=\"submit\"])[1]"
+    "selector": "(//div[contains(@class,\"settings-page\")]//button[normalize-space()=\"Update Settings\"])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4531,7 +4531,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".banner .article-meta button[aria-label=\"Favorite article\"]"
+    "selector": ".banner .article-meta .btn[aria-label=\"Favorite article\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4552,7 +4552,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "//div[contains(@class,\"banner\")]//div[contains(@class,\"article-meta\")]//button[@aria-label=\"Favorite article\"]"
+    "selector": "//div[contains(@class,\"banner\")]//button[@aria-label=\"Favorite article\" and ancestor::div[contains(@class,\"article-meta\")]]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4615,7 +4615,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "a.preview-link > p"
+    "selector": ".preview-link > p[role=\"note\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4636,7 +4636,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(.//a[contains(@class,\"preview-link\")]//p)[1]"
+    "selector": "(.//a[contains(@class,\"preview-link\")]/descendant::p[@role=\"note\" or @aria-label=\"Article preview description\"])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4699,7 +4699,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "[role=\"button\"][aria-label=\"Delete comment\"]"
+    "selector": ".card-footer [aria-label=\"Delete comment\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4720,7 +4720,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".//*[@role=\"button\" and @aria-label=\"Delete comment\"]"
+    "selector": ".//div[contains(@class,\"card-footer\")]//*[@aria-label=\"Delete comment\" and (@role=\"button\" or self::button)]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4804,7 +4804,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1)[1]"
+    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1[normalize-space()])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4867,7 +4867,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".pagination a.page-link"
+    "selector": ".pagination .page-item > a.page-link"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4888,7 +4888,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "//ul[contains(@class,\"pagination\")]//a[@aria-label=\"Go to page N\"]"
+    "selector": "//ul[contains(@class,\"pagination\")]/li[.//a[@aria-label=\"Go to page N\"]]//a[@aria-label=\"Go to page N\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4951,7 +4951,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".pagination li.page-item"
+    "selector": ".pagination .page-item:has(> a.page-link[aria-label])"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -5035,7 +5035,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button[aria-label=\"Follow user\"]"
+    "selector": ".user-info .btn.action-btn[aria-label=\"Follow user\"]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -5119,7 +5119,7 @@
     "purity": "css",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": ".profile-page .user-info button[aria-label=\"Unfollow user\"]"
+    "selector": ".user-info .btn.action-btn[aria-label=\"Unfollow user\"]"
   },
   {
     "app": "vue3-realworld-example-app",
