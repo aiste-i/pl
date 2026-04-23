@@ -39,6 +39,32 @@ export function bindAppLocators(page: Page, strategy: StrategyName = 'semantic-f
   return bindNode(rawLocators);
 }
 
+export function bindAppOracle(page: Page): any {
+  const rawOracle = getAppRawOracle();
+
+  const bindNode = (node: any): any => {
+    if (typeof node === 'function') {
+      return (...args: any[]) => {
+        const { scope, remainingArgs } = resolveFactoryScope(page, args);
+        const locator = node(scope, ...remainingArgs);
+        return {
+          raw: locator,
+          click: () => locator.click(),
+          fill: (value: string) => locator.fill(value),
+          press: (key: string) => locator.press(key),
+          waitFor: (options?: Parameters<typeof locator.waitFor>[0]) => locator.waitFor(options),
+        };
+      };
+    }
+    if (!node || typeof node !== 'object') {
+      return node;
+    }
+    return Object.fromEntries(Object.entries(node).map(([key, value]) => [key, bindNode(value)]));
+  };
+
+  return bindNode(rawOracle);
+}
+
 export function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

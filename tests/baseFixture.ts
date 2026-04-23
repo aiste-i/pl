@@ -1,5 +1,5 @@
 import { test as base, expect, Locator, Page } from '@playwright/test';
-import { MutantGenerator } from '../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../src/benchmark/runner/MutantGenerator';
 import { WebMutator } from '../src/webmutator/WebMutator';
 import { MutationCandidate } from '../src/webmutator/MutationCandidate';
 import { MutationRecord } from '../src/webmutator/MutationRecord';
@@ -27,7 +27,7 @@ import {
     shouldWriteDetailedAccessibilityArtifacts,
     shouldWriteMirroredRunArtifacts,
 } from '../src/benchmark/retention';
-import { getCandidateCategory } from '../src/murun/runner/sampling';
+import { getCandidateCategory } from '../src/benchmark/runner/sampling';
 
 const BENCHMARK_ACTIVE_MODE = process.env.BENCHMARK_ACTIVE_MODE || 'baseline';
 

@@ -4,7 +4,7 @@ import { TextReplace } from '../../src/webmutator/operators/dom/TextReplace';
 import { StyleVisibility } from '../../src/webmutator/operators/dom/StyleVisibility';
 import { SubtreeDelete } from '../../src/webmutator/operators/dom/SubtreeDelete';
 import { ChangeAriaLabel } from '../../src/webmutator/operators/dom/accessibility/ChangeAriaLabel';
-import { buildMutationPreflightPool, computeCategoryQuotas, sampleMutationCandidates } from '../../src/murun/runner/sampling';
+import { buildMutationPreflightPool, computeCategoryQuotas, sampleMutationCandidates } from '../../src/benchmark/runner/sampling';
 import { evaluateComparableYield } from '../../src/benchmark/comparable-yield';
 import { evaluateMutationMeaningfulness } from '../../src/benchmark/mutation-quality';
 import { ReplaceHeadingWithP } from '../../src/webmutator/operators/dom/accessibility/ReplaceHeadingWithP';

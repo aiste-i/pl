@@ -1,6 +1,6 @@
 import { test, expect } from '../baseFixture';
 import { STRATEGIES, StrategyName } from '../../src/locators';
-import { MutantGenerator } from '../../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../../src/benchmark/runner/MutantGenerator';
 import * as path from 'path';
 import * as fs from 'fs';
 

@@ -12,18 +12,18 @@ export function getActiveBenchmarkTestTimeoutMs(): number {
 }
 
 async function readCommentIds(oracle: any): Promise<number[]> {
-  const ids = await oracle.comments.cards().raw.evaluateAll(cards =>
+  const ids = await oracle.comments.cards().raw.evaluateAll((cards: Element[]) =>
     cards
-      .map(card => {
+      .map((card: Element) => {
         const nested = card.querySelector('[data-testid^="comment-card-"]');
         const value = nested?.getAttribute('data-testid') ?? null;
         const match = value ? /^comment-card-(\d+)$/.exec(value) : null;
         return match ? Number(match[1]) : null;
       })
-      .filter((id): id is number => typeof id === 'number'),
+      .filter((id: number | null): id is number => typeof id === 'number'),
   );
 
-  return ids.sort((left, right) => left - right);
+  return ids.sort((left: number, right: number) => left - right);
 }
 
 export async function getStableCommentIds(

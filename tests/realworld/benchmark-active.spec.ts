@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { test, expect } from '../baseFixture';
 import { STRATEGIES, StrategyName } from '../../src/locators';
-import { MutantGenerator } from '../../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../../src/benchmark/runner/MutantGenerator';
 import {
   getAppPreflightPoolPath,
   getAppPreflightResultsPath,
@@ -19,7 +19,7 @@ import {
 } from '../../src/benchmark/realworld-touchpoints';
 import { evaluateMutationMeaningfulness, type MutationSurfaceSnapshot } from '../../src/benchmark/mutation-quality';
 import { captureMutationSurface } from '../../src/benchmark/mutation-surface';
-import { getCandidateCategory } from '../../src/murun/runner/sampling';
+import { getCandidateCategory } from '../../src/benchmark/runner/sampling';
 import { getActiveBenchmarkTestTimeoutMs } from './helpers/benchmark-active';
 
 const APP_ID = getSelectedAppId();
@@ -99,12 +99,13 @@ if (MODE === 'collect') {
         });
 
         const generator = new MutantGenerator(page, APP_ID);
-        await scenario.collect({
+          await scenario.collect({
           page,
           request,
           locators,
           oracle,
           appAdapter,
+          applyDeferredMutation: async () => undefined,
           generator,
             async collectCheckpoint(viewContext: string, touchpoints: ScenarioTouchpointInput[] = []) {
               const resolvedTouchpoints = await resolveScenarioTouchpoints(APP_ID, scenario.scenarioId, touchpoints);
@@ -223,6 +224,7 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
             locators,
             oracle,
             appAdapter,
+            applyDeferredMutation: async () => undefined,
             generator: new MutantGenerator(page, APP_ID),
             async collectCheckpoint(viewContext: string) {
               if (viewContext !== mutationScenario.viewContext || checkpointReached) {

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { MutantGenerator } from '../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../src/benchmark/runner/MutantGenerator';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -11,7 +11,12 @@ test.describe('Baseline Collection and Scenario Generation', () => {
         const generator = new MutantGenerator(page);
         
         // 1. Baseline Run (collect reachable targets)
-        const targets = await generator.collectReachableTargets();
+        const targets = await generator.collectReachableTargets({
+            scenarioId: 'baseline-collection',
+            scenarioCategory: 'exploratory',
+            sourceSpec: 'tests/BaselineCollection.spec.ts',
+            viewContext: 'home',
+        });
         console.log(`Collected ${targets.length} reachable targets.`);
         expect(targets.length).toBeGreaterThan(0);
         

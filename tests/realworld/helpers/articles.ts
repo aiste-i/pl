@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { appPaths } from './app';
+import { appPaths, bindAppLocators } from './app';
 
 export interface ArticleData {
   title: string;
@@ -8,7 +8,17 @@ export interface ArticleData {
   tags?: string[];
 }
 
-export async function createArticle(page: Page, locators: any, article: ArticleData, options: { sleepAfter?: number } = {}) {
+export async function createArticle(page: Page, article: ArticleData, options?: { sleepAfter?: number }): Promise<void>;
+export async function createArticle(page: Page, locators: any, article: ArticleData, options?: { sleepAfter?: number }): Promise<void>;
+export async function createArticle(
+  page: Page,
+  arg2: any,
+  arg3?: ArticleData | { sleepAfter?: number },
+  arg4: { sleepAfter?: number } = {},
+): Promise<void> {
+  const locators = isArticleData(arg2) ? bindAppLocators(page) : arg2;
+  const article = (isArticleData(arg2) ? arg2 : arg3) as ArticleData;
+  const options = ((isArticleData(arg2) ? arg3 : arg4) ?? {}) as { sleepAfter?: number };
   const { sleepAfter = 1 } = options;
 
   await page.goto(appPaths.editor(), { waitUntil: 'load' });
@@ -31,6 +41,10 @@ export async function createArticle(page: Page, locators: any, article: ArticleD
   if (sleepAfter > 0) {
     await new Promise(resolve => setTimeout(resolve, sleepAfter));
   }
+}
+
+function isArticleData(value: unknown): value is ArticleData {
+  return Boolean(value && typeof value === 'object' && 'title' in value && 'description' in value && 'body' in value);
 }
 
 export async function editArticle(page: Page, locators: any, slug: string, updates: Partial<ArticleData>) {

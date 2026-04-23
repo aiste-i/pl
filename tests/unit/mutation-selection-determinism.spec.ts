@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { MutantGenerator } from '../../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../../src/benchmark/runner/MutantGenerator';
 import { MutationCandidate } from '../../src/webmutator/MutationCandidate';
 import { TextReplace } from '../../src/webmutator/operators/dom/TextReplace';
 import { StyleVisibility } from '../../src/webmutator/operators/dom/StyleVisibility';

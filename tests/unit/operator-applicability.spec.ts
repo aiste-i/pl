@@ -16,7 +16,7 @@ import { MutateAccessibleNameText } from '../../src/webmutator/operators/dom/acc
 import { MutatePlaceholderText } from '../../src/webmutator/operators/dom/accessibility/MutatePlaceholderText';
 import { RemovePlaceholderText } from '../../src/webmutator/operators/dom/accessibility/RemovePlaceholderText';
 import { captureMutationSurface } from '../../src/benchmark/mutation-surface';
-import { MutantGenerator } from '../../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../../src/benchmark/runner/MutantGenerator';
 
 test('each in-scope operator exposes an explicit applicability check', () => {
   for (const entry of getBenchmarkOperatorCatalog()) {

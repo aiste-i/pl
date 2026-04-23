@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { MutantGenerator } from '../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../src/benchmark/runner/MutantGenerator';
 import { WebMutator } from '../src/webmutator/WebMutator';
 import * as path from 'path';
 

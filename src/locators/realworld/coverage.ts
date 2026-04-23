@@ -15,6 +15,7 @@ import {
   type LocatorSourceKind,
 } from '../apps/shared-realworld';
 import { generateCssXpathAuditReport, writeCssXpathAuditReports } from './css-xpath-audit';
+import { generateXPathCleanupAuditReport, writeXPathCleanupAuditReports } from './xpath-cleanup-audit';
 
 export type CoverageFamily = LocatorFamily;
 
@@ -253,6 +254,7 @@ export function writeCoverageReports(rows: SupportMatrixRow[]): void {
   const reportsDir = path.join(process.cwd(), 'reports');
   fs.mkdirSync(reportsDir, { recursive: true });
   const cssXpathAudit = generateCssXpathAuditReport();
+  const xpathCleanupAudit = generateXPathCleanupAuditReport();
 
   fs.writeFileSync(path.join(reportsDir, 'realworld-locator-support-matrix.json'), JSON.stringify(rows, null, 2));
   fs.writeFileSync(
@@ -264,4 +266,5 @@ export function writeCoverageReports(rows: SupportMatrixRow[]): void {
     JSON.stringify(generateSemanticCssExceptionReport(), null, 2),
   );
   writeCssXpathAuditReports(cssXpathAudit);
+  writeXPathCleanupAuditReports(xpathCleanupAudit);
 }

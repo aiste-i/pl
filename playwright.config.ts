@@ -3,6 +3,12 @@ import { getSelectedAppAdapter } from './src/apps';
 
 const adapter = getSelectedAppAdapter();
 const enableWebServer = process.env.SKIP_WEB_SERVER !== '1';
+const webServerEnv = Object.fromEntries(
+  Object.entries({
+    ...process.env,
+    ...(adapter.env ?? {}),
+  }).filter((entry): entry is [string, string] => typeof entry[1] === 'string'),
+);
 const requestedBrowsers = (process.env.PLAYWRIGHT_BROWSERS || 'chromium')
   .split(',')
   .map(value => value.trim().toLowerCase())
@@ -52,10 +58,7 @@ export default defineConfig({
         command: adapter.startCommand,
         cwd: adapter.rootDir,
         url: adapter.healthUrl,
-        env: {
-          ...process.env,
-          ...(adapter.env ?? {}),
-        },
+        env: webServerEnv,
         reuseExistingServer: !process.env.CI,
         stdout: 'pipe',
         stderr: 'pipe',

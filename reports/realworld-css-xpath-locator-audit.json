@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-21T18:07:31.708Z",
+  "generatedAt": "2026-04-22T19:03:09.266Z",
   "auditedLogicalKeyCount": 19,
   "auditedRowCount": 57,
   "overlapAudit": {
@@ -7,10 +7,10 @@
     "currentMatchedSurfacePct": "0.7895",
     "currentFamilyDistinctCount": 12,
     "currentFamilyDistinctPct": "0.2105",
-    "refactoredMatchedSurfaceCount": 21,
-    "refactoredMatchedSurfacePct": "0.3684",
-    "refactoredFamilyDistinctCount": 36,
-    "refactoredFamilyDistinctPct": "0.6316"
+    "refactoredMatchedSurfaceCount": 25,
+    "refactoredMatchedSurfacePct": "0.4386",
+    "refactoredFamilyDistinctCount": 32,
+    "refactoredFamilyDistinctPct": "0.5614"
   },
   "rows": [
     {
@@ -22,14 +22,14 @@
       "currentXpathPrimarySurface": "class-context",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".navbar .navbar-brand",
-      "refactoredXpathLocator": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]//a[normalize-space()=\"conduit\"])[1]",
+      "refactoredXpathLocator": "(//a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")][ancestor::nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]])[1]",
       "refactoredCssPrimarySurface": "class-token",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses the concise brand class inside the navbar because that is the idiomatic CSS anchor for a top-level brand link.",
-      "xpathRationale": "Uses normalized brand text within navbar context so XPath expresses a relational target rather than another class transliteration.",
+      "xpathRationale": "Uses the brand-link class with explicit navbar ancestry so XPath stays contextual without forcing brand-text dependence.",
       "cssExpectedMutationSensitivity": "Most sensitive to class renames on the brand link or navbar shell.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to visible-brand text changes and text-structure mutations; less sensitive to added wrappers."
+      "xpathExpectedMutationSensitivity": "Most sensitive to navbar-brand class changes and navbar ancestry rewrites; less sensitive to brand-copy changes."
     },
     {
       "appId": "angular-realworld-example-app",
@@ -40,14 +40,14 @@
       "currentXpathPrimarySurface": "class-context",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": "nav.navbar",
-      "refactoredXpathLocator": "(//nav[.//a[normalize-space()=\"conduit\"]])[1]",
+      "refactoredXpathLocator": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")][descendant::a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")]])[1]",
       "refactoredCssPrimarySurface": "class-token",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Keeps the navbar as a short class-token selector because practitioners usually preserve the top-level navbar shell as a stable component anchor.",
-      "xpathRationale": "Uses descendant context from the conduit brand text so XPath leans on relational meaning instead of repeating the same navbar class chain.",
+      "xpathRationale": "Uses descendant brand-link context inside the navbar shell so XPath stays relational without leaning on brand copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to class-token churn on the outer shell; less sensitive to descendant reshaping inside the navbar.",
-      "xpathExpectedMutationSensitivity": "More sensitive to brand-text changes and descendant context mutations than to simple navbar wrapper refactors."
+      "xpathExpectedMutationSensitivity": "More sensitive to navbar-brand context rewrites and descendant-structure changes than to simple copy edits."
     },
     {
       "appId": "angular-realworld-example-app",
@@ -94,14 +94,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": "form button[type=\"submit\"]",
-      "refactoredXpathLocator": "(//form//button[normalize-space()=\"Sign in\" or normalize-space()=\"Sign up\"])[1]",
+      "refactoredXpathLocator": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" auth-page \")]//button[@type=\"submit\" and ancestor::form[.//input[@name=\"email\"] and .//input[@name=\"password\"]]])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses the submit-button contract because CSS is strongest when the control already exposes a direct stable attribute.",
-      "xpathRationale": "Uses normalized button text so XPath can lean on relational/text meaning rather than just @type.",
+      "xpathRationale": "Uses the submit control inside the auth form identified by its email/password fields, which is a stronger relational XPath pattern than button copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to submit-type or button-class changes; less sensitive to label wording.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to wording changes, text wrappers, and ambiguity from nearby similar buttons."
+      "xpathExpectedMutationSensitivity": "Most sensitive to auth-form field context changes, submit-type rewrites, and ancestor-form restructuring."
     },
     {
       "appId": "angular-realworld-example-app",
@@ -112,14 +112,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".feed-toggle .nav-link[href=\"/\"]",
-      "refactoredXpathLocator": "(//div[contains(@class,\"feed-toggle\")]//a[normalize-space()=\"Global Feed\"])[1]",
+      "refactoredXpathLocator": "(//a[@href=\"/\" and ancestor::div[contains(concat(\" \", normalize-space(@class), \" \"), \" feed-toggle \")] and ancestor::li[contains(concat(\" \", normalize-space(@class), \" \"), \" nav-item \")]])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Anchors the tab through its feed-toggle container plus href because that is the shortest stable CSS expression available in the RealWorld apps.",
-      "xpathRationale": "Uses visible tab text inside the local toggle context so XPath captures relational meaning that CSS does not express as cleanly.",
+      "xpathRationale": "Uses href together with toggle-container and nav-item ancestry so XPath stays contextual without making copy the primary differentiator.",
       "cssExpectedMutationSensitivity": "Most sensitive to href rewrites or nav-link class churn.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to tab text changes, text wrapping, and nearby duplicate feed labels."
+      "xpathExpectedMutationSensitivity": "Most sensitive to tab-list restructuring, href rewrites, and ancestor-context changes around the feed toggle."
     },
     {
       "appId": "angular-realworld-example-app",
@@ -148,14 +148,14 @@
       "currentXpathPrimarySurface": "accessibility-attribute-predicate",
       "currentPairRelationship": "family-distinct",
       "refactoredCssLocator": ".comment-form .card-block > textarea.form-control[placeholder=\"Write a comment...\"]",
-      "refactoredXpathLocator": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-block\")]//textarea[contains(@placeholder,\"Write a comment\")])[1]",
+      "refactoredXpathLocator": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-block \")]/textarea[contains(concat(\" \", normalize-space(@class), \" \"), \" form-control \")])[1]",
       "refactoredCssPrimarySurface": "scoped-attribute-structure",
-      "refactoredXpathPrimarySurface": "accessibility-attribute-predicate",
+      "refactoredXpathPrimarySurface": "relational-structure",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses the comment-form control surface directly because placeholder/name attributes are the cleanest CSS anchors for this field.",
-      "xpathRationale": "Adds local form-block context so XPath reflects component structure instead of mirroring the same bare textarea attributes.",
+      "xpathRationale": "Uses comment-form and card-block context around the textarea control so XPath stays structural instead of placeholder-driven.",
       "cssExpectedMutationSensitivity": "Most sensitive to placeholder/name attribute changes on the textarea itself.",
-      "xpathExpectedMutationSensitivity": "More sensitive to wrapper insertion, footer/block rewrites, and label-mechanism changes."
+      "xpathExpectedMutationSensitivity": "More sensitive to block-wrapper reshaping, textarea-class changes, and comment-form hierarchy mutations."
     },
     {
       "appId": "angular-realworld-example-app",
@@ -166,14 +166,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".comment-form .card-footer > button.btn.btn-primary[type=\"submit\"]",
-      "refactoredXpathLocator": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-footer\")]//button[normalize-space()=\"Post Comment\"])[1]",
+      "refactoredXpathLocator": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-footer \")]//button[@type=\"submit\" and ancestor::form[.//textarea]])[1]",
       "refactoredCssPrimarySurface": "scoped-attribute-structure",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses footer-scoped submit-button classes because a practitioner would normally keep a short footer > button selector here.",
-      "xpathRationale": "Uses normalized button text inside footer context so XPath emphasizes relational meaning rather than only @type.",
+      "xpathRationale": "Uses the footer-scoped submit control inside the form that owns the comment textarea, which is a defensible relational XPath choice.",
       "cssExpectedMutationSensitivity": "Most sensitive to footer/button class churn and direct submit-surface changes.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to wording changes, button-text wrapping, and footer hierarchy mutations."
+      "xpathExpectedMutationSensitivity": "Most sensitive to footer hierarchy mutations, submit-type changes, and comment-form context rewrites."
     },
     {
       "appId": "angular-realworld-example-app",
@@ -184,14 +184,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": "form textarea.form-control[name=\"bio\"]",
-      "refactoredXpathLocator": "(//div[contains(@class,\"settings-page\")]//textarea[@name=\"bio\" and contains(@placeholder,\"Short bio\")])[1]",
+      "refactoredXpathLocator": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" settings-page \")]//form//textarea[@name=\"bio\"])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "accessibility-attribute-predicate",
-      "refactoredPairRelationship": "family-distinct",
+      "refactoredXpathPrimarySurface": "attribute-predicate",
+      "refactoredPairRelationship": "matched-surface",
       "cssRationale": "Uses the textarea field contract directly because CSS is strongest on the control surface exposed by the settings form.",
-      "xpathRationale": "Adds settings-page context so XPath is anchored by page structure rather than a bare textarea transliteration.",
+      "xpathRationale": "Uses settings-page form context plus the bio field contract rather than leaning on placeholder copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to field attribute changes on the textarea itself.",
-      "xpathExpectedMutationSensitivity": "More sensitive to settings-page restructuring and ancestor-depth mutations."
+      "xpathExpectedMutationSensitivity": "More sensitive to settings-form restructuring and field-context moves than to placeholder wording changes."
     },
     {
       "appId": "angular-realworld-example-app",
@@ -202,14 +202,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": "form .btn.btn-primary.pull-xs-right[type=\"submit\"]",
-      "refactoredXpathLocator": "(//div[contains(@class,\"settings-page\")]//button[normalize-space()=\"Update Settings\"])[1]",
+      "refactoredXpathLocator": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" settings-page \")]//form[.//textarea[@name=\"bio\"]]//button[@type=\"submit\"])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "text-normalized",
-      "refactoredPairRelationship": "family-distinct",
+      "refactoredXpathPrimarySurface": "attribute-predicate",
+      "refactoredPairRelationship": "matched-surface",
       "cssRationale": "Uses the visible submit button classes because that is the concise CSS a maintainer would actually keep.",
-      "xpathRationale": "Uses normalized button text inside settings-page context so XPath leans on relational and text meaning.",
+      "xpathRationale": "Uses the submit control inside the settings form anchored by the bio field, which better reflects XPath relational engineering than button copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to button class churn and button-type changes.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to wording changes and structural shifts around the form action area."
+      "xpathExpectedMutationSensitivity": "Most sensitive to settings-form restructuring, submit-type or button-class changes, and field-context rewrites."
     },
     {
       "appId": "angular-realworld-example-app",
@@ -274,14 +274,14 @@
       "currentXpathPrimarySurface": "class-context",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".article-page .banner h1",
-      "refactoredXpathLocator": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1[normalize-space()])[1]",
+      "refactoredXpathLocator": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" article-page \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" banner \")]/descendant::h1)[1]",
       "refactoredCssPrimarySurface": "class-token",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Keeps the banner heading selector short because that is the idiomatic CSS expression for the article title surface.",
-      "xpathRationale": "Uses normalized heading text within banner context so XPath encodes a meaningful heading lookup rather than a pure class chain.",
+      "xpathRationale": "Uses banner-scoped heading structure rather than non-empty text predicates, keeping XPath contextual without making copy part of the locator.",
       "cssExpectedMutationSensitivity": "Most sensitive to banner/heading class or tag changes.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to text-node structure, heading replacement, and banner hierarchy rewrites."
+      "xpathExpectedMutationSensitivity": "Most sensitive to banner hierarchy rewrites, heading replacement, and structural wrapper changes around the title."
     },
     {
       "appId": "angular-realworld-example-app",
@@ -364,14 +364,14 @@
       "currentXpathPrimarySurface": "class-context",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".navbar .navbar-brand",
-      "refactoredXpathLocator": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]//a[normalize-space()=\"conduit\"])[1]",
+      "refactoredXpathLocator": "(//a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")][ancestor::nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]])[1]",
       "refactoredCssPrimarySurface": "class-token",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses the concise brand class inside the navbar because that is the idiomatic CSS anchor for a top-level brand link.",
-      "xpathRationale": "Uses normalized brand text within navbar context so XPath expresses a relational target rather than another class transliteration.",
+      "xpathRationale": "Uses the brand-link class with explicit navbar ancestry so XPath stays contextual without forcing brand-text dependence.",
       "cssExpectedMutationSensitivity": "Most sensitive to class renames on the brand link or navbar shell.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to visible-brand text changes and text-structure mutations; less sensitive to added wrappers."
+      "xpathExpectedMutationSensitivity": "Most sensitive to navbar-brand class changes and navbar ancestry rewrites; less sensitive to brand-copy changes."
     },
     {
       "appId": "realworld",
@@ -382,14 +382,14 @@
       "currentXpathPrimarySurface": "class-context",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": "nav.navbar",
-      "refactoredXpathLocator": "(//nav[.//a[normalize-space()=\"conduit\"]])[1]",
+      "refactoredXpathLocator": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")][descendant::a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")]])[1]",
       "refactoredCssPrimarySurface": "class-token",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Keeps the navbar as a short class-token selector because practitioners usually preserve the top-level navbar shell as a stable component anchor.",
-      "xpathRationale": "Uses descendant context from the conduit brand text so XPath leans on relational meaning instead of repeating the same navbar class chain.",
+      "xpathRationale": "Uses descendant brand-link context inside the navbar shell so XPath stays relational without leaning on brand copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to class-token churn on the outer shell; less sensitive to descendant reshaping inside the navbar.",
-      "xpathExpectedMutationSensitivity": "More sensitive to brand-text changes and descendant context mutations than to simple navbar wrapper refactors."
+      "xpathExpectedMutationSensitivity": "More sensitive to navbar-brand context rewrites and descendant-structure changes than to simple copy edits."
     },
     {
       "appId": "realworld",
@@ -436,14 +436,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": "form button[type=\"submit\"]",
-      "refactoredXpathLocator": "(//form//button[normalize-space()=\"Sign in\" or normalize-space()=\"Sign up\"])[1]",
+      "refactoredXpathLocator": "(//button[@type=\"submit\" and ancestor::form[.//input[@name=\"email\"] and .//input[@name=\"password\"]]])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses the submit-button contract because CSS is strongest when the control already exposes a direct stable attribute.",
-      "xpathRationale": "Uses normalized button text so XPath can lean on relational/text meaning rather than just @type.",
+      "xpathRationale": "Uses the submit control inside the auth form identified by its email/password fields, which is a stronger relational XPath pattern than button copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to submit-type or button-class changes; less sensitive to label wording.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to wording changes, text wrappers, and ambiguity from nearby similar buttons."
+      "xpathExpectedMutationSensitivity": "Most sensitive to auth-form field context changes, submit-type rewrites, and ancestor-form restructuring."
     },
     {
       "appId": "realworld",
@@ -454,14 +454,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".feed-toggle .nav-link[href=\"/?tab=all\"]",
-      "refactoredXpathLocator": "(//div[contains(@class,\"feed-toggle\")]//a[normalize-space()=\"Global Feed\"])[1]",
+      "refactoredXpathLocator": "(//a[@href=\"/?tab=all\" and ancestor::div[contains(concat(\" \", normalize-space(@class), \" \"), \" feed-toggle \")] and ancestor::li[contains(concat(\" \", normalize-space(@class), \" \"), \" nav-item \")]])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Anchors the tab through its feed-toggle container plus href because that is the shortest stable CSS expression available in the RealWorld apps.",
-      "xpathRationale": "Uses visible tab text inside the local toggle context so XPath captures relational meaning that CSS does not express as cleanly.",
+      "xpathRationale": "Uses href together with toggle-container and nav-item ancestry so XPath stays contextual without making copy the primary differentiator.",
       "cssExpectedMutationSensitivity": "Most sensitive to href rewrites or nav-link class churn.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to tab text changes, text wrapping, and nearby duplicate feed labels."
+      "xpathExpectedMutationSensitivity": "Most sensitive to tab-list restructuring, href rewrites, and ancestor-context changes around the feed toggle."
     },
     {
       "appId": "realworld",
@@ -490,14 +490,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".comment-form .form-control[name=\"comment\"]",
-      "refactoredXpathLocator": "(//form[contains(@class,\"comment-form\")]//textarea[@name=\"comment\" and contains(@placeholder,\"Write a comment\")])[1]",
+      "refactoredXpathLocator": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-block \")]//textarea[@name=\"comment\" and contains(concat(\" \", normalize-space(@class), \" \"), \" form-control \")])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "accessibility-attribute-predicate",
-      "refactoredPairRelationship": "family-distinct",
+      "refactoredXpathPrimarySurface": "attribute-predicate",
+      "refactoredPairRelationship": "matched-surface",
       "cssRationale": "Uses the comment-form control surface directly because placeholder/name attributes are the cleanest CSS anchors for this field.",
-      "xpathRationale": "Adds local form-block context so XPath reflects component structure instead of mirroring the same bare textarea attributes.",
+      "xpathRationale": "Uses comment-form and card-block context around the textarea control so XPath stays structural instead of placeholder-driven.",
       "cssExpectedMutationSensitivity": "Most sensitive to placeholder/name attribute changes on the textarea itself.",
-      "xpathExpectedMutationSensitivity": "More sensitive to wrapper insertion, footer/block rewrites, and label-mechanism changes."
+      "xpathExpectedMutationSensitivity": "More sensitive to block-wrapper reshaping, textarea-class changes, and comment-form hierarchy mutations."
     },
     {
       "appId": "realworld",
@@ -508,14 +508,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".comment-form .card-footer > button.btn.btn-primary[type=\"submit\"]",
-      "refactoredXpathLocator": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-footer\")]//button[normalize-space()=\"Post Comment\"])[1]",
+      "refactoredXpathLocator": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-footer \")]//button[@type=\"submit\" and ancestor::form[.//textarea[@name=\"comment\"]]])[1]",
       "refactoredCssPrimarySurface": "scoped-attribute-structure",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses footer-scoped submit-button classes because a practitioner would normally keep a short footer > button selector here.",
-      "xpathRationale": "Uses normalized button text inside footer context so XPath emphasizes relational meaning rather than only @type.",
+      "xpathRationale": "Uses the footer-scoped submit control inside the form that owns the comment textarea, which is a defensible relational XPath choice.",
       "cssExpectedMutationSensitivity": "Most sensitive to footer/button class churn and direct submit-surface changes.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to wording changes, button-text wrapping, and footer hierarchy mutations."
+      "xpathExpectedMutationSensitivity": "Most sensitive to footer hierarchy mutations, submit-type changes, and comment-form context rewrites."
     },
     {
       "appId": "realworld",
@@ -526,14 +526,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".settings-page textarea.form-control[name=\"bio\"]",
-      "refactoredXpathLocator": "(//div[contains(@class,\"settings-page\")]//textarea[@name=\"bio\" and contains(@placeholder,\"Short bio\")])[1]",
+      "refactoredXpathLocator": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" settings-page \")]//form//textarea[@name=\"bio\"])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "accessibility-attribute-predicate",
-      "refactoredPairRelationship": "family-distinct",
+      "refactoredXpathPrimarySurface": "attribute-predicate",
+      "refactoredPairRelationship": "matched-surface",
       "cssRationale": "Uses the textarea field contract directly because CSS is strongest on the control surface exposed by the settings form.",
-      "xpathRationale": "Adds settings-page context so XPath is anchored by page structure rather than a bare textarea transliteration.",
+      "xpathRationale": "Uses settings-page form context plus the bio field contract rather than leaning on placeholder copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to field attribute changes on the textarea itself.",
-      "xpathExpectedMutationSensitivity": "More sensitive to settings-page restructuring and ancestor-depth mutations."
+      "xpathExpectedMutationSensitivity": "More sensitive to settings-form restructuring and field-context moves than to placeholder wording changes."
     },
     {
       "appId": "realworld",
@@ -544,14 +544,14 @@
       "currentXpathPrimarySurface": "class-context",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": "form .btn.btn-primary.pull-xs-right",
-      "refactoredXpathLocator": "(//div[contains(@class,\"settings-page\")]//button[normalize-space()=\"Update Settings\"])[1]",
+      "refactoredXpathLocator": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" settings-page \")]//form[.//textarea[@name=\"bio\"]]//button[contains(concat(\" \", normalize-space(@class), \" \"), \" btn-primary \")])[1]",
       "refactoredCssPrimarySurface": "class-token",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "attribute-predicate",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses the visible submit button classes because that is the concise CSS a maintainer would actually keep.",
-      "xpathRationale": "Uses normalized button text inside settings-page context so XPath leans on relational and text meaning.",
+      "xpathRationale": "Uses the submit control inside the settings form anchored by the bio field, which better reflects XPath relational engineering than button copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to button class churn and button-type changes.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to wording changes and structural shifts around the form action area."
+      "xpathExpectedMutationSensitivity": "Most sensitive to settings-form restructuring, submit-type or button-class changes, and field-context rewrites."
     },
     {
       "appId": "realworld",
@@ -616,14 +616,14 @@
       "currentXpathPrimarySurface": "class-context",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".article-page .banner h1",
-      "refactoredXpathLocator": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1[normalize-space()])[1]",
+      "refactoredXpathLocator": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" article-page \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" banner \")]/descendant::h1)[1]",
       "refactoredCssPrimarySurface": "class-token",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Keeps the banner heading selector short because that is the idiomatic CSS expression for the article title surface.",
-      "xpathRationale": "Uses normalized heading text within banner context so XPath encodes a meaningful heading lookup rather than a pure class chain.",
+      "xpathRationale": "Uses banner-scoped heading structure rather than non-empty text predicates, keeping XPath contextual without making copy part of the locator.",
       "cssExpectedMutationSensitivity": "Most sensitive to banner/heading class or tag changes.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to text-node structure, heading replacement, and banner hierarchy rewrites."
+      "xpathExpectedMutationSensitivity": "Most sensitive to banner hierarchy rewrites, heading replacement, and structural wrapper changes around the title."
     },
     {
       "appId": "realworld",
@@ -706,14 +706,14 @@
       "currentXpathPrimarySurface": "class-context",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".navbar .navbar-brand",
-      "refactoredXpathLocator": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]//a[normalize-space()=\"conduit\"])[1]",
+      "refactoredXpathLocator": "(//a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")][ancestor::nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]])[1]",
       "refactoredCssPrimarySurface": "class-token",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses the concise brand class inside the navbar because that is the idiomatic CSS anchor for a top-level brand link.",
-      "xpathRationale": "Uses normalized brand text within navbar context so XPath expresses a relational target rather than another class transliteration.",
+      "xpathRationale": "Uses the brand-link class with explicit navbar ancestry so XPath stays contextual without forcing brand-text dependence.",
       "cssExpectedMutationSensitivity": "Most sensitive to class renames on the brand link or navbar shell.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to visible-brand text changes and text-structure mutations; less sensitive to added wrappers."
+      "xpathExpectedMutationSensitivity": "Most sensitive to navbar-brand class changes and navbar ancestry rewrites; less sensitive to brand-copy changes."
     },
     {
       "appId": "vue3-realworld-example-app",
@@ -724,14 +724,14 @@
       "currentXpathPrimarySurface": "class-context",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": "nav.navbar",
-      "refactoredXpathLocator": "(//nav[.//a[normalize-space()=\"conduit\"]])[1]",
+      "refactoredXpathLocator": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")][descendant::a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")]])[1]",
       "refactoredCssPrimarySurface": "class-token",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Keeps the navbar as a short class-token selector because practitioners usually preserve the top-level navbar shell as a stable component anchor.",
-      "xpathRationale": "Uses descendant context from the conduit brand text so XPath leans on relational meaning instead of repeating the same navbar class chain.",
+      "xpathRationale": "Uses descendant brand-link context inside the navbar shell so XPath stays relational without leaning on brand copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to class-token churn on the outer shell; less sensitive to descendant reshaping inside the navbar.",
-      "xpathExpectedMutationSensitivity": "More sensitive to brand-text changes and descendant context mutations than to simple navbar wrapper refactors."
+      "xpathExpectedMutationSensitivity": "More sensitive to navbar-brand context rewrites and descendant-structure changes than to simple copy edits."
     },
     {
       "appId": "vue3-realworld-example-app",
@@ -778,14 +778,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": "form button[type=\"submit\"]",
-      "refactoredXpathLocator": "(//form//button[normalize-space()=\"Sign in\" or normalize-space()=\"Sign up\"])[1]",
+      "refactoredXpathLocator": "(//button[@type=\"submit\" and ancestor::form[.//input[@type=\"email\"] and .//input[@type=\"password\"]]])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses the submit-button contract because CSS is strongest when the control already exposes a direct stable attribute.",
-      "xpathRationale": "Uses normalized button text so XPath can lean on relational/text meaning rather than just @type.",
+      "xpathRationale": "Uses the submit control inside the auth form identified by its email/password fields, which is a stronger relational XPath pattern than button copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to submit-type or button-class changes; less sensitive to label wording.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to wording changes, text wrappers, and ambiguity from nearby similar buttons."
+      "xpathExpectedMutationSensitivity": "Most sensitive to auth-form field context changes, submit-type rewrites, and ancestor-form restructuring."
     },
     {
       "appId": "vue3-realworld-example-app",
@@ -796,14 +796,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".articles-toggle .nav-link[href=\"#/\"]",
-      "refactoredXpathLocator": "(//div[contains(@class,\"articles-toggle\")]//a[normalize-space()=\"Global Feed\"])[1]",
+      "refactoredXpathLocator": "(//a[@href=\"#/\" and ancestor::div[contains(concat(\" \", normalize-space(@class), \" \"), \" articles-toggle \")] and ancestor::li[contains(concat(\" \", normalize-space(@class), \" \"), \" nav-item \")]])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Anchors the tab through its feed-toggle container plus href because that is the shortest stable CSS expression available in the RealWorld apps.",
-      "xpathRationale": "Uses visible tab text inside the local toggle context so XPath captures relational meaning that CSS does not express as cleanly.",
+      "xpathRationale": "Uses href together with toggle-container and nav-item ancestry so XPath stays contextual without making copy the primary differentiator.",
       "cssExpectedMutationSensitivity": "Most sensitive to href rewrites or nav-link class churn.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to tab text changes, text wrapping, and nearby duplicate feed labels."
+      "xpathExpectedMutationSensitivity": "Most sensitive to tab-list restructuring, href rewrites, and ancestor-context changes around the feed toggle."
     },
     {
       "appId": "vue3-realworld-example-app",
@@ -832,14 +832,14 @@
       "currentXpathPrimarySurface": "accessibility-attribute-predicate",
       "currentPairRelationship": "family-distinct",
       "refactoredCssLocator": ".comment-form .form-control[placeholder=\"Write a comment...\"]",
-      "refactoredXpathLocator": "(//form[contains(@class,\"comment-form\")]//textarea[contains(@placeholder,\"Write a comment\")])[1]",
+      "refactoredXpathLocator": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-block \")]//textarea[contains(concat(\" \", normalize-space(@class), \" \"), \" form-control \")])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "accessibility-attribute-predicate",
+      "refactoredXpathPrimarySurface": "relational-structure",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses the comment-form control surface directly because placeholder/name attributes are the cleanest CSS anchors for this field.",
-      "xpathRationale": "Adds local form-block context so XPath reflects component structure instead of mirroring the same bare textarea attributes.",
+      "xpathRationale": "Uses comment-form and card-block context around the textarea control so XPath stays structural instead of placeholder-driven.",
       "cssExpectedMutationSensitivity": "Most sensitive to placeholder/name attribute changes on the textarea itself.",
-      "xpathExpectedMutationSensitivity": "More sensitive to wrapper insertion, footer/block rewrites, and label-mechanism changes."
+      "xpathExpectedMutationSensitivity": "More sensitive to block-wrapper reshaping, textarea-class changes, and comment-form hierarchy mutations."
     },
     {
       "appId": "vue3-realworld-example-app",
@@ -850,14 +850,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".comment-form .card-footer > button[type=\"submit\"]",
-      "refactoredXpathLocator": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-footer\")]//button[@aria-label=\"Submit\"])[1]",
+      "refactoredXpathLocator": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-footer \")]//button[@type=\"submit\" and ancestor::form[.//textarea]])[1]",
       "refactoredCssPrimarySurface": "scoped-attribute-structure",
-      "refactoredXpathPrimarySurface": "accessibility-attribute-predicate",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses footer-scoped submit-button classes because a practitioner would normally keep a short footer > button selector here.",
-      "xpathRationale": "Uses normalized button text inside footer context so XPath emphasizes relational meaning rather than only @type.",
+      "xpathRationale": "Uses the footer-scoped submit control inside the form that owns the comment textarea, which is a defensible relational XPath choice.",
       "cssExpectedMutationSensitivity": "Most sensitive to footer/button class churn and direct submit-surface changes.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to wording changes, button-text wrapping, and footer hierarchy mutations."
+      "xpathExpectedMutationSensitivity": "Most sensitive to footer hierarchy mutations, submit-type changes, and comment-form context rewrites."
     },
     {
       "appId": "vue3-realworld-example-app",
@@ -873,9 +873,9 @@
       "refactoredXpathPrimarySurface": "accessibility-attribute-predicate",
       "refactoredPairRelationship": "matched-surface",
       "cssRationale": "Uses the textarea field contract directly because CSS is strongest on the control surface exposed by the settings form.",
-      "xpathRationale": "Adds settings-page context so XPath is anchored by page structure rather than a bare textarea transliteration.",
+      "xpathRationale": "Uses settings-page form context plus the bio field contract rather than leaning on placeholder copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to field attribute changes on the textarea itself.",
-      "xpathExpectedMutationSensitivity": "More sensitive to settings-page restructuring and ancestor-depth mutations."
+      "xpathExpectedMutationSensitivity": "More sensitive to settings-form restructuring and field-context moves than to placeholder wording changes."
     },
     {
       "appId": "vue3-realworld-example-app",
@@ -886,14 +886,14 @@
       "currentXpathPrimarySurface": "attribute-predicate",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": "form button[type=\"submit\"]",
-      "refactoredXpathLocator": "(//div[contains(@class,\"settings-page\")]//button[normalize-space()=\"Update Settings\"])[1]",
+      "refactoredXpathLocator": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" settings-page \")]//form[.//textarea[@aria-label=\"Bio\"]]//button[@type=\"submit\"])[1]",
       "refactoredCssPrimarySurface": "attribute-selector",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "accessibility-attribute-predicate",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Uses the visible submit button classes because that is the concise CSS a maintainer would actually keep.",
-      "xpathRationale": "Uses normalized button text inside settings-page context so XPath leans on relational and text meaning.",
+      "xpathRationale": "Uses the submit control inside the settings form anchored by the bio field, which better reflects XPath relational engineering than button copy.",
       "cssExpectedMutationSensitivity": "Most sensitive to button class churn and button-type changes.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to wording changes and structural shifts around the form action area."
+      "xpathExpectedMutationSensitivity": "Most sensitive to settings-form restructuring, submit-type or button-class changes, and field-context rewrites."
     },
     {
       "appId": "vue3-realworld-example-app",
@@ -958,14 +958,14 @@
       "currentXpathPrimarySurface": "class-context",
       "currentPairRelationship": "matched-surface",
       "refactoredCssLocator": ".article-page .banner h1",
-      "refactoredXpathLocator": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1[normalize-space()])[1]",
+      "refactoredXpathLocator": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" article-page \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" banner \")]/descendant::h1)[1]",
       "refactoredCssPrimarySurface": "class-token",
-      "refactoredXpathPrimarySurface": "text-normalized",
+      "refactoredXpathPrimarySurface": "axis-relational",
       "refactoredPairRelationship": "family-distinct",
       "cssRationale": "Keeps the banner heading selector short because that is the idiomatic CSS expression for the article title surface.",
-      "xpathRationale": "Uses normalized heading text within banner context so XPath encodes a meaningful heading lookup rather than a pure class chain.",
+      "xpathRationale": "Uses banner-scoped heading structure rather than non-empty text predicates, keeping XPath contextual without making copy part of the locator.",
       "cssExpectedMutationSensitivity": "Most sensitive to banner/heading class or tag changes.",
-      "xpathExpectedMutationSensitivity": "Most sensitive to text-node structure, heading replacement, and banner hierarchy rewrites."
+      "xpathExpectedMutationSensitivity": "Most sensitive to banner hierarchy rewrites, heading replacement, and structural wrapper changes around the title."
     },
     {
       "appId": "vue3-realworld-example-app",

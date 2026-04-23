@@ -1,18 +1,19 @@
 import { expect, Page } from '@playwright/test';
+import { bindAppLocators, bindAppOracle } from './app';
 
 async function readCommentIds(oracle: any): Promise<number[]> {
-  const ids = await oracle.comments.cards().raw.evaluateAll(cards =>
+  const ids = await oracle.comments.cards().raw.evaluateAll((cards: Element[]) =>
     cards
-      .map(card => {
+      .map((card: Element) => {
         const nested = card.querySelector('[data-testid^="comment-card-"]');
         const value = nested?.getAttribute('data-testid') ?? null;
         const match = value ? /^comment-card-(\d+)$/.exec(value) : null;
         return match ? Number(match[1]) : null;
       })
-      .filter((id): id is number => typeof id === 'number'),
+      .filter((id: number | null): id is number => typeof id === 'number'),
   );
 
-  return ids.sort((left, right) => left - right);
+  return ids.sort((left: number, right: number) => left - right);
 }
 
 async function getStableCommentIds(
@@ -45,7 +46,12 @@ async function getStableCommentIds(
   return lastIds;
 }
 
-export async function addComment(page: Page, locators: any, oracle: any, commentText: string): Promise<number> {
+export async function addComment(page: Page, commentText: string): Promise<number>;
+export async function addComment(page: Page, locators: any, oracle: any, commentText: string): Promise<number>;
+export async function addComment(page: Page, arg2: any, arg3?: any, arg4?: string): Promise<number> {
+  const locators = typeof arg2 === 'string' ? bindAppLocators(page) : arg2;
+  const oracle = typeof arg2 === 'string' ? bindAppOracle(page) : arg3;
+  const commentText = typeof arg2 === 'string' ? arg2 : arg4!;
   await locators.comments.textarea().raw.waitFor({ timeout: 10000 });
   const initialIds = await getStableCommentIds(oracle, page);
 

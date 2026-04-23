@@ -307,15 +307,15 @@ const BASELINE_SELECTORS: Record<string, Partial<Record<RealWorldLogicalKey, Sel
 const RATIONALES: Partial<Record<RealWorldLogicalKey, RationaleRow>> = {
   'nav.navbar': {
     css: 'Keeps the navbar as a short class-token selector because practitioners usually preserve the top-level navbar shell as a stable component anchor.',
-    xpath: 'Uses descendant context from the conduit brand text so XPath leans on relational meaning instead of repeating the same navbar class chain.',
+    xpath: 'Uses descendant brand-link context inside the navbar shell so XPath stays relational without leaning on brand copy.',
     cssSensitivity: 'Most sensitive to class-token churn on the outer shell; less sensitive to descendant reshaping inside the navbar.',
-    xpathSensitivity: 'More sensitive to brand-text changes and descendant context mutations than to simple navbar wrapper refactors.',
+    xpathSensitivity: 'More sensitive to navbar-brand context rewrites and descendant-structure changes than to simple copy edits.',
   },
   'nav.brandLink': {
     css: 'Uses the concise brand class inside the navbar because that is the idiomatic CSS anchor for a top-level brand link.',
-    xpath: 'Uses normalized brand text within navbar context so XPath expresses a relational target rather than another class transliteration.',
+    xpath: 'Uses the brand-link class with explicit navbar ancestry so XPath stays contextual without forcing brand-text dependence.',
     cssSensitivity: 'Most sensitive to class renames on the brand link or navbar shell.',
-    xpathSensitivity: 'Most sensitive to visible-brand text changes and text-structure mutations; less sensitive to added wrappers.',
+    xpathSensitivity: 'Most sensitive to navbar-brand class changes and navbar ancestry rewrites; less sensitive to brand-copy changes.',
   },
   'auth.emailInput': {
     css: 'Prefers the direct form-field attribute anchor that an engineer would realistically keep for a sign-in form input.',
@@ -331,15 +331,15 @@ const RATIONALES: Partial<Record<RealWorldLogicalKey, RationaleRow>> = {
   },
   'auth.submitButton': {
     css: 'Uses the submit-button contract because CSS is strongest when the control already exposes a direct stable attribute.',
-    xpath: 'Uses normalized button text so XPath can lean on relational/text meaning rather than just @type.',
+    xpath: 'Uses the submit control inside the auth form identified by its email/password fields, which is a stronger relational XPath pattern than button copy.',
     cssSensitivity: 'Most sensitive to submit-type or button-class changes; less sensitive to label wording.',
-    xpathSensitivity: 'Most sensitive to wording changes, text wrappers, and ambiguity from nearby similar buttons.',
+    xpathSensitivity: 'Most sensitive to auth-form field context changes, submit-type rewrites, and ancestor-form restructuring.',
   },
   'nav.globalFeedTab': {
     css: 'Anchors the tab through its feed-toggle container plus href because that is the shortest stable CSS expression available in the RealWorld apps.',
-    xpath: 'Uses visible tab text inside the local toggle context so XPath captures relational meaning that CSS does not express as cleanly.',
+    xpath: 'Uses href together with toggle-container and nav-item ancestry so XPath stays contextual without making copy the primary differentiator.',
     cssSensitivity: 'Most sensitive to href rewrites or nav-link class churn.',
-    xpathSensitivity: 'Most sensitive to tab text changes, text wrapping, and nearby duplicate feed labels.',
+    xpathSensitivity: 'Most sensitive to tab-list restructuring, href rewrites, and ancestor-context changes around the feed toggle.',
   },
   'home.firstReadMoreLink': {
     css: 'Uses local card scoping plus the preview-link surface because that is the idiomatic CSS way to target the first article CTA.',
@@ -349,27 +349,27 @@ const RATIONALES: Partial<Record<RealWorldLogicalKey, RationaleRow>> = {
   },
   'comments.textarea': {
     css: 'Uses the comment-form control surface directly because placeholder/name attributes are the cleanest CSS anchors for this field.',
-    xpath: 'Adds local form-block context so XPath reflects component structure instead of mirroring the same bare textarea attributes.',
+    xpath: 'Uses comment-form and card-block context around the textarea control so XPath stays structural instead of placeholder-driven.',
     cssSensitivity: 'Most sensitive to placeholder/name attribute changes on the textarea itself.',
-    xpathSensitivity: 'More sensitive to wrapper insertion, footer/block rewrites, and label-mechanism changes.',
+    xpathSensitivity: 'More sensitive to block-wrapper reshaping, textarea-class changes, and comment-form hierarchy mutations.',
   },
   'comments.submitButton': {
     css: 'Uses footer-scoped submit-button classes because a practitioner would normally keep a short footer > button selector here.',
-    xpath: 'Uses normalized button text inside footer context so XPath emphasizes relational meaning rather than only @type.',
+    xpath: 'Uses the footer-scoped submit control inside the form that owns the comment textarea, which is a defensible relational XPath choice.',
     cssSensitivity: 'Most sensitive to footer/button class churn and direct submit-surface changes.',
-    xpathSensitivity: 'Most sensitive to wording changes, button-text wrapping, and footer hierarchy mutations.',
+    xpathSensitivity: 'Most sensitive to footer hierarchy mutations, submit-type changes, and comment-form context rewrites.',
   },
   'settings.bioInput': {
     css: 'Uses the textarea field contract directly because CSS is strongest on the control surface exposed by the settings form.',
-    xpath: 'Adds settings-page context so XPath is anchored by page structure rather than a bare textarea transliteration.',
+    xpath: 'Uses settings-page form context plus the bio field contract rather than leaning on placeholder copy.',
     cssSensitivity: 'Most sensitive to field attribute changes on the textarea itself.',
-    xpathSensitivity: 'More sensitive to settings-page restructuring and ancestor-depth mutations.',
+    xpathSensitivity: 'More sensitive to settings-form restructuring and field-context moves than to placeholder wording changes.',
   },
   'settings.submitButton': {
     css: 'Uses the visible submit button classes because that is the concise CSS a maintainer would actually keep.',
-    xpath: 'Uses normalized button text inside settings-page context so XPath leans on relational and text meaning.',
+    xpath: 'Uses the submit control inside the settings form anchored by the bio field, which better reflects XPath relational engineering than button copy.',
     cssSensitivity: 'Most sensitive to button class churn and button-type changes.',
-    xpathSensitivity: 'Most sensitive to wording changes and structural shifts around the form action area.',
+    xpathSensitivity: 'Most sensitive to settings-form restructuring, submit-type or button-class changes, and field-context rewrites.',
   },
   'article.favoriteButton': {
     css: 'Uses the action button inside the article meta region because CSS is strongest on a short meta-scoped button selector.',
@@ -391,9 +391,9 @@ const RATIONALES: Partial<Record<RealWorldLogicalKey, RationaleRow>> = {
   },
   'article.title': {
     css: 'Keeps the banner heading selector short because that is the idiomatic CSS expression for the article title surface.',
-    xpath: 'Uses normalized heading text within banner context so XPath encodes a meaningful heading lookup rather than a pure class chain.',
+    xpath: 'Uses banner-scoped heading structure rather than non-empty text predicates, keeping XPath contextual without making copy part of the locator.',
     cssSensitivity: 'Most sensitive to banner/heading class or tag changes.',
-    xpathSensitivity: 'Most sensitive to text-node structure, heading replacement, and banner hierarchy rewrites.',
+    xpathSensitivity: 'Most sensitive to banner hierarchy rewrites, heading replacement, and structural wrapper changes around the title.',
   },
   'home.paginationButton': {
     css: 'Uses direct-child pagination link/button scoping because CSS is good at concise parent-child contracts for pager controls.',

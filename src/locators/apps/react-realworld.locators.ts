@@ -30,7 +30,11 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('navigation').first(), 'getByRole'),
         ),
         css: css({ ...meta('nav.navbar'), selector: 'nav.navbar' }),
-        xpath: xpath({ ...meta('nav.navbar'), selector: '(//nav[.//a[normalize-space()="conduit"]])[1]' }),
+        xpath: xpath({
+          ...meta('nav.navbar'),
+          selector:
+            '(//nav[contains(concat(" ", normalize-space(@class), " "), " navbar ")][descendant::a[contains(concat(" ", normalize-space(@class), " "), " navbar-brand ")]])[1]',
+        }),
       }),
       brandLink: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -38,7 +42,11 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('link', { name: /conduit/i }).first(), 'getByRole'),
         ),
         css: css({ ...meta('nav.brandLink'), selector: '.navbar .navbar-brand' }),
-        xpath: xpath({ ...meta('nav.brandLink'), selector: '(//nav[contains(concat(" ", normalize-space(@class), " "), " navbar ")]//a[normalize-space()="conduit"])[1]' }),
+        xpath: xpath({
+          ...meta('nav.brandLink'),
+          selector:
+            '(//a[contains(concat(" ", normalize-space(@class), " "), " navbar-brand ")][ancestor::nav[contains(concat(" ", normalize-space(@class), " "), " navbar ")]])[1]',
+        }),
       }),
       globalFeedTab: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -46,7 +54,11 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('link', { name: /^global feed$/i }).first(), 'getByRole'),
         ),
         css: css({ ...meta('nav.globalFeedTab'), selector: '.feed-toggle .nav-link[href="/?tab=all"]' }),
-        xpath: xpath({ ...meta('nav.globalFeedTab'), selector: '(//div[contains(@class,"feed-toggle")]//a[normalize-space()="Global Feed"])[1]' }),
+        xpath: xpath({
+          ...meta('nav.globalFeedTab'),
+          selector:
+            '(//a[@href="/?tab=all" and ancestor::div[contains(concat(" ", normalize-space(@class), " "), " feed-toggle ")] and ancestor::li[contains(concat(" ", normalize-space(@class), " "), " nav-item ")]])[1]',
+        }),
       }),
     },
     auth: {
@@ -72,7 +84,11 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('button', { name: /sign in|sign up/i }).first(), 'getByRole'),
         ),
         css: css({ ...meta('auth.submitButton'), selector: 'form button[type="submit"]' }),
-        xpath: xpath({ ...meta('auth.submitButton'), selector: '(//form//button[normalize-space()="Sign in" or normalize-space()="Sign up"])[1]' }),
+        xpath: xpath({
+          ...meta('auth.submitButton'),
+          selector:
+            '(//button[@type="submit" and ancestor::form[.//input[@name="email"] and .//input[@name="password"]]])[1]',
+        }),
       }),
     },
     home: {
@@ -156,7 +172,11 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('heading', { level: 1 }).first(), 'getByRole'),
         ),
         css: css({ ...meta('article.title'), selector: '.article-page .banner h1' }),
-        xpath: xpath({ ...meta('article.title'), selector: '(//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//h1[normalize-space()])[1]' }),
+        xpath: xpath({
+          ...meta('article.title'),
+          selector:
+            '(//div[contains(concat(" ", normalize-space(@class), " "), " article-page ")]//div[contains(concat(" ", normalize-space(@class), " "), " banner ")]/descendant::h1)[1]',
+        }),
       }),
       favoriteButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -194,7 +214,11 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByPlaceholder(/write a comment/i), 'getByPlaceholder'),
         ),
         css: css({ ...meta('comments.textarea'), selector: '.comment-form .form-control[name="comment"]' }),
-        xpath: xpath({ ...meta('comments.textarea'), selector: '(//form[contains(@class,"comment-form")]//textarea[@name="comment" and contains(@placeholder,"Write a comment")])[1]' }),
+        xpath: xpath({
+          ...meta('comments.textarea'),
+          selector:
+            '(//form[contains(concat(" ", normalize-space(@class), " "), " comment-form ")]//div[contains(concat(" ", normalize-space(@class), " "), " card-block ")]//textarea[@name="comment" and contains(concat(" ", normalize-space(@class), " "), " form-control ")])[1]',
+        }),
       }),
       submitButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -202,7 +226,11 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('button', { name: /post comment/i }).first(), 'getByRole'),
         ),
         css: css({ ...meta('comments.submitButton'), selector: '.comment-form .card-footer > button.btn.btn-primary[type="submit"]' }),
-        xpath: xpath({ ...meta('comments.submitButton'), selector: '(//form[contains(@class,"comment-form")]//div[contains(@class,"card-footer")]//button[normalize-space()="Post Comment"])[1]' }),
+        xpath: xpath({
+          ...meta('comments.submitButton'),
+          selector:
+            '(//form[contains(concat(" ", normalize-space(@class), " "), " comment-form ")]//div[contains(concat(" ", normalize-space(@class), " "), " card-footer ")]//button[@type="submit" and ancestor::form[.//textarea[@name="comment"]]])[1]',
+        }),
       }),
       deleteButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -256,7 +284,11 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByPlaceholder(/short bio/i), 'getByPlaceholder'),
         ),
         css: css({ ...meta('settings.bioInput'), selector: '.settings-page textarea.form-control[name="bio"]' }),
-        xpath: xpath({ ...meta('settings.bioInput'), selector: '(//div[contains(@class,"settings-page")]//textarea[@name="bio" and contains(@placeholder,"Short bio")])[1]' }),
+        xpath: xpath({
+          ...meta('settings.bioInput'),
+          selector:
+            '(//div[contains(concat(" ", normalize-space(@class), " "), " settings-page ")]//form//textarea[@name="bio"])[1]',
+        }),
       }),
       submitButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -264,7 +296,11 @@ export function getReactRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('button', { name: /update settings/i }).first(), 'getByRole'),
         ),
         css: css({ ...meta('settings.submitButton'), selector: 'form .btn.btn-primary.pull-xs-right' }),
-        xpath: xpath({ ...meta('settings.submitButton'), selector: '(//div[contains(@class,"settings-page")]//button[normalize-space()="Update Settings"])[1]' }),
+        xpath: xpath({
+          ...meta('settings.submitButton'),
+          selector:
+            '(//div[contains(concat(" ", normalize-space(@class), " "), " settings-page ")]//form[.//textarea[@name="bio"]]//button[contains(concat(" ", normalize-space(@class), " "), " btn-primary ")])[1]',
+        }),
       }),
     },
   };

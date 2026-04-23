@@ -1,5 +1,5 @@
 import type { APIRequestContext, Page } from '@playwright/test';
-import { MutantGenerator } from '../../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../../src/benchmark/runner/MutantGenerator';
 import {
   getActiveScenarioEntries,
   type RealWorldScenarioEntry,

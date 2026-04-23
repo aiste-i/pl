@@ -60,7 +60,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]//a[normalize-space()=\"conduit\"])[1]"
+    "selector": "(//a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")][ancestor::nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -144,7 +144,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[.//a[normalize-space()=\"conduit\"]])[1]"
+    "selector": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")][descendant::a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")]])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -396,7 +396,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//button[normalize-space()=\"Sign in\" or normalize-space()=\"Sign up\"])[1]"
+    "selector": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" auth-page \")]//button[@type=\"submit\" and ancestor::form[.//input[@name=\"email\"] and .//input[@name=\"password\"]]])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -492,7 +492,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"feed-toggle\")]//a[normalize-space()=\"Global Feed\"])[1]"
+    "selector": "(//a[@href=\"/\" and ancestor::div[contains(concat(\" \", normalize-space(@class), \" \"), \" feed-toggle \")] and ancestor::li[contains(concat(\" \", normalize-space(@class), \" \"), \" nav-item \")]])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -672,7 +672,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-block\")]//textarea[contains(@placeholder,\"Write a comment\")])[1]"
+    "selector": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-block \")]/textarea[contains(concat(\" \", normalize-space(@class), \" \"), \" form-control \")])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -756,7 +756,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-footer\")]//button[normalize-space()=\"Post Comment\"])[1]"
+    "selector": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-footer \")]//button[@type=\"submit\" and ancestor::form[.//textarea]])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -840,7 +840,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"settings-page\")]//textarea[@name=\"bio\" and contains(@placeholder,\"Short bio\")])[1]"
+    "selector": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" settings-page \")]//form//textarea[@name=\"bio\"])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -924,7 +924,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"settings-page\")]//button[normalize-space()=\"Update Settings\"])[1]"
+    "selector": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" settings-page \")]//form[.//textarea[@name=\"bio\"]]//button[@type=\"submit\"])[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1260,7 +1260,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1[normalize-space()])[1]"
+    "selector": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" article-page \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" banner \")]/descendant::h1)[1]"
   },
   {
     "app": "angular-realworld-example-app",
@@ -1832,7 +1832,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]//a[normalize-space()=\"conduit\"])[1]"
+    "selector": "(//a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")][ancestor::nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]])[1]"
   },
   {
     "app": "realworld",
@@ -1916,7 +1916,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[.//a[normalize-space()=\"conduit\"]])[1]"
+    "selector": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")][descendant::a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")]])[1]"
   },
   {
     "app": "realworld",
@@ -2168,7 +2168,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//button[normalize-space()=\"Sign in\" or normalize-space()=\"Sign up\"])[1]"
+    "selector": "(//button[@type=\"submit\" and ancestor::form[.//input[@name=\"email\"] and .//input[@name=\"password\"]]])[1]"
   },
   {
     "app": "realworld",
@@ -2264,7 +2264,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"feed-toggle\")]//a[normalize-space()=\"Global Feed\"])[1]"
+    "selector": "(//a[@href=\"/?tab=all\" and ancestor::div[contains(concat(\" \", normalize-space(@class), \" \"), \" feed-toggle \")] and ancestor::li[contains(concat(\" \", normalize-space(@class), \" \"), \" nav-item \")]])[1]"
   },
   {
     "app": "realworld",
@@ -2444,7 +2444,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//textarea[@name=\"comment\" and contains(@placeholder,\"Write a comment\")])[1]"
+    "selector": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-block \")]//textarea[@name=\"comment\" and contains(concat(\" \", normalize-space(@class), \" \"), \" form-control \")])[1]"
   },
   {
     "app": "realworld",
@@ -2528,7 +2528,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-footer\")]//button[normalize-space()=\"Post Comment\"])[1]"
+    "selector": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-footer \")]//button[@type=\"submit\" and ancestor::form[.//textarea[@name=\"comment\"]]])[1]"
   },
   {
     "app": "realworld",
@@ -2612,7 +2612,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"settings-page\")]//textarea[@name=\"bio\" and contains(@placeholder,\"Short bio\")])[1]"
+    "selector": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" settings-page \")]//form//textarea[@name=\"bio\"])[1]"
   },
   {
     "app": "realworld",
@@ -2696,7 +2696,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"settings-page\")]//button[normalize-space()=\"Update Settings\"])[1]"
+    "selector": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" settings-page \")]//form[.//textarea[@name=\"bio\"]]//button[contains(concat(\" \", normalize-space(@class), \" \"), \" btn-primary \")])[1]"
   },
   {
     "app": "realworld",
@@ -3032,7 +3032,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1[normalize-space()])[1]"
+    "selector": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" article-page \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" banner \")]/descendant::h1)[1]"
   },
   {
     "app": "realworld",
@@ -3604,7 +3604,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]//a[normalize-space()=\"conduit\"])[1]"
+    "selector": "(//a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")][ancestor::nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")]])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -3688,7 +3688,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//nav[.//a[normalize-space()=\"conduit\"]])[1]"
+    "selector": "(//nav[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar \")][descendant::a[contains(concat(\" \", normalize-space(@class), \" \"), \" navbar-brand \")]])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -3940,7 +3940,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form//button[normalize-space()=\"Sign in\" or normalize-space()=\"Sign up\"])[1]"
+    "selector": "(//button[@type=\"submit\" and ancestor::form[.//input[@type=\"email\"] and .//input[@type=\"password\"]]])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4036,7 +4036,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"articles-toggle\")]//a[normalize-space()=\"Global Feed\"])[1]"
+    "selector": "(//a[@href=\"#/\" and ancestor::div[contains(concat(\" \", normalize-space(@class), \" \"), \" articles-toggle \")] and ancestor::li[contains(concat(\" \", normalize-space(@class), \" \"), \" nav-item \")]])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4216,7 +4216,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//textarea[contains(@placeholder,\"Write a comment\")])[1]"
+    "selector": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-block \")]//textarea[contains(concat(\" \", normalize-space(@class), \" \"), \" form-control \")])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4300,7 +4300,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//form[contains(@class,\"comment-form\")]//div[contains(@class,\"card-footer\")]//button[@aria-label=\"Submit\"])[1]"
+    "selector": "(//form[contains(concat(\" \", normalize-space(@class), \" \"), \" comment-form \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" card-footer \")]//button[@type=\"submit\" and ancestor::form[.//textarea]])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4468,7 +4468,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"settings-page\")]//button[normalize-space()=\"Update Settings\"])[1]"
+    "selector": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" settings-page \")]//form[.//textarea[@aria-label=\"Bio\"]]//button[@type=\"submit\"])[1]"
   },
   {
     "app": "vue3-realworld-example-app",
@@ -4804,7 +4804,7 @@
     "purity": "xpath",
     "semanticEntryPoint": null,
     "isException": false,
-    "selector": "(//div[contains(@class,\"article-page\")]//div[contains(@class,\"banner\")]//h1[normalize-space()])[1]"
+    "selector": "(//div[contains(concat(\" \", normalize-space(@class), \" \"), \" article-page \")]//div[contains(concat(\" \", normalize-space(@class), \" \"), \" banner \")]/descendant::h1)[1]"
   },
   {
     "app": "vue3-realworld-example-app",

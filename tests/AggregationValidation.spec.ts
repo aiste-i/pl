@@ -232,7 +232,7 @@ test.describe('Aggregation Script Validation', () => {
 
         // 2. Run Aggregation
         const { execSync } = require('child_process');
-        execSync(`npx ts-node src/murun/runner/aggregate.ts ${testDataDir} ${outputDir}`);
+        execSync(`npx ts-node src/benchmark/runner/aggregate.ts ${testDataDir} ${outputDir}`);
 
         // 3. Verify Outputs
         expect(fs.existsSync(path.join(outputDir, 'benchmark_runs.csv'))).toBe(true);
@@ -295,7 +295,7 @@ test.describe('Aggregation Script Validation', () => {
         });
 
         const { execSync } = require('child_process');
-        execSync(`npx ts-node src/murun/runner/aggregate.ts ${dedupeInputDir} ${dedupeOutputDir}`);
+        execSync(`npx ts-node src/benchmark/runner/aggregate.ts ${dedupeInputDir} ${dedupeOutputDir}`);
 
         const benchmarkRuns = fs.readFileSync(path.join(dedupeOutputDir, 'benchmark_runs.csv'), 'utf8');
         expect(benchmarkRuns).toContain('ASSERTION');
@@ -311,10 +311,10 @@ test.describe('Aggregation Script Validation', () => {
         
         const { execSync } = require('child_process');
         try {
-            execSync(`npx ts-node src/murun/runner/aggregate.ts ${emptyDir} ${outputDir}`);
+            execSync(`npx ts-node src/benchmark/runner/aggregate.ts ${emptyDir} ${outputDir}`);
             throw new Error('Should have failed');
         } catch (e) {
-            expect(e.message).toContain('No valid results found to aggregate');
+            expect(e instanceof Error ? e.message : String(e)).toContain('No valid results found to aggregate');
         }
     });
 });

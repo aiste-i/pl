@@ -18,6 +18,7 @@ test('operator taxonomy and coverage reports are machine-readable', async () => 
   const taxonomyPath = path.join(process.cwd(), 'reports', 'realworld-operator-taxonomy.json');
   const coveragePath = path.join(process.cwd(), 'reports', 'realworld-operator-coverage.json');
   const auditPath = path.join(process.cwd(), 'reports', 'realworld-css-xpath-locator-audit.json');
+  const cleanupAuditPath = path.join(process.cwd(), 'reports', 'realworld-xpath-cleanup-audit.json');
   const taxonomy = JSON.parse(fs.readFileSync(taxonomyPath, 'utf8')) as Array<{
     operator: string;
     benchmarkScope: string;
@@ -34,6 +35,10 @@ test('operator taxonomy and coverage reports are machine-readable', async () => 
     overlapAudit: { refactoredFamilyDistinctCount: number };
     rows: Array<{ logicalKey: string; currentPairRelationship: string; refactoredPairRelationship: string }>;
   };
+  const cleanupAudit = JSON.parse(fs.readFileSync(cleanupAuditPath, 'utf8')) as {
+    summary: { reviewedRows: number; currentContentHeavyRows: number };
+    rows: Array<{ logicalKey: string; actionTaken: string; divergenceIsRelationalContextual: boolean }>;
+  };
 
   expect(taxonomy.some(row => row.operator === 'ToggleAriaExpanded' && row.benchmarkScope === 'in-scope')).toBe(true);
   expect(taxonomy.some(row => row.operator === 'MaskMutator' && row.benchmarkScope === 'excluded-by-design')).toBe(true);
@@ -44,6 +49,13 @@ test('operator taxonomy and coverage reports are machine-readable', async () => 
   expect(audit.auditedRowCount).toBeGreaterThan(0);
   expect(audit.overlapAudit.refactoredFamilyDistinctCount).toBeGreaterThan(0);
   expect(audit.rows.some(row => row.logicalKey === 'nav.brandLink' && row.currentPairRelationship !== row.refactoredPairRelationship)).toBe(true);
+  expect(cleanupAudit.summary.reviewedRows).toBeGreaterThan(0);
+  expect(cleanupAudit.summary.currentContentHeavyRows).toBeLessThan(cleanupAudit.summary.reviewedRows);
+  expect(
+    cleanupAudit.rows.some(
+      row => row.logicalKey === 'auth.submitButton' && row.actionTaken === 'rewrite-to-relational-contextual-xpath' && row.divergenceIsRelationalContextual,
+    ),
+  ).toBe(true);
 });
 
 test('pipeline verification report distinguishes primary and supplementary environments', async () => {
