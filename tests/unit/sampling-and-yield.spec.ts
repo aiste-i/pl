@@ -4,7 +4,13 @@ import { TextReplace } from '../../src/webmutator/operators/dom/TextReplace';
 import { StyleVisibility } from '../../src/webmutator/operators/dom/StyleVisibility';
 import { SubtreeDelete } from '../../src/webmutator/operators/dom/SubtreeDelete';
 import { ChangeAriaLabel } from '../../src/webmutator/operators/dom/accessibility/ChangeAriaLabel';
-import { buildMutationPreflightPool, computeCategoryQuotas, sampleMutationCandidates } from '../../src/benchmark/runner/sampling';
+import {
+  buildMutationPreflightPool,
+  buildSemanticSupplementPreflightPool,
+  computeCategoryQuotas,
+  sampleMutationCandidates,
+  sampleSemanticSupplementMutationCandidates,
+} from '../../src/benchmark/runner/sampling';
 import { evaluateComparableYield } from '../../src/benchmark/comparable-yield';
 import { evaluateMutationMeaningfulness } from '../../src/benchmark/mutation-quality';
 import { ReplaceHeadingWithP } from '../../src/webmutator/operators/dom/accessibility/ReplaceHeadingWithP';
@@ -47,6 +53,48 @@ test('final sampling rebalances across validated candidates only', () => {
 
   expect(sampled.selected).toHaveLength(8);
   expect(sampled.summary.categoryQuotas).toEqual(computeCategoryQuotas(8));
+});
+
+test('semantic supplement sampling adds deterministic per-scenario coverage before normal selection', () => {
+  const candidates = candidatePool().map((candidate, index) => {
+    candidate.corpusId = 'realworld-semantic-supplement';
+    candidate.scenarioId = `semantic.scenario-${index % 3}`;
+    return candidate;
+  });
+
+  const sampled = sampleSemanticSupplementMutationCandidates(
+    candidates,
+    2,
+    12345,
+    ['semantic.scenario-0', 'semantic.scenario-1', 'semantic.scenario-2', 'semantic.scenario-missing'],
+  );
+
+  expect(sampled.selected).toHaveLength(4);
+  expect(new Set(sampled.selected.map(candidate => candidate.scenarioId))).toEqual(
+    new Set(['semantic.scenario-0', 'semantic.scenario-1', 'semantic.scenario-2']),
+  );
+  expect(sampled.selected.filter(candidate => candidate.selectedForSemanticScenarioCoverage)).toHaveLength(3);
+  expect(sampled.summary.semanticScenarioCoverage).toEqual(expect.arrayContaining([
+    expect.objectContaining({ scenarioId: 'semantic.scenario-0', status: 'mutated-covered' }),
+    expect.objectContaining({ scenarioId: 'semantic.scenario-missing', status: 'baseline-supported-no-valid-mutated-candidate' }),
+  ]));
+  expect(sampled.summary.semanticScenarioCoverageSatisfied).toBe(false);
+  expect(sampleSemanticSupplementMutationCandidates(candidates, 2, 12345, ['semantic.scenario-0']).selected.map(candidate => candidate.candidateId)).toEqual(
+    sampleSemanticSupplementMutationCandidates(candidates, 2, 12345, ['semantic.scenario-0']).selected.map(candidate => candidate.candidateId),
+  );
+});
+
+test('semantic supplement preflight pool includes all eligible candidates so no-valid mutation statuses are explicit', () => {
+  const candidates = candidatePool();
+  candidates[0].eligible = false;
+  candidates[1].aggregateComparisonEligible = false;
+
+  const preflightPool = buildSemanticSupplementPreflightPool(candidates, 12345);
+
+  expect(preflightPool).toHaveLength(candidates.length - 2);
+  expect(preflightPool.map(candidate => candidate.candidateId)).toEqual(
+    buildSemanticSupplementPreflightPool(candidates, 12345).map(candidate => candidate.candidateId),
+  );
 });
 
 test('exact touchpoint candidates outrank generic candidates within the same category', () => {

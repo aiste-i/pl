@@ -305,6 +305,55 @@ test.describe('Aggregation Script Validation', () => {
         expect(summaryByFamily).toContain('semantic-first,1,1,1,1');
     });
 
+    test('semantic supplement query reports use only supplement semantic-first rows', async () => {
+        const supplementInputDir = path.join(process.cwd(), 'test-results', 'agg-semantic-supplement-test');
+        const supplementOutputDir = path.join(process.cwd(), 'test-results', 'agg-semantic-supplement-output');
+        if (fs.existsSync(supplementInputDir)) fs.rmSync(supplementInputDir, { recursive: true });
+        if (fs.existsSync(supplementOutputDir)) fs.rmSync(supplementOutputDir, { recursive: true });
+        fs.mkdirSync(supplementInputDir, { recursive: true });
+
+        const supplementBase = {
+            corpusId: 'realworld-semantic-supplement',
+            corpusRole: 'supplementary',
+            activeScenarioId: 'semantic.article-title-text',
+            scenarioId: 'semantic.article-title-text [semantic-first]',
+            activeScenarioCategory: 'content-access',
+            sourceSpec: 'tests/realworld/articles.spec.ts',
+            intendedSemanticEntryPoint: 'getByText',
+            actualSemanticEntryPoint: 'getByText',
+            targetLogicalKeys: ['article.titleText'],
+            semanticScenarioSupportedApps: ['angular-realworld-example-app', 'realworld', 'vue3-realworld-example-app'],
+        };
+        const mockRuns = [
+            makeBenchmarkRun({ ...supplementBase, locatorFamily: 'semantic-first', phase: 'baseline', runStatus: 'passed' }),
+            makeBenchmarkRun({ ...supplementBase, locatorFamily: 'semantic-first', phase: 'mutated', runStatus: 'failed', failureClass: 'NO_MATCH', failureStage: 'ACTION', changeId: 'sem-mut-1', changeOperator: 'TextReplace', changeCategory: 'content', quotaBucket: 'content', mutationTelemetry: { selectedCandidateId: 'sem-mut-1' } }),
+            makeBenchmarkRun({ ...supplementBase, locatorFamily: 'css', phase: 'baseline', runStatus: 'passed', actualSemanticEntryPoint: null }),
+            makeBenchmarkRun({ ...supplementBase, locatorFamily: 'xpath', phase: 'mutated', runStatus: 'failed', failureClass: 'NO_MATCH', failureStage: 'ACTION', actualSemanticEntryPoint: null, changeId: 'xpath-mut-1', changeOperator: 'TextReplace', changeCategory: 'content', quotaBucket: 'content', mutationTelemetry: { selectedCandidateId: 'xpath-mut-1' } }),
+            makeBenchmarkRun({ corpusId: 'realworld-active', activeScenarioId: 'article.assert-title', intendedSemanticEntryPoint: 'getByAltText', actualSemanticEntryPoint: 'getByAltText', locatorFamily: 'semantic-first', phase: 'baseline', runStatus: 'passed' }),
+        ];
+
+        mockRuns.forEach((run, index) => {
+            fs.writeFileSync(path.join(supplementInputDir, `semantic_${index}.json`), JSON.stringify(run));
+        });
+
+        const { execSync } = require('child_process');
+        execSync(`npx ts-node src/benchmark/runner/aggregate.ts ${supplementInputDir} ${supplementOutputDir}`);
+
+        const report = JSON.parse(fs.readFileSync(path.join(supplementOutputDir, 'aggregate_report.json'), 'utf8'));
+        const getByTextSummary = report.semanticSupplement.summaryBySemanticQuery.find((row: any) => row.semanticEntryPoint === 'getByText');
+        const getByAltTextSummary = report.semanticSupplement.summaryBySemanticQuery.find((row: any) => row.semanticEntryPoint === 'getByAltText');
+
+        expect(getByTextSummary.baselineRuns).toBe(1);
+        expect(getByTextSummary.mutatedRuns).toBe(1);
+        expect(getByTextSummary.failures).toBe(1);
+        expect(getByAltTextSummary.baselineRuns).toBe(0);
+        expect(report.semanticSupplement.validation.nonSemanticSupplementRowsExcluded).toBe(2);
+        expect(report.semanticSupplement.validation.nonSupplementRowsExcluded).toBe(1);
+
+        const mapping = fs.readFileSync(path.join(supplementOutputDir, 'semantic_scenario_query_mapping.csv'), 'utf8');
+        expect(mapping).toContain('semantic.article-title-text,getByText');
+    });
+
     test('should fail loudly on empty input', async () => {
         const emptyDir = path.join(process.cwd(), 'test-results', 'empty-test');
         if (!fs.existsSync(emptyDir)) fs.mkdirSync(emptyDir, { recursive: true });

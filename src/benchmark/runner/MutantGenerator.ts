@@ -12,7 +12,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { createHash } from 'crypto';
 import { getAppReachableTargetsPath } from '../../apps';
-import { getBenchmarkCorpusId } from '../../benchmark/realworld-corpus';
+import {
+    REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+    getBenchmarkCorpusId,
+    getSemanticSupplementScenarioEntriesForApp,
+} from '../../benchmark/realworld-corpus';
 import {
     annotateTargetRelevance,
     categoryAvailabilityHint,
@@ -20,7 +24,14 @@ import {
     type RelevanceBand,
     type ScenarioTouchpoint,
 } from '../../benchmark/realworld-touchpoints';
-import { buildMutationPreflightPool, getCandidateCategory, sampleMutationCandidates } from './sampling';
+import {
+    buildMutationPreflightPool,
+    buildSemanticSupplementPreflightPool,
+    getCandidateCategory,
+    sampleMutationCandidates,
+    sampleSemanticSupplementMutationCandidates,
+    type SemanticScenarioCoverageRow,
+} from './sampling';
 
 export interface ReachableTargetContext {
     scenarioId: string;
@@ -103,6 +114,8 @@ interface SavedScenarioSet {
         applicableButUnselectedOperators?: Record<string, string[]>;
         heavilyBlockedByOracleOperators?: string[];
         mandatoryCoverageSatisfied?: boolean;
+        semanticScenarioCoverage?: SemanticScenarioCoverageRow[];
+        semanticScenarioCoverageSatisfied?: boolean;
         validatedCountsByCategory?: Record<string, number>;
         validatedCountsByOperator?: Record<string, number>;
         activeScenarioIds: string[];
@@ -556,6 +569,7 @@ export class MutantGenerator {
                 relevanceScore: d.relevanceScore ?? 0,
                 categoryAvailabilityHint: d.categoryAvailabilityHint ?? false,
                 selectedForCategoryMinimum: d.selectedForCategoryMinimum ?? false,
+                selectedForSemanticScenarioCoverage: d.selectedForSemanticScenarioCoverage ?? false,
             });
             if (d.record) candidate.record = d.record;
             return candidate;
@@ -563,7 +577,14 @@ export class MutantGenerator {
     }
 
     sampleScenarios(candidates: MutationCandidate[], budget: number, seed: number): MutationCandidate[] {
-        const { selected: finalSelection, summary } = sampleMutationCandidates(candidates, budget, seed);
+        const requiredSemanticScenarioIds =
+            this.corpusId === REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID
+                ? getSemanticSupplementScenarioEntriesForApp(this.appName as any).map(entry => entry.scenarioId)
+                : [];
+        const { selected: finalSelection, summary } =
+            this.corpusId === REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID
+                ? sampleSemanticSupplementMutationCandidates(candidates, budget, seed, requiredSemanticScenarioIds)
+                : sampleMutationCandidates(candidates, budget, seed);
         const eligibleCandidates = candidates.filter(candidate => candidate.eligible !== false && candidate.aggregateComparisonEligible !== false);
         for (const candidate of finalSelection) {
             candidate.quotaBucket = getCandidateCategory(candidate);
@@ -592,6 +613,8 @@ export class MutantGenerator {
             applicableButUnselectedOperators: summary.applicableButUnselectedOperators,
             heavilyBlockedByOracleOperators,
             mandatoryCoverageSatisfied: summary.mandatoryCoverageSatisfied,
+            semanticScenarioCoverage: summary.semanticScenarioCoverage,
+            semanticScenarioCoverageSatisfied: summary.semanticScenarioCoverageSatisfied,
             activeScenarioIds: [...new Set(finalSelection.map(candidate => candidate.scenarioId).filter(Boolean) as string[])].sort(),
         };
 
@@ -599,6 +622,10 @@ export class MutantGenerator {
     }
 
     buildPreflightPool(candidates: MutationCandidate[], budget: number, seed: number): MutationCandidate[] {
+        if (this.corpusId === REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID) {
+            return buildSemanticSupplementPreflightPool(candidates, seed);
+        }
+
         return buildMutationPreflightPool(candidates, budget, seed);
     }
 

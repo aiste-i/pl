@@ -7,6 +7,7 @@ import { getBenchmarkRetention, pruneCompactBenchmarkArtifacts } from '../../ben
 import { validateBenchmarkPayload } from '../../benchmark/result-schema-validator';
 import { CATEGORY_ORDER } from './sampling';
 import {
+    REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST,
     REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
     getSemanticSupplementExcludedPairs,
 } from '../../benchmark/realworld-corpus';
@@ -87,6 +88,15 @@ interface ScenarioFilePayload {
         applicableButUnselectedOperators?: Record<string, string[]>;
         heavilyBlockedByOracleOperators?: string[];
         mandatoryCoverageSatisfied?: boolean;
+        semanticScenarioCoverage?: Array<{
+            scenarioId: string;
+            status: string;
+            selectedCandidateId: string | null;
+            reason: string | null;
+        }>;
+        semanticScenarioCoverageSatisfied?: boolean;
+        budget?: number;
+        seed?: number;
     };
     scenarios?: Array<{
         candidateId?: string;
@@ -189,7 +199,7 @@ function dedupeRuns(runs: AggregatedRun[]): AggregatedRun[] {
     return [...latestByIdentity.values()].sort((left, right) => (left.recordedAtMs ?? 0) - (right.recordedAtMs ?? 0));
 }
 
-function loadResults(inputDir: string): AggregatedRun[] {
+export function loadResults(inputDir: string): AggregatedRun[] {
     const runs: AggregatedRun[] = [];
     const files = getAllFiles(inputDir).filter(f => f.endsWith('.json') && !f.includes('axe.json'));
 
@@ -210,6 +220,12 @@ function loadResults(inputDir: string): AggregatedRun[] {
             }
             if (!content.corpusId || !content.activeScenarioId) {
                 console.warn(`Skipping legacy non-corpus benchmark record: ${file}`);
+                continue;
+            }
+            if (
+                typeof content.scenarioId === 'string' &&
+                (content.scenarioId.includes(' Collection @app:') || content.scenarioId.includes('collect reachable targets:'))
+            ) {
                 continue;
             }
 
@@ -294,7 +310,7 @@ function isCssOrXpathFamily(family: string): family is 'css' | 'xpath' {
     return family === 'css' || family === 'xpath';
 }
 
-function aggregate(runs: AggregatedRun[], outputDir: string) {
+export function aggregate(runs: AggregatedRun[], outputDir: string) {
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
     const appRootDir = path.dirname(outputDir);
     const scenarioPayload = readJsonIfPresent<ScenarioFilePayload>(path.join(appRootDir, 'scenarios.json'));
@@ -508,9 +524,47 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     writeCsv(path.join(outputDir, 'comparison_denominators.csv'), comparisonDenominators);
 
     const isSemanticSupplement = corpusIds.includes(REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID);
-    const semanticEntryPoints = ['getByRole', 'getByLabel', 'getByText', 'getByPlaceholder', 'getByAltText', 'getByTitle'];
-    const semanticQueryForRun = (run: AggregatedRun) =>
-        run.actualSemanticEntryPoint !== 'none' ? run.actualSemanticEntryPoint : run.intendedSemanticEntryPoint;
+    const supplementScenarioEntries = REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST.scenarios;
+    const supplementScenarioIds = new Set(supplementScenarioEntries.map(entry => entry.scenarioId));
+    const semanticEntryPoints = ['getByRole', 'getByLabel', 'getByText', 'getByPlaceholder', 'getByAltText', 'getByTitle', 'none'];
+    const supplementRows = runs.filter(run =>
+        run.corpusId === REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID &&
+        supplementScenarioIds.has(run.activeScenarioId),
+    );
+    const semanticSupplementRows = supplementRows.filter(run => run.locatorFamily === 'semantic-first');
+    const semanticSupplementBaseline = semanticSupplementRows.filter(run => run.phase === 'baseline');
+    const semanticSupplementMutated = semanticSupplementRows.filter(run => run.phase === 'mutated');
+    const semanticSupplementEligibleMutated = semanticSupplementMutated.filter(run => run.comparisonEligible);
+    const queryForSemanticRun = (run: AggregatedRun) =>
+        run.actualSemanticEntryPoint && run.actualSemanticEntryPoint !== 'none'
+            ? run.actualSemanticEntryPoint
+            : 'none';
+    const scenarioPayloadsByApp = new Map<string, ScenarioFilePayload>();
+    for (const app of appsInRuns) {
+        const conventionalScenarioPath = path.join(
+            process.cwd(),
+            'test-results',
+            app,
+            REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+            'scenarios.json',
+        );
+        const payload = readJsonIfPresent<ScenarioFilePayload>(conventionalScenarioPath);
+        if (payload) {
+            scenarioPayloadsByApp.set(app, payload);
+        }
+    }
+    if (scenarioPayload && appsInRuns.length === 1 && !scenarioPayloadsByApp.has(appsInRuns[0])) {
+        scenarioPayloadsByApp.set(appsInRuns[0], scenarioPayload);
+    }
+    const semanticCoverageStatusByAppScenario = new Map<string, { status: string; reason: string | null }>();
+    for (const [app, payload] of scenarioPayloadsByApp.entries()) {
+        for (const row of payload.metadata?.semanticScenarioCoverage ?? []) {
+            semanticCoverageStatusByAppScenario.set(`${app}::${row.scenarioId}`, {
+                status: row.status,
+                reason: row.reason,
+            });
+        }
+    }
     const semanticSupplementExclusions = isSemanticSupplement
         ? getSemanticSupplementExcludedPairs()
             .filter(pair => appsInRuns.includes(pair.appId))
@@ -524,57 +578,114 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
             }))
         : [];
 
-    const semanticQueryDistribution = semanticEntryPoints.map(entryPoint => ({
-        semanticEntryPoint: entryPoint,
-        actualSemanticFirstRuns: runs.filter(run => run.locatorFamily === 'semantic-first' && run.actualSemanticEntryPoint === entryPoint).length,
-        intendedRuns: runs.filter(run => run.intendedSemanticEntryPoint === entryPoint).length,
-        baselineRuns: baseline.filter(run => semanticQueryForRun(run) === entryPoint).length,
-        mutatedRuns: mutated.filter(run => semanticQueryForRun(run) === entryPoint).length,
-    }));
-    const semanticScenarioQueryMapping = Array.from(new Set(runs.map(run => `${run.applicationId}::${run.activeScenarioId}`))).map(key => {
-        const [applicationId, activeScenarioId] = key.split('::');
-        const scenarioRuns = runs.filter(run => run.applicationId === applicationId && run.activeScenarioId === activeScenarioId);
-        const first = scenarioRuns[0];
-        return {
-            applicationId,
-            scenarioId: activeScenarioId,
-            intendedSemanticEntryPoint: first?.intendedSemanticEntryPoint ?? 'none',
-            actualSemanticEntryPoints: JSON.stringify(Array.from(new Set(scenarioRuns.map(run => run.actualSemanticEntryPoint))).sort()),
-            targetLogicalKeys: JSON.stringify(first?.targetLogicalKeys ?? []),
-            supportedApps: JSON.stringify(first?.semanticScenarioSupportedApps ?? []),
-            excluded: false,
-            exclusionReason: first?.semanticScenarioExclusionReason ?? null,
-        };
-    }).concat(semanticSupplementExclusions.map(pair => ({
-        applicationId: pair.appId,
-        scenarioId: pair.scenarioId,
-        intendedSemanticEntryPoint: pair.intendedSemanticEntryPoint,
-        actualSemanticEntryPoints: JSON.stringify([]),
-        targetLogicalKeys: JSON.stringify([]),
-        supportedApps: JSON.stringify([]),
-        excluded: true,
-        exclusionReason: pair.exclusionReason,
-    }))).sort((left, right) => `${left.applicationId}:${left.scenarioId}`.localeCompare(`${right.applicationId}:${right.scenarioId}`));
+    const countSemanticRows = (rows: AggregatedRun[], entryPoint: string) =>
+        rows.filter(run => queryForSemanticRun(run) === entryPoint).length;
+    const baselineSemanticSupportDistribution = semanticEntryPoints
+        .map(entryPoint => ({
+            view: 'baseline-semantic-support',
+            semanticEntryPoint: entryPoint,
+            runs: countSemanticRows(semanticSupplementBaseline.filter(run => run.runStatus === 'passed'), entryPoint),
+            comparisonEligibleRuns: '',
+            failedComparisonEligibleRuns: '',
+        }))
+        .filter(row => row.runs > 0 || row.semanticEntryPoint !== 'none');
+    const mutatedSemanticEvidenceDistribution = semanticEntryPoints
+        .map(entryPoint => ({
+            view: 'mutated-semantic-evidence',
+            semanticEntryPoint: entryPoint,
+            runs: countSemanticRows(semanticSupplementMutated, entryPoint),
+            comparisonEligibleRuns: countSemanticRows(semanticSupplementEligibleMutated, entryPoint),
+            failedComparisonEligibleRuns: countSemanticRows(
+                semanticSupplementEligibleMutated.filter(run => run.runStatus === 'failed'),
+                entryPoint,
+            ),
+        }))
+        .filter(row => row.runs > 0 || row.comparisonEligibleRuns > 0 || row.semanticEntryPoint !== 'none');
+    const semanticQueryDistribution = [
+        ...baselineSemanticSupportDistribution,
+        ...mutatedSemanticEvidenceDistribution,
+    ];
+
+    const semanticScenarioQueryMapping = supplementScenarioEntries
+        .flatMap(scenario => appsInRuns.map(applicationId => {
+            const supported = scenario.supportedApps.includes(applicationId as any);
+            const exclusion = scenario.excludedApps.find(item => item.appId === applicationId);
+            const scenarioBaseline = semanticSupplementBaseline.filter(run =>
+                run.applicationId === applicationId &&
+                run.activeScenarioId === scenario.scenarioId,
+            );
+            const scenarioMutated = semanticSupplementMutated.filter(run =>
+                run.applicationId === applicationId &&
+                run.activeScenarioId === scenario.scenarioId,
+            );
+            const scenarioEligibleMutated = scenarioMutated.filter(run => run.comparisonEligible);
+            const coverageMetadata = semanticCoverageStatusByAppScenario.get(`${applicationId}::${scenario.scenarioId}`);
+            const baselineSupported = scenarioBaseline.some(run => run.runStatus === 'passed');
+            const coverageStatus = !supported
+                ? 'unsupported-in-this-app'
+                : !baselineSupported
+                    ? 'baseline-support-missing'
+                    : scenarioEligibleMutated.length > 0
+                        ? 'baseline-supported-mutated-covered'
+                        : coverageMetadata?.status === 'baseline-supported-no-valid-mutated-candidate'
+                            ? 'baseline-supported-no-valid-mutated-candidate'
+                            : 'baseline-supported-mutated-coverage-missing';
+            const exclusionReason = !supported
+                ? exclusion?.reason ?? 'scenario not supported for this app'
+                : coverageStatus === 'baseline-supported-no-valid-mutated-candidate'
+                    ? coverageMetadata?.reason ?? 'no valid mutated candidate recorded'
+                    : coverageStatus === 'baseline-supported-mutated-coverage-missing'
+                        ? 'supported baseline scenario has no comparison-eligible mutated semantic-first evidence'
+                        : null;
+
+            return {
+                applicationId,
+                scenarioId: scenario.scenarioId,
+                intendedSemanticEntryPoint: scenario.intendedSemanticEntryPoint,
+                actualBaselineSemanticEntryPoints: JSON.stringify(Array.from(new Set(scenarioBaseline.map(queryForSemanticRun))).sort()),
+                actualMutatedSemanticEntryPoints: JSON.stringify(Array.from(new Set(scenarioMutated.map(queryForSemanticRun))).sort()),
+                supportStatus: coverageStatus,
+                baselineSemanticSupportRuns: scenarioBaseline.filter(run => run.runStatus === 'passed').length,
+                mutatedSemanticRuns: scenarioMutated.length,
+                comparisonEligibleMutatedSemanticRuns: scenarioEligibleMutated.length,
+                targetLogicalKeys: JSON.stringify(scenario.targetLogicalKeys),
+                supportedApps: JSON.stringify(scenario.supportedApps),
+                excluded: !supported,
+                exclusionReason,
+            };
+        }))
+        .sort((left, right) => `${left.applicationId}:${left.scenarioId}`.localeCompare(`${right.applicationId}:${right.scenarioId}`));
+
+    const supportedButNoValidMutationByQuery = semanticScenarioQueryMapping.reduce((acc, row) => {
+        if (row.supportStatus === 'baseline-supported-no-valid-mutated-candidate') {
+            acc[row.intendedSemanticEntryPoint] = (acc[row.intendedSemanticEntryPoint] ?? 0) + 1;
+        }
+        return acc;
+    }, {} as Record<string, number>);
     const summaryBySemanticQuery = semanticEntryPoints.map(entryPoint => {
-        const queryRuns = runs.filter(run => semanticQueryForRun(run) === entryPoint);
-        const queryBaseline = queryRuns.filter(run => run.phase === 'baseline');
-        const queryMutated = queryRuns.filter(run => run.phase === 'mutated');
+        const queryBaseline = semanticSupplementBaseline.filter(run => queryForSemanticRun(run) === entryPoint);
+        const queryMutated = semanticSupplementMutated.filter(run => queryForSemanticRun(run) === entryPoint);
         const comparable = queryMutated.filter(run => run.comparisonEligible);
         const failedComparable = comparable.filter(run => run.runStatus === 'failed');
         return {
             semanticEntryPoint: entryPoint,
-            totalRuns: queryRuns.length,
             baselineRuns: queryBaseline.length,
             mutatedRuns: queryMutated.length,
-            comparisonEligibleRuns: comparable.length,
-            failedComparisonEligibleRuns: failedComparable.length,
-            failureRateComparisonEligible: (failedComparable.length / comparable.length || 0).toFixed(4),
+            eligibleMutatedRuns: comparable.length,
+            failures: failedComparable.length,
+            failureRate: (failedComparable.length / comparable.length || 0).toFixed(4),
+            supportedButNoValidMutationCount: supportedButNoValidMutationByQuery[entryPoint] ?? 0,
         };
-    }).filter(row => row.totalRuns > 0);
+    }).filter(row =>
+        row.baselineRuns > 0 ||
+        row.mutatedRuns > 0 ||
+        row.supportedButNoValidMutationCount > 0 ||
+        row.semanticEntryPoint !== 'none',
+    );
     const summaryBySemanticQueryCategory = [];
     for (const entryPoint of semanticEntryPoints) {
         for (const category of categories) {
-            const cellRuns = mutated.filter(run => semanticQueryForRun(run) === entryPoint && run.changeCategory === category);
+            const cellRuns = semanticSupplementMutated.filter(run => queryForSemanticRun(run) === entryPoint && run.changeCategory === category);
             if (cellRuns.length === 0) continue;
             const comparable = cellRuns.filter(run => run.comparisonEligible);
             const failedComparable = comparable.filter(run => run.runStatus === 'failed');
@@ -590,8 +701,31 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     }
     const failureDistributionBySemanticQuery = [];
     for (const entryPoint of semanticEntryPoints) {
-        const failedRuns = mutated.filter(run => semanticQueryForRun(run) === entryPoint && run.runStatus === 'failed');
-        if (failedRuns.length === 0) continue;
+        const queryEligibleMutated = semanticSupplementEligibleMutated.filter(run => queryForSemanticRun(run) === entryPoint);
+        const failedRuns = queryEligibleMutated.filter(run => run.runStatus === 'failed');
+        if (queryEligibleMutated.length === 0) {
+            const baselineOnlyCount = semanticSupplementBaseline.filter(run => queryForSemanticRun(run) === entryPoint).length;
+            if (baselineOnlyCount > 0 || (supportedButNoValidMutationByQuery[entryPoint] ?? 0) > 0) {
+                failureDistributionBySemanticQuery.push({
+                    semanticEntryPoint: entryPoint,
+                    failureClass: 'none',
+                    count: 0,
+                    proportion: '0.0000',
+                    evidenceStatus: 'baseline-only-no-mutated-evidence',
+                });
+            }
+            continue;
+        }
+        if (failedRuns.length === 0) {
+            failureDistributionBySemanticQuery.push({
+                semanticEntryPoint: entryPoint,
+                failureClass: 'none',
+                count: 0,
+                proportion: '0.0000',
+                evidenceStatus: 'mutated-evidence-no-failures',
+            });
+            continue;
+        }
         for (const failureClass of Array.from(new Set(failedRuns.map(run => run.failureClass)))) {
             const count = failedRuns.filter(run => run.failureClass === failureClass).length;
             failureDistributionBySemanticQuery.push({
@@ -599,9 +733,62 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
                 failureClass,
                 count,
                 proportion: (count / failedRuns.length || 0).toFixed(4),
+                evidenceStatus: 'mutated-evidence',
             });
         }
     }
+    const semanticValidationWarnings = isSemanticSupplement
+        ? [
+            ...runs
+                .filter(run => run.corpusId !== REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID)
+                .map(run => ({
+                    validationType: 'non-supplement-row-excluded',
+                    applicationId: run.applicationId,
+                    scenarioId: run.activeScenarioId,
+                    family: run.locatorFamily,
+                    message: 'Row was excluded from supplement semantic query reporting because it is not in the supplementary semantic corpus.',
+                })),
+            ...supplementRows
+                .filter(run => run.locatorFamily !== 'semantic-first')
+                .map(run => ({
+                    validationType: 'non-semantic-family-excluded',
+                    applicationId: run.applicationId,
+                    scenarioId: run.activeScenarioId,
+                    family: run.locatorFamily,
+                    message: 'Non-semantic family row was excluded from supplement semantic query reporting.',
+                })),
+            ...semanticSupplementRows
+                .filter(run => {
+                    const scenario = supplementScenarioEntries.find(entry => entry.scenarioId === run.activeScenarioId);
+                    return scenario && queryForSemanticRun(run) !== 'none' && queryForSemanticRun(run) !== scenario.intendedSemanticEntryPoint;
+                })
+                .map(run => ({
+                    validationType: 'semantic-query-mismatch',
+                    applicationId: run.applicationId,
+                    scenarioId: run.activeScenarioId,
+                    family: run.locatorFamily,
+                    message: `Actual semantic entry point ${queryForSemanticRun(run)} does not match the intended supplement query ${supplementScenarioEntries.find(entry => entry.scenarioId === run.activeScenarioId)?.intendedSemanticEntryPoint}.`,
+                })),
+            ...(semanticSupplementEligibleMutated.length === 0
+                ? [{
+                    validationType: 'zero-eligible-mutated-semantic-rows',
+                    applicationId: appsInRuns.join('|'),
+                    scenarioId: 'all',
+                    family: 'semantic-first',
+                    message: 'Supplement semantic mutated query summaries were computed with zero comparison-eligible mutated semantic-first rows.',
+                }]
+                : []),
+            ...semanticScenarioQueryMapping
+                .filter(row => row.supportStatus === 'baseline-supported-mutated-coverage-missing')
+                .map(row => ({
+                    validationType: 'unexplained-missing-mutated-coverage',
+                    applicationId: row.applicationId,
+                    scenarioId: row.scenarioId,
+                    family: 'semantic-first',
+                    message: row.exclusionReason ?? 'Supported supplement scenario has no mutated semantic-first coverage and no no-valid-candidate explanation.',
+                })),
+        ]
+        : [];
 
     if (isSemanticSupplement) {
         writeCsv(path.join(outputDir, 'semantic_query_distribution.csv'), semanticQueryDistribution);
@@ -609,6 +796,7 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         writeCsv(path.join(outputDir, 'summary_by_semantic_query.csv'), summaryBySemanticQuery);
         writeCsv(path.join(outputDir, 'summary_by_semantic_query_and_category.csv'), summaryBySemanticQueryCategory);
         writeCsv(path.join(outputDir, 'failure_distribution_by_semantic_query.csv'), failureDistributionBySemanticQuery);
+        writeCsv(path.join(outputDir, 'semantic_validation_warnings.csv'), semanticValidationWarnings);
     }
 
     const accessibilityScanStatusSummary = families.map(family => {
@@ -867,15 +1055,40 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         comparisonDenominators,
         semanticSupplement: isSemanticSupplement
             ? {
+                corpusId: REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
                 corpusRole: 'supplementary',
                 notPooledIntoPrimaryDenominators: true,
                 primaryCorpusId: 'realworld-active',
-                queryDistribution: semanticQueryDistribution,
+                interpretationBoundary: 'Supplementary semantic-coverage evidence only; not pooled into the main thesis benchmark denominator.',
+                appsIncluded: appsInRuns,
+                scenariosIncluded: supplementScenarioEntries.map(entry => entry.scenarioId),
+                familiesIncluded: families,
+                seeds: Array.from(new Set([...scenarioPayloadsByApp.values()].map(payload => payload.metadata?.seed).filter(value => value !== undefined))),
+                budgets: Array.from(new Set([...scenarioPayloadsByApp.values()].map(payload => payload.metadata?.budget).filter(value => value !== undefined))),
+                supportedAppScenarioMatrix: semanticScenarioQueryMapping,
+                queryDistribution: {
+                    baselineSemanticSupportDistribution,
+                    mutatedSemanticEvidenceDistribution,
+                    rows: semanticQueryDistribution,
+                },
                 scenarioToQueryMapping: semanticScenarioQueryMapping,
                 summaryBySemanticQuery,
                 summaryBySemanticQueryCategory,
                 failureDistributionBySemanticQuery,
+                mutationCategoryBreakdownByQuery: summaryBySemanticQueryCategory,
+                failureClassBreakdownByQuery: failureDistributionBySemanticQuery,
                 excludedAppScenarioPairs: semanticSupplementExclusions,
+                validation: {
+                    warnings: semanticValidationWarnings,
+                    nonSemanticSupplementRowsExcluded: supplementRows.length - semanticSupplementRows.length,
+                    nonSupplementRowsExcluded: runs.length - supplementRows.length,
+                    eligibleMutatedSemanticFirstRows: semanticSupplementEligibleMutated.length,
+                },
+                transparency: {
+                    notPooledIntoPrimaryThesisDenominator: true,
+                    supplementarySemanticCoverageEvidenceOnly: true,
+                    mainCorpusId: 'realworld-active',
+                },
             }
             : null,
         exclusions: exclusionSummary,
@@ -937,33 +1150,39 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     console.log(`Aggregation complete. Results written to ${outputDir}`);
 }
 
-const args = process.argv.slice(2);
-const selectedAppId = getSelectedAppId();
-const defaultAppResultsDir = getAppResultsDir(selectedAppId);
-const inputDir = path.resolve(args[0] || path.join(defaultAppResultsDir, 'benchmark-runs'));
-const outputDir = path.resolve(args[1] || path.join(defaultAppResultsDir, 'aggregate'));
+function main() {
+    const args = process.argv.slice(2);
+    const selectedAppId = getSelectedAppId();
+    const defaultAppResultsDir = getAppResultsDir(selectedAppId);
+    const inputDir = path.resolve(args[0] || path.join(defaultAppResultsDir, 'benchmark-runs'));
+    const outputDir = path.resolve(args[1] || path.join(defaultAppResultsDir, 'aggregate'));
 
-if (!fs.existsSync(inputDir)) {
-    console.error(`Input directory does not exist: ${inputDir}`);
-    process.exit(1);
+    if (!fs.existsSync(inputDir)) {
+        console.error(`Input directory does not exist: ${inputDir}`);
+        process.exit(1);
+    }
+
+    const runs = loadResults(inputDir);
+    if (runs.length === 0) {
+        console.error('No valid results found to aggregate.');
+        process.exit(1);
+    }
+
+    aggregate(runs, outputDir);
+
+    const retention = getBenchmarkRetention();
+    const cleanup = pruneCompactBenchmarkArtifacts({
+        inputDir,
+        outputDir,
+        additionalDirs: [path.join(path.dirname(inputDir), 'accessibility-artifacts')],
+        retention,
+    });
+
+    if (cleanup.removedPaths.length > 0) {
+        console.log(`Compact retention pruned raw benchmark artifacts: ${cleanup.removedPaths.join(', ')}`);
+    }
 }
 
-const runs = loadResults(inputDir);
-if (runs.length === 0) {
-    console.error('No valid results found to aggregate.');
-    process.exit(1);
-}
-
-aggregate(runs, outputDir);
-
-const retention = getBenchmarkRetention();
-const cleanup = pruneCompactBenchmarkArtifacts({
-    inputDir,
-    outputDir,
-    additionalDirs: [path.join(path.dirname(inputDir), 'accessibility-artifacts')],
-    retention,
-});
-
-if (cleanup.removedPaths.length > 0) {
-    console.log(`Compact retention pruned raw benchmark artifacts: ${cleanup.removedPaths.join(', ')}`);
+if (require.main === module) {
+    main();
 }

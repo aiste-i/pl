@@ -151,8 +151,17 @@ These files are emitted only for `realworld-semantic-supplement` aggregate direc
 - `summary_by_semantic_query.csv`
 - `summary_by_semantic_query_and_category.csv`
 - `failure_distribution_by_semantic_query.csv`
+- `semantic_validation_warnings.csv`
 
-The same data is also embedded under `semanticSupplement` in `aggregate_report.json`, marked as supplementary and not pooled into primary denominators.
+These reports are scoped to `realworld-semantic-supplement` and the `semantic-first` family only. Baseline semantic support distribution and mutated semantic evidence distribution are reported separately so CSS/XPath rows and primary-corpus rows cannot appear as semantic query evidence. The same data is also embedded under `semanticSupplement` in `aggregate_report.json`, marked as supplementary and not pooled into primary denominators.
+
+A thesis-facing combined supplement aggregate can be generated with:
+
+```bash
+npm run benchmark:semantic:aggregate:combined
+```
+
+It writes to `test-results/realworld-semantic-supplement/combined-aggregate/` and includes only supplementary semantic-corpus data across supported apps.
 
 ## Denominator Rules
 

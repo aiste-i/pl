@@ -19,6 +19,15 @@ export interface SamplingSummary {
   selectedApplicableRatiosByOperator: Record<string, number>;
   applicableButUnselectedOperators: Record<string, string[]>;
   mandatoryCoverageSatisfied: boolean;
+  semanticScenarioCoverage?: SemanticScenarioCoverageRow[];
+  semanticScenarioCoverageSatisfied?: boolean;
+}
+
+export interface SemanticScenarioCoverageRow {
+  scenarioId: string;
+  status: 'mutated-covered' | 'baseline-supported-no-valid-mutated-candidate';
+  selectedCandidateId: string | null;
+  reason: string | null;
 }
 
 export function getCandidateCategory(candidate: MutationCandidate): DomOperator['category'] {
@@ -273,6 +282,76 @@ function summarizeSelectedOperators(
   };
 }
 
+function scenarioCoverageComparator(seed: number) {
+  return (left: MutationCandidate, right: MutationCandidate): number => {
+    const leftHint = left.categoryAvailabilityHint === false ? 0 : 1;
+    const rightHint = right.categoryAvailabilityHint === false ? 0 : 1;
+
+    return (
+      rightHint - leftHint ||
+      compareBaseRanking(seed, left, right) ||
+      String(left.candidateId || left.selector).localeCompare(String(right.candidateId || right.selector))
+    );
+  };
+}
+
+function selectSemanticScenarioCoverageCandidates(
+  candidates: MutationCandidate[],
+  seed: number,
+  requiredScenarioIds: string[],
+): { selected: MutationCandidate[]; coverage: SemanticScenarioCoverageRow[] } {
+  const eligibleCandidates = getEligibleCandidates(candidates);
+  const selected: MutationCandidate[] = [];
+  const coverage: SemanticScenarioCoverageRow[] = [];
+  const used = new Set<string>();
+
+  for (const scenarioId of [...requiredScenarioIds].sort()) {
+    const pool = eligibleCandidates
+      .filter(candidate => candidate.scenarioId === scenarioId)
+      .filter(candidate => !used.has(candidate.candidateId || candidate.selector))
+      .sort(scenarioCoverageComparator(seed));
+
+    const candidate = pool[0] ?? null;
+    if (!candidate) {
+      coverage.push({
+        scenarioId,
+        status: 'baseline-supported-no-valid-mutated-candidate',
+        selectedCandidateId: null,
+        reason: 'no eligible validated mutation candidate for supported supplement scenario',
+      });
+      continue;
+    }
+
+    candidate.selectedForSemanticScenarioCoverage = true;
+    selected.push(markSelection(candidate, seed, false));
+    used.add(candidate.candidateId || candidate.selector);
+    coverage.push({
+      scenarioId,
+      status: 'mutated-covered',
+      selectedCandidateId: candidate.candidateId ?? candidate.selector,
+      reason: null,
+    });
+  }
+
+  return { selected, coverage };
+}
+
+function countSelectedByCategory(selected: MutationCandidate[]): Record<string, number> {
+  return selected.reduce((acc, candidate) => {
+    const category = getCandidateCategory(candidate);
+    acc[category] = (acc[category] ?? 0) + 1;
+    return acc;
+  }, Object.fromEntries(CATEGORY_ORDER.map(category => [category, 0])) as Record<string, number>);
+}
+
+function countSelectedByOperator(selected: MutationCandidate[]): Map<string, number> {
+  return selected.reduce((acc, candidate) => {
+    const operatorName = candidate.operator.constructor.name;
+    acc.set(operatorName, (acc.get(operatorName) ?? 0) + 1);
+    return acc;
+  }, new Map<string, number>());
+}
+
 export function sampleMutationCandidates(
   candidates: MutationCandidate[],
   budget: number,
@@ -394,6 +473,72 @@ export function sampleMutationCandidates(
       mandatoryCoverageSatisfied,
     },
   };
+}
+
+export function sampleSemanticSupplementMutationCandidates(
+  candidates: MutationCandidate[],
+  budget: number,
+  seed: number,
+  requiredScenarioIds: string[],
+): { selected: MutationCandidate[]; summary: SamplingSummary } {
+  const eligibleCandidates = getEligibleCandidates(candidates);
+  const effectiveBudget = Math.max(budget, requiredScenarioIds.length);
+  const coverageSelection = selectSemanticScenarioCoverageCandidates(candidates, seed, requiredScenarioIds);
+  const stageZeroIds = new Set(coverageSelection.selected.map(candidate => candidate.candidateId || candidate.selector));
+  const remainingBudget = Math.max(0, effectiveBudget - coverageSelection.selected.length);
+  const normalSelection = sampleMutationCandidates(
+    eligibleCandidates.filter(candidate => !stageZeroIds.has(candidate.candidateId || candidate.selector)),
+    remainingBudget,
+    seed,
+  );
+  const selected = [...coverageSelection.selected, ...normalSelection.selected].slice(0, effectiveBudget);
+  const selectedOperatorCounts = countSelectedByOperator(selected);
+  const selectedCounts = countSelectedByCategory(selected);
+  const availableCountsByCategory = getAvailableCountsByCategory(eligibleCandidates);
+  const availableCountsByOperator = getAvailableCountsByOperator(eligibleCandidates);
+  const { selectedCountsByOperator, selectedApplicableRatiosByOperator } = summarizeSelectedOperators(
+    availableCountsByOperator,
+    selectedOperatorCounts,
+  );
+  const operatorPoolsByCategory = buildCategoryOperatorPools(candidates, seed);
+  const applicableButUnselectedOperators = Object.fromEntries(
+    CATEGORY_ORDER.map(category => {
+      const operatorPools = operatorPoolsByCategory.get(category) ?? new Map<string, MutationCandidate[]>();
+      const operators = [...operatorPools.keys()]
+        .filter(operatorName => (availableCountsByOperator[operatorName] ?? 0) > 0 && (selectedCountsByOperator[operatorName] ?? 0) === 0)
+        .sort((left, right) => left.localeCompare(right));
+      return [category, operators];
+    }),
+  ) as Record<string, string[]>;
+
+  for (const candidate of selected) {
+    candidate.selectionSeed = seed;
+    candidate.quotaBucket = getCandidateCategory(candidate);
+  }
+
+  return {
+    selected,
+    summary: {
+      categoryQuotas: computeCategoryQuotas(effectiveBudget),
+      selectedCounts,
+      availableCountsByCategory,
+      availableCountsByOperator,
+      selectedCountsByOperator,
+      selectedApplicableRatiosByOperator,
+      applicableButUnselectedOperators,
+      mandatoryCoverageSatisfied: true,
+      semanticScenarioCoverage: coverageSelection.coverage,
+      semanticScenarioCoverageSatisfied: coverageSelection.coverage.every(row => row.status === 'mutated-covered'),
+    },
+  };
+}
+
+export function buildSemanticSupplementPreflightPool(candidates: MutationCandidate[], seed: number): MutationCandidate[] {
+  return getEligibleCandidates(candidates)
+    .sort((left, right) =>
+      String(left.scenarioId ?? '').localeCompare(String(right.scenarioId ?? '')) ||
+      scenarioCoverageComparator(seed)(left, right),
+    );
 }
 
 function buildPreflightCategorySelection(

@@ -34,11 +34,14 @@ async function main() {
   const seed = parseInt(process.argv[4] || process.env.BENCHMARK_SEED || process.env.npm_config_seed || '12345', 10);
   const preflightTimeoutMs = parseInt(process.argv[5] || process.env.PREFLIGHT_TEST_TIMEOUT_MS || '60000', 10);
   const maxSupplementBudget = getSemanticSupplementScenarioEntries().length;
-  const budget = Math.min(requestedBudget, maxSupplementBudget);
+  const supportedScenarioCount = getSemanticSupplementScenarioEntries().filter(scenario =>
+    scenario.supportedApps.includes(appName),
+  ).length;
+  const budget = Math.max(Math.min(requestedBudget, maxSupplementBudget), supportedScenarioCount);
 
   if (budget !== requestedBudget) {
     console.log(
-      `Requested supplementary budget ${requestedBudget} exceeds the corpus size ${maxSupplementBudget}; capping to ${budget}.`,
+      `Adjusted supplementary budget from ${requestedBudget} to ${budget} so every supported scenario for ${appName} can receive mutation coverage while staying within corpus size ${maxSupplementBudget}.`,
     );
   }
 

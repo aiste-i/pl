@@ -35,6 +35,7 @@ export interface MutationCandidateMetadata {
     relevanceScore?: number;
     categoryAvailabilityHint?: boolean;
     selectedForCategoryMinimum?: boolean;
+    selectedForSemanticScenarioCoverage?: boolean;
 }
 
 export class MutationCandidate {
@@ -75,6 +76,7 @@ export class MutationCandidate {
     relevanceScore?: number;
     categoryAvailabilityHint?: boolean;
     selectedForCategoryMinimum?: boolean;
+    selectedForSemanticScenarioCoverage?: boolean;
 
     constructor(selector: string, operator: DomOperator, url?: string, fingerprint?: any, metadata: MutationCandidateMetadata = {}) {
         this.selector = selector;
@@ -125,6 +127,7 @@ export class MutationCandidate {
             relevanceScore: this.relevanceScore ?? 0,
             categoryAvailabilityHint: this.categoryAvailabilityHint ?? false,
             selectedForCategoryMinimum: this.selectedForCategoryMinimum ?? false,
+            selectedForSemanticScenarioCoverage: this.selectedForSemanticScenarioCoverage ?? false,
             record: this.record
         };
     }
