@@ -4,6 +4,7 @@ import { MutationRecord } from '../../../MutationRecord';
 
 export class ReplaceAnchorWithSpan extends AccessibilityOperator {
     category: 'structural' = 'structural';
+    oracleAnchorSafe = true;
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
         if (!await super.isApplicable(page, target)) return false;
 

@@ -4,6 +4,7 @@ import { MutationRecord } from '../../../MutationRecord';
 
 export class ReplaceImageWithDiv extends AccessibilityOperator {
     category: 'structural' = 'structural';
+    oracleAnchorSafe = true;
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
         if (!await super.isApplicable(page, target)) return false;
 
@@ -44,9 +45,13 @@ export class ReplaceImageWithDiv extends AccessibilityOperator {
             
             div.style.backgroundPosition = style.objectPosition || 'center';
             
-            // Copy attributes like id, class to keep CSS/JS hooks
-            if (el.id) div.id = el.id;
-            if (el.className) div.className = el.className;
+            for (let i = 0; i < el.attributes.length; i++) {
+                const attr = el.attributes[i];
+                if (attr.name === 'src' || attr.name === 'alt') {
+                    continue;
+                }
+                div.setAttribute(attr.name, attr.value);
+            }
             
             // Replace the image with the div
             if (el.parentNode) {

@@ -4,6 +4,7 @@ import { MutationRecord } from '../../../MutationRecord';
 
 export class RemoveInputNames extends AccessibilityOperator {
     category: 'accessibility-semantic' = 'accessibility-semantic';
+    oracleAnchorSafe = true;
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
         if (!await super.isApplicable(page, target)) return false;
 
@@ -20,6 +21,13 @@ export class RemoveInputNames extends AccessibilityOperator {
             // Check for parent label
             if (el.closest('label')) return true;
 
+            // Check placeholder/title fallback surfaces
+            const placeholder = el.getAttribute('placeholder');
+            if (placeholder && placeholder.trim() !== '') return true;
+
+            const title = el.getAttribute('title');
+            if (title && title.trim() !== '') return true;
+
             return false;
         });
     }
@@ -29,6 +37,8 @@ export class RemoveInputNames extends AccessibilityOperator {
             // Remove ARIA labels
             el.removeAttribute('aria-label');
             el.removeAttribute('aria-labelledby');
+            el.removeAttribute('placeholder');
+            el.removeAttribute('title');
             
             // Break <label for="..."> association
             const id = el.id;

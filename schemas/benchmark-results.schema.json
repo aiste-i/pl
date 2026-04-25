@@ -175,6 +175,8 @@
         "operatorApplicableCount",
         "operatorSkippedOracleCount",
         "operatorNotApplicableCount",
+        "operatorSelectedCount",
+        "operatorSelectedApplicableRatio",
         "operatorCheckDurationMs",
         "applyDurationMs",
         "applyFailureCount",
@@ -191,6 +193,8 @@
         "operatorApplicableCount": { "$ref": "#/definitions/nullableNumber" },
         "operatorSkippedOracleCount": { "$ref": "#/definitions/nullableNumber" },
         "operatorNotApplicableCount": { "$ref": "#/definitions/nullableNumber" },
+        "operatorSelectedCount": { "$ref": "#/definitions/nullableNumber" },
+        "operatorSelectedApplicableRatio": { "$ref": "#/definitions/nullableNumber" },
         "operatorCheckDurationMs": { "$ref": "#/definitions/nullableNumber" },
         "applyDurationMs": { "$ref": "#/definitions/nullableNumber" },
         "applyFailureCount": { "type": "integer", "minimum": 0 },
@@ -380,10 +384,27 @@
         "browserName": { "$ref": "#/definitions/browserName" },
         "browserChannel": { "$ref": "#/definitions/nullableString" },
         "corpusId": { "$ref": "#/definitions/nullableString" },
+        "corpusRole": {
+          "anyOf": [
+            { "enum": ["primary", "supplementary"] },
+            { "type": "null" }
+          ]
+        },
         "scenarioId": { "$ref": "#/definitions/nonEmptyString" },
         "activeScenarioId": { "$ref": "#/definitions/nullableString" },
         "activeScenarioCategory": { "$ref": "#/definitions/nullableString" },
         "sourceSpec": { "$ref": "#/definitions/nullableString" },
+        "intendedSemanticEntryPoint": { "$ref": "#/definitions/nullableString" },
+        "actualSemanticEntryPoint": { "$ref": "#/definitions/nullableString" },
+        "targetLogicalKeys": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/nonEmptyString" }
+        },
+        "semanticScenarioSupportedApps": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/nonEmptyString" }
+        },
+        "semanticScenarioExclusionReason": { "$ref": "#/definitions/nullableString" },
         "locatorFamily": { "$ref": "#/definitions/locatorFamily" },
         "semanticEntryPoint": { "$ref": "#/definitions/nullableString" },
         "phase": { "$ref": "#/definitions/phase" },

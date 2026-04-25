@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import Ajv, { ErrorObject, ValidateFunction } from 'ajv';
+import addFormats from 'ajv-formats';
 
 export interface ValidationFailure {
   filePath: string;
@@ -28,16 +29,15 @@ function getValidator(): ValidateFunction {
   const schema = JSON.parse(fs.readFileSync(getBenchmarkResultsSchemaPath(), 'utf8'));
   const ajv = new Ajv({
     allErrors: true,
-    jsonPointers: true,
-    format: 'fast',
-    schemaId: 'auto',
+    strict: false,
   });
+  addFormats(ajv, { mode: 'fast' });
   cachedValidator = ajv.compile(schema);
   return cachedValidator;
 }
 
 function normalizeJsonPath(error: ErrorObject): string {
-  const pathValue = error.dataPath || '';
+  const pathValue = error.instancePath || '';
   if (pathValue === '') {
     return '$';
   }

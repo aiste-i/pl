@@ -129,6 +129,8 @@ test('valid full benchmark record passes schema validation', () => {
       operatorApplicableCount: 4,
       operatorSkippedOracleCount: 1,
       operatorNotApplicableCount: 5,
+      operatorSelectedCount: 1,
+      operatorSelectedApplicableRatio: 0.25,
       operatorCheckDurationMs: 12,
       applyDurationMs: 3,
       applyFailureCount: 0,

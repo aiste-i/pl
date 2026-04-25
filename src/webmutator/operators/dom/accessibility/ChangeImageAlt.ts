@@ -4,6 +4,7 @@ import { MutationRecord } from '../../../MutationRecord';
 
 export class ChangeImageAlt extends AccessibilityOperator {
     category: 'content' = 'content';
+    oracleAnchorSafe = true;
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
         if (!await super.isApplicable(page, target)) return false;
 

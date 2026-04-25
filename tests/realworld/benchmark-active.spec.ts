@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { test, expect } from '../baseFixture';
 import { STRATEGIES, StrategyName } from '../../src/locators';
-import { MutantGenerator } from '../../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../../src/benchmark/runner/MutantGenerator';
 import {
   getAppPreflightPoolPath,
   getAppPreflightResultsPath,
@@ -11,6 +11,16 @@ import {
 } from '../../src/apps';
 import { getActiveScenarioDefinitions } from './benchmark-active.scenarios';
 import { WebMutator } from '../../src/webmutator/WebMutator';
+import {
+  resolveScenarioTouchpoints,
+  type FamilyStressHints,
+  type RelevanceBand,
+  type ScenarioTouchpointInput,
+} from '../../src/benchmark/realworld-touchpoints';
+import { evaluateMutationMeaningfulness, type MutationSurfaceSnapshot } from '../../src/benchmark/mutation-quality';
+import { captureMutationSurface } from '../../src/benchmark/mutation-surface';
+import { getCandidateCategory } from '../../src/benchmark/runner/sampling';
+import { getActiveBenchmarkTestTimeoutMs } from './helpers/benchmark-active';
 
 const APP_ID = getSelectedAppId();
 const MODE = process.env.BENCHMARK_ACTIVE_MODE || 'baseline';
@@ -29,10 +39,18 @@ interface PreflightResultRow {
   scenarioId: string;
   viewContext: string;
   operator: string;
+  operatorCategory: string;
   selector: string;
   success: boolean;
   reason: string | null;
   durationMs: number;
+  touchpointLogicalKeys: string[];
+  relevanceBand: RelevanceBand;
+  relevanceScore: number;
+  familyStressHints: FamilyStressHints;
+  categoryAvailabilityHint: boolean;
+  meaningfulEffect: boolean;
+  meaningfulEffectReason: string | null;
 }
 
 const preflightResults: PreflightResultRow[] = [];
@@ -43,12 +61,19 @@ function describeScenario(
   testTitle = `${scenario.displayName} [${strategy}]`,
 ) {
   test(testTitle, async ({ page, request, locators, oracle, appAdapter, applyDeferredMutation, setScenarioMetadata }) => {
+    test.setTimeout(getActiveBenchmarkTestTimeoutMs());
     setScenarioMetadata({
       activeScenarioId: scenario.scenarioId,
       activeScenarioCategory: scenario.category,
       sourceSpec: scenario.sourceSpec,
     });
-    await scenario.run({ page, request, locators, oracle, appAdapter, applyDeferredMutation });
+    try {
+      await scenario.run({ page, request, locators, oracle, appAdapter, applyDeferredMutation });
+    } catch (error) {
+      if (MODE !== 'mutate') {
+        throw error;
+      }
+    }
   });
 }
 
@@ -74,22 +99,25 @@ if (MODE === 'collect') {
         });
 
         const generator = new MutantGenerator(page, APP_ID);
-        await scenario.collect({
+          await scenario.collect({
           page,
           request,
           locators,
           oracle,
           appAdapter,
+          applyDeferredMutation: async () => undefined,
           generator,
-          async collectCheckpoint(viewContext: string) {
-            await generator.collectReachableTargets({
-              scenarioId: scenario.scenarioId,
-              scenarioCategory: scenario.category,
-              sourceSpec: scenario.sourceSpec,
-              viewContext,
-            });
-          },
-        });
+            async collectCheckpoint(viewContext: string, touchpoints: ScenarioTouchpointInput[] = []) {
+              const resolvedTouchpoints = await resolveScenarioTouchpoints(APP_ID, scenario.scenarioId, touchpoints);
+              await generator.collectReachableTargets({
+                scenarioId: scenario.scenarioId,
+                scenarioCategory: scenario.category,
+                sourceSpec: scenario.sourceSpec,
+                viewContext,
+                touchpoints: resolvedTouchpoints,
+              });
+            },
+          });
 
         await generator.saveRegistryToFile();
         expect(fs.existsSync(REACHABLE_TARGETS_FILE)).toBe(true);
@@ -132,6 +160,18 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
   const scenarios = generator.loadScenarios(PREFLIGHT_POOL_FILE);
 
   test.afterAll(async () => {
+    const successfulCountsByCategory = preflightResults.reduce((acc, result) => {
+      if (result.success) {
+        acc[result.operatorCategory] = (acc[result.operatorCategory] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+    const successfulCountsByOperator = preflightResults.reduce((acc, result) => {
+      if (result.success) {
+        acc[result.operator] = (acc[result.operator] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
     const payload = {
       metadata: {
         applicationId: APP_ID,
@@ -140,6 +180,8 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
         seed: BENCHMARK_SEED,
         totalCandidates: scenarios.length,
         successfulCandidates: preflightResults.filter(result => result.success).length,
+        successfulCountsByCategory,
+        successfulCountsByOperator,
       },
       results: preflightResults,
     };
@@ -172,6 +214,8 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
         let durationMs = 0;
         let reason: string | null = null;
         let success = false;
+        let meaningfulEffect = false;
+        let meaningfulEffectReason: string | null = null;
 
         try {
           await matchingScenario.collect({
@@ -180,6 +224,7 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
             locators,
             oracle,
             appAdapter,
+            applyDeferredMutation: async () => undefined,
             generator: new MutantGenerator(page, APP_ID),
             async collectCheckpoint(viewContext: string) {
               if (viewContext !== mutationScenario.viewContext || checkpointReached) {
@@ -188,11 +233,22 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
 
               checkpointReached = true;
               const mutator = new WebMutator();
+              const beforeSurface = await captureMutationSurface(page, mutationScenario.selector);
               const startedAt = Date.now();
               const record = await mutator.applyMutation(page, mutationScenario.selector, mutationScenario.operator);
               durationMs = Date.now() - startedAt;
-              success = record.success;
-              reason = record.error ?? null;
+              const afterSurface = await captureMutationSurface(page, mutationScenario.selector);
+              const operatorCategory = getCandidateCategory(mutationScenario);
+              const meaningfulResult = evaluateMutationMeaningfulness(
+                operatorCategory,
+                mutationScenario.relevanceBand,
+                beforeSurface,
+                afterSurface,
+              );
+              meaningfulEffect = meaningfulResult.meaningful;
+              meaningfulEffectReason = meaningfulResult.reason;
+              success = record.success && meaningfulResult.meaningful;
+              reason = record.error ?? meaningfulResult.reason ?? null;
             },
           });
         } catch (error: any) {
@@ -208,10 +264,18 @@ if (MODE === 'preflight' && fs.existsSync(PREFLIGHT_POOL_FILE)) {
           scenarioId: mutationScenario.scenarioId ?? matchingScenario.scenarioId,
           viewContext: mutationScenario.viewContext ?? 'unknown',
           operator: mutationScenario.operator.constructor.name,
+          operatorCategory: getCandidateCategory(mutationScenario),
           selector: mutationScenario.selector,
           success: checkpointReached && success,
           reason,
           durationMs,
+          touchpointLogicalKeys: mutationScenario.touchpointLogicalKeys ?? [],
+          relevanceBand: mutationScenario.relevanceBand ?? 'generic',
+          relevanceScore: mutationScenario.relevanceScore ?? 0,
+          familyStressHints: mutationScenario.familyStressHints ?? { semantic: false, css: false, xpath: false },
+          categoryAvailabilityHint: mutationScenario.categoryAvailabilityHint ?? false,
+          meaningfulEffect,
+          meaningfulEffectReason,
         });
       });
     }

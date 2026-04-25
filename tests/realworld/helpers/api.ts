@@ -69,6 +69,7 @@ export async function createArticleViaAPI(
   request: APIRequestContext,
   token: string,
   article: { title: string; description: string; body: string; tagList?: string[] },
+  waitOptions?: { timeoutMs?: number; intervalMs?: number },
 ): Promise<string> {
   const response = await request.post(`${API_BASE}/articles`, {
     headers: {
@@ -88,7 +89,7 @@ export async function createArticleViaAPI(
   }
   const data = await response.json();
   const slug = data.article.slug;
-  await waitForArticleViaAPI(request, slug);
+  await waitForArticleViaAPI(request, slug, waitOptions);
   return slug;
 }
 

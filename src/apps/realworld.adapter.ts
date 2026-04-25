@@ -35,7 +35,11 @@ export const realworldAdapter: AppAdapter = {
   startCommand: `npm run dev -- --host 127.0.0.1 --port ${REALWORLD_PORT}`,
   baseURL: REALWORLD_BASE_URL,
   healthUrl: REALWORLD_BASE_URL,
-  testMatch: ['tests/realworld/**/*.spec.ts', 'tests/realworld-validation/**/*.spec.ts'],
+  testMatch: [
+    'tests/realworld/benchmark-active.spec.ts',
+    'tests/realworld/benchmark-semantic-supplement.spec.ts',
+    'tests/realworld-validation/**/*.spec.ts',
+  ],
   paths: realworldPaths,
   getLocators: getReactRealWorldLocators,
   getOracle: getReactRealWorldOracle,

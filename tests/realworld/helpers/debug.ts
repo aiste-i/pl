@@ -29,12 +29,18 @@ export interface User {
   token: string;
 }
 
+interface ConduitDebug {
+  getToken(): string | null;
+  getAuthState(): AuthState;
+  getCurrentUser(): User | null;
+}
+
 /**
  * Get the current JWT token from the app's debug interface.
  * Returns null if no token is set or debug interface is not available.
  */
 export async function getToken(page: Page): Promise<string | null> {
-  return page.evaluate(() => window.__conduit_debug__?.getToken() ?? null);
+  return page.evaluate(() => (window as Window & { __conduit_debug__?: ConduitDebug }).__conduit_debug__?.getToken() ?? null);
 }
 
 /**
@@ -42,7 +48,7 @@ export async function getToken(page: Page): Promise<string | null> {
  * Returns undefined if debug interface is not available.
  */
 export async function getAuthState(page: Page): Promise<AuthState | undefined> {
-  return page.evaluate(() => window.__conduit_debug__?.getAuthState());
+  return page.evaluate(() => (window as Window & { __conduit_debug__?: ConduitDebug }).__conduit_debug__?.getAuthState());
 }
 
 /**
@@ -50,7 +56,7 @@ export async function getAuthState(page: Page): Promise<AuthState | undefined> {
  * Returns null if not authenticated or debug interface is not available.
  */
 export async function getCurrentUser(page: Page): Promise<User | null> {
-  return page.evaluate(() => window.__conduit_debug__?.getCurrentUser() ?? null);
+  return page.evaluate(() => (window as Window & { __conduit_debug__?: ConduitDebug }).__conduit_debug__?.getCurrentUser() ?? null);
 }
 
 /**
@@ -63,7 +69,11 @@ export async function waitForAuthState(
   options: { timeout?: number } = {},
 ): Promise<void> {
   const timeout = options.timeout ?? 5000;
-  await page.waitForFunction(state => window.__conduit_debug__?.getAuthState() === state, expectedState, { timeout });
+  await page.waitForFunction(
+    state => (window as Window & { __conduit_debug__?: ConduitDebug }).__conduit_debug__?.getAuthState() === state,
+    expectedState,
+    { timeout },
+  );
 }
 
 /**
@@ -71,5 +81,5 @@ export async function waitForAuthState(
  * Can be used to skip tests if implementation doesn't support it.
  */
 export async function isDebugInterfaceAvailable(page: Page): Promise<boolean> {
-  return page.evaluate(() => typeof window.__conduit_debug__ !== 'undefined');
+  return page.evaluate(() => typeof (window as Window & { __conduit_debug__?: ConduitDebug }).__conduit_debug__ !== 'undefined');
 }

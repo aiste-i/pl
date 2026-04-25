@@ -30,23 +30,35 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('navigation').first(), 'getByRole'),
         ),
         css: css({ ...meta('nav.navbar'), selector: 'nav.navbar' }),
-        xpath: xpath({ ...meta('nav.navbar'), selector: '(//nav[contains(@class,"navbar")])[1]' }),
+        xpath: xpath({
+          ...meta('nav.navbar'),
+          selector:
+            '(//nav[contains(concat(" ", normalize-space(@class), " "), " navbar ")][descendant::a[contains(concat(" ", normalize-space(@class), " "), " navbar-brand ")]])[1]',
+        }),
       }),
       brandLink: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('nav.brandLink'), semanticEntryPoint: 'getByRole' },
           (page: Page) => markSemantic(page.getByRole('link', { name: /conduit/i }).first(), 'getByRole'),
         ),
-        css: css({ ...meta('nav.brandLink'), selector: 'nav.navbar a.navbar-brand' }),
-        xpath: xpath({ ...meta('nav.brandLink'), selector: '(//nav[contains(@class,"navbar")]//a[contains(@class,"navbar-brand")])[1]' }),
+        css: css({ ...meta('nav.brandLink'), selector: '.navbar .navbar-brand' }),
+        xpath: xpath({
+          ...meta('nav.brandLink'),
+          selector:
+            '(//a[contains(concat(" ", normalize-space(@class), " "), " navbar-brand ")][ancestor::nav[contains(concat(" ", normalize-space(@class), " "), " navbar ")]])[1]',
+        }),
       }),
       globalFeedTab: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('nav.globalFeedTab'), semanticEntryPoint: 'getByRole' },
           (page: Page) => markSemantic(page.getByRole('link', { name: /^global feed$/i }).first(), 'getByRole'),
         ),
-        css: css({ ...meta('nav.globalFeedTab'), selector: '.feed-toggle a.nav-link[href="/"]' }),
-        xpath: xpath({ ...meta('nav.globalFeedTab'), selector: '(//div[contains(@class,"feed-toggle")]//a[contains(@class,"nav-link") and @href="/"])[1]' }),
+        css: css({ ...meta('nav.globalFeedTab'), selector: '.feed-toggle .nav-link[href="/"]' }),
+        xpath: xpath({
+          ...meta('nav.globalFeedTab'),
+          selector:
+            '(//a[@href="/" and ancestor::div[contains(concat(" ", normalize-space(@class), " "), " feed-toggle ")] and ancestor::li[contains(concat(" ", normalize-space(@class), " "), " nav-item ")]])[1]',
+        }),
       }),
     },
     auth: {
@@ -56,7 +68,7 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByPlaceholder(/^email$/i), 'getByPlaceholder'),
         ),
         css: css({ ...meta('auth.emailInput'), selector: 'form input[name="email"]' }),
-        xpath: xpath({ ...meta('auth.emailInput'), selector: '(//form//input[@name="email"])[1]' }),
+        xpath: xpath({ ...meta('auth.emailInput'), selector: '(//div[contains(@class,"auth-page")]//input[@name="email"])[1]' }),
       }),
       passwordInput: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -64,7 +76,7 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByPlaceholder(/^password$/i), 'getByPlaceholder'),
         ),
         css: css({ ...meta('auth.passwordInput'), selector: 'form input[name="password"]' }),
-        xpath: xpath({ ...meta('auth.passwordInput'), selector: '(//form//input[@name="password"])[1]' }),
+        xpath: xpath({ ...meta('auth.passwordInput'), selector: '(//div[contains(@class,"auth-page")]//input[@name="password"])[1]' }),
       }),
       submitButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -72,7 +84,11 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('button', { name: /sign in|sign up/i }).first(), 'getByRole'),
         ),
         css: css({ ...meta('auth.submitButton'), selector: 'form button[type="submit"]' }),
-        xpath: xpath({ ...meta('auth.submitButton'), selector: '(//form//button[@type="submit"])[1]' }),
+        xpath: xpath({
+          ...meta('auth.submitButton'),
+          selector:
+            '(//div[contains(concat(" ", normalize-space(@class), " "), " auth-page ")]//button[@type="submit" and ancestor::form[.//input[@name="email"] and .//input[@name="password"]]])[1]',
+        }),
       }),
     },
     home: {
@@ -95,8 +111,8 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           { ...meta('home.firstReadMoreLink'), semanticEntryPoint: 'getByRole' },
           (page: Page) => markSemantic(page.getByRole('link', { name: /^read more about /i }).first(), 'getByRole'),
         ),
-        css: css({ ...meta('home.firstReadMoreLink'), selector: '.article-list > app-article-preview:first-of-type a.preview-link' }),
-        xpath: xpath({ ...meta('home.firstReadMoreLink'), selector: '((//div[contains(@class,"article-list")]/app-article-preview)[1]//a[contains(@class,"preview-link")])[1]' }),
+        css: css({ ...meta('home.firstReadMoreLink'), selector: '.article-list > app-article-preview:first-of-type .preview-link' }),
+        xpath: xpath({ ...meta('home.firstReadMoreLink'), selector: '((//div[contains(@class,"article-list")]/app-article-preview)[1]//a[contains(@class,"preview-link") and .//h1])[1]' }),
       }),
       previewDescription: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -104,12 +120,12 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (preview: Locator) => markSemantic(preview.getByRole('note', { name: /^article preview description$/i }).first(), 'getByRole'),
         ),
         css: css(
-          { ...meta('home.previewDescription'), selector: 'a.preview-link > p' },
-          (preview: Locator) => preview.locator('a.preview-link > p').first(),
+          { ...meta('home.previewDescription'), selector: '.preview-link > p[role="note"]' },
+          (preview: Locator) => preview.locator('.preview-link > p[role="note"]').first(),
         ),
         xpath: xpath(
-          { ...meta('home.previewDescription'), selector: '(.//a[contains(@class,"preview-link")]//p)[1]' },
-          (preview: Locator) => preview.locator('xpath=(.//a[contains(@class,"preview-link")]//p)[1]'),
+          { ...meta('home.previewDescription'), selector: '(.//a[contains(@class,"preview-link")]/descendant::p[@role="note" or @aria-label="Article preview description"])[1]' },
+          (preview: Locator) => preview.locator('xpath=(.//a[contains(@class,"preview-link")]/descendant::p[@role="note" or @aria-label="Article preview description"])[1]'),
         ),
       }),
       paginationButton: chooseStrategy(strategy, {
@@ -119,13 +135,13 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
             markSemantic(page.getByRole('button', { name: new RegExp(`^go to page ${pageNumber}$`, 'i') }).first(), 'getByRole'),
         ),
         css: css(
-          { ...meta('home.paginationButton'), selector: '.pagination button.page-link[aria-label]' },
-          (page: Page, pageNumber: number) => page.locator(`.pagination button.page-link[aria-label="Go to page ${pageNumber}"]`),
+          { ...meta('home.paginationButton'), selector: '.pagination .page-item > button.page-link[aria-label]' },
+          (page: Page, pageNumber: number) => page.locator(`.pagination .page-item > button.page-link[aria-label="Go to page ${pageNumber}"]`),
         ),
         xpath: xpath(
-          { ...meta('home.paginationButton'), selector: '//ul[contains(@class,"pagination")]//button[@aria-label="Go to page N"]' },
+          { ...meta('home.paginationButton'), selector: '//ul[contains(@class,"pagination")]/li[.//button[@aria-label="Go to page N"]]//button[@aria-label="Go to page N"]' },
           (page: Page, pageNumber: number) =>
-            page.locator(`xpath=//ul[contains(@class,"pagination")]//button[@aria-label="Go to page ${pageNumber}"]`),
+            page.locator(`xpath=//ul[contains(@class,"pagination")]/li[.//button[@aria-label="Go to page ${pageNumber}"]]//button[@aria-label="Go to page ${pageNumber}"]`),
         ),
       }),
       paginationItem: chooseStrategy(strategy, {
@@ -135,9 +151,9 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
             markSemantic(page.getByRole('listitem', { name: new RegExp(`^page ${pageNumber}$`, 'i') }).first(), 'getByRole'),
         ),
         css: css(
-          { ...meta('home.paginationItem'), selector: '.pagination li.page-item' },
+          { ...meta('home.paginationItem'), selector: '.pagination .page-item:has(> button.page-link[aria-label])' },
           (page: Page, pageNumber: number) =>
-            page.locator('.pagination li.page-item').filter({ has: page.locator(`button.page-link[aria-label="Go to page ${pageNumber}"]`) }).first(),
+            page.locator(`.pagination .page-item:has(> button.page-link[aria-label="Go to page ${pageNumber}"])`).first(),
         ),
         xpath: xpath(
           { ...meta('home.paginationItem'), selector: '//ul[contains(@class,"pagination")]//li[contains(@class,"page-item") and .//button[@aria-label="Go to page N"]]' },
@@ -153,7 +169,23 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('heading', { level: 1 }).first(), 'getByRole'),
         ),
         css: css({ ...meta('article.title'), selector: '.article-page .banner h1' }),
-        xpath: xpath({ ...meta('article.title'), selector: '(//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//h1)[1]' }),
+        xpath: xpath({
+          ...meta('article.title'),
+          selector:
+            '(//div[contains(concat(" ", normalize-space(@class), " "), " article-page ")]//div[contains(concat(" ", normalize-space(@class), " "), " banner ")]/descendant::h1)[1]',
+        }),
+      }),
+      titleText: chooseStrategy(strategy, {
+        'semantic-first': semanticNative(
+          { ...meta('article.titleText'), semanticEntryPoint: 'getByText' },
+          (page: Page, title: string) => markSemantic(page.getByText(title, { exact: true }).first(), 'getByText'),
+        ),
+        css: css({ ...meta('article.titleText'), selector: '.article-page .banner h1' }),
+        xpath: xpath(
+          { ...meta('article.titleText'), selector: '//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//h1[normalize-space() = "${title}"]' },
+          (page: Page, title: string) =>
+            page.locator(`xpath=//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//h1[normalize-space() = ${JSON.stringify(title)}]`),
+        ),
       }),
       favoriteButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -161,12 +193,12 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('button', { name: /^favorite article\b/i }).first(), 'getByRole'),
         ),
         css: css(
-          { ...meta('article.favoriteButton'), selector: '.article-page .banner button[aria-label="Favorite article"]' },
-          (page: Page) => page.locator('.article-page .banner button[aria-label="Favorite article"]'),
+          { ...meta('article.favoriteButton'), selector: '.banner .article-meta .btn[aria-label="Favorite article"]' },
+          (page: Page) => page.locator('.banner .article-meta .btn[aria-label="Favorite article"]'),
         ),
         xpath: xpath(
-          { ...meta('article.favoriteButton'), selector: '//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//button[@aria-label="Favorite article"]' },
-          (page: Page) => page.locator('xpath=//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//button[@aria-label="Favorite article"]'),
+          { ...meta('article.favoriteButton'), selector: '//div[contains(@class,"banner")]//app-article-meta//*[self::button or self::a][@aria-label="Favorite article"]' },
+          (page: Page) => page.locator('xpath=//div[contains(@class,"banner")]//app-article-meta//*[self::button or self::a][@aria-label="Favorite article"]'),
         ),
       }),
       unfavoriteButton: chooseStrategy(strategy, {
@@ -175,12 +207,12 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('button', { name: /^unfavorite article\b/i }).first(), 'getByRole'),
         ),
         css: css(
-          { ...meta('article.unfavoriteButton'), selector: '.article-page .banner button[aria-label="Unfavorite article"]' },
-          (page: Page) => page.locator('.article-page .banner button[aria-label="Unfavorite article"]'),
+          { ...meta('article.unfavoriteButton'), selector: '.banner .article-meta .btn[aria-label="Unfavorite article"]' },
+          (page: Page) => page.locator('.banner .article-meta .btn[aria-label="Unfavorite article"]'),
         ),
         xpath: xpath(
-          { ...meta('article.unfavoriteButton'), selector: '//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//button[@aria-label="Unfavorite article"]' },
-          (page: Page) => page.locator('xpath=//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//button[@aria-label="Unfavorite article"]'),
+          { ...meta('article.unfavoriteButton'), selector: '//div[contains(@class,"banner")]//app-article-meta//*[self::button or self::a][@aria-label="Unfavorite article"]' },
+          (page: Page) => page.locator('xpath=//div[contains(@class,"banner")]//app-article-meta//*[self::button or self::a][@aria-label="Unfavorite article"]'),
         ),
       }),
     },
@@ -190,16 +222,24 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           { ...meta('comments.textarea'), semanticEntryPoint: 'getByPlaceholder' },
           (page: Page) => markSemantic(page.getByPlaceholder(/write a comment/i), 'getByPlaceholder'),
         ),
-        css: css({ ...meta('comments.textarea'), selector: 'form.comment-form textarea[placeholder="Write a comment..."]' }),
-        xpath: xpath({ ...meta('comments.textarea'), selector: '(//form[contains(@class,"comment-form")]//textarea[contains(@placeholder,"Write a comment")])[1]' }),
+        css: css({ ...meta('comments.textarea'), selector: '.comment-form .card-block > textarea.form-control[placeholder="Write a comment..."]' }),
+        xpath: xpath({
+          ...meta('comments.textarea'),
+          selector:
+            '(//form[contains(concat(" ", normalize-space(@class), " "), " comment-form ")]//div[contains(concat(" ", normalize-space(@class), " "), " card-block ")]/textarea[contains(concat(" ", normalize-space(@class), " "), " form-control ")])[1]',
+        }),
       }),
       submitButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('comments.submitButton'), semanticEntryPoint: 'getByRole' },
           (page: Page) => markSemantic(page.getByRole('button', { name: /post comment/i }).first(), 'getByRole'),
         ),
-        css: css({ ...meta('comments.submitButton'), selector: 'form.comment-form button[type="submit"]' }),
-        xpath: xpath({ ...meta('comments.submitButton'), selector: '(//form[contains(@class,"comment-form")]//button[@type="submit"])[1]' }),
+        css: css({ ...meta('comments.submitButton'), selector: '.comment-form .card-footer > button.btn.btn-primary[type="submit"]' }),
+        xpath: xpath({
+          ...meta('comments.submitButton'),
+          selector:
+            '(//form[contains(concat(" ", normalize-space(@class), " "), " comment-form ")]//div[contains(concat(" ", normalize-space(@class), " "), " card-footer ")]//button[@type="submit" and ancestor::form[.//textarea]])[1]',
+        }),
       }),
       deleteButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
@@ -207,12 +247,12 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (commentRoot: Locator) => markSemantic(commentRoot.getByRole('button', { name: /delete comment/i }).first(), 'getByRole'),
         ),
         css: css(
-          { ...meta('comments.deleteButton'), selector: 'button[aria-label="Delete comment"]' },
-          (commentRoot: Locator) => commentRoot.locator('button[aria-label="Delete comment"]').first(),
+          { ...meta('comments.deleteButton'), selector: '.card-footer button[aria-label="Delete comment"]' },
+          (commentRoot: Locator) => commentRoot.locator('.card-footer button[aria-label="Delete comment"]').first(),
         ),
         xpath: xpath(
-          { ...meta('comments.deleteButton'), selector: './/button[@aria-label="Delete comment"]' },
-          (commentRoot: Locator) => commentRoot.locator('xpath=.//button[@aria-label="Delete comment"]'),
+          { ...meta('comments.deleteButton'), selector: './/div[contains(@class,"card-footer")]//button[@aria-label="Delete comment"]' },
+          (commentRoot: Locator) => commentRoot.locator('xpath=.//div[contains(@class,"card-footer")]//button[@aria-label="Delete comment"]'),
         ),
       }),
     },
@@ -223,8 +263,8 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('button', { name: /^follow user\b/i }).first(), 'getByRole'),
         ),
         css: css(
-          { ...meta('profile.followButton'), selector: '.profile-page .user-info button[aria-label="Follow user"]' },
-          (page: Page) => page.locator('.profile-page .user-info button[aria-label="Follow user"]'),
+          { ...meta('profile.followButton'), selector: '.user-info .btn.action-btn[aria-label="Follow user"]' },
+          (page: Page) => page.locator('.user-info .btn.action-btn[aria-label="Follow user"]'),
         ),
         xpath: xpath(
           { ...meta('profile.followButton'), selector: '//div[contains(@class,"user-info")]//button[@aria-label="Follow user"]' },
@@ -237,8 +277,8 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           (page: Page) => markSemantic(page.getByRole('button', { name: /^unfollow user\b/i }).first(), 'getByRole'),
         ),
         css: css(
-          { ...meta('profile.unfollowButton'), selector: '.profile-page .user-info button[aria-label="Unfollow user"]' },
-          (page: Page) => page.locator('.profile-page .user-info button[aria-label="Unfollow user"]'),
+          { ...meta('profile.unfollowButton'), selector: '.user-info .btn.action-btn[aria-label="Unfollow user"]' },
+          (page: Page) => page.locator('.user-info .btn.action-btn[aria-label="Unfollow user"]'),
         ),
         xpath: xpath(
           { ...meta('profile.unfollowButton'), selector: '//div[contains(@class,"user-info")]//button[@aria-label="Unfollow user"]' },
@@ -252,16 +292,24 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
           { ...meta('settings.bioInput'), semanticEntryPoint: 'getByPlaceholder' },
           (page: Page) => markSemantic(page.getByPlaceholder(/short bio/i), 'getByPlaceholder'),
         ),
-        css: css({ ...meta('settings.bioInput'), selector: 'form textarea[name="bio"]' }),
-        xpath: xpath({ ...meta('settings.bioInput'), selector: '(//form//textarea[@name="bio"])[1]' }),
+        css: css({ ...meta('settings.bioInput'), selector: 'form textarea.form-control[name="bio"]' }),
+        xpath: xpath({
+          ...meta('settings.bioInput'),
+          selector:
+            '(//div[contains(concat(" ", normalize-space(@class), " "), " settings-page ")]//form//textarea[@name="bio"])[1]',
+        }),
       }),
       submitButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('settings.submitButton'), semanticEntryPoint: 'getByRole' },
           (page: Page) => markSemantic(page.getByRole('button', { name: /update settings/i }).first(), 'getByRole'),
         ),
-        css: css({ ...meta('settings.submitButton'), selector: 'form button[type="submit"]' }),
-        xpath: xpath({ ...meta('settings.submitButton'), selector: '(//form//button[@type="submit"])[1]' }),
+        css: css({ ...meta('settings.submitButton'), selector: 'form .btn.btn-primary.pull-xs-right[type="submit"]' }),
+        xpath: xpath({
+          ...meta('settings.submitButton'),
+          selector:
+            '(//div[contains(concat(" ", normalize-space(@class), " "), " settings-page ")]//form[.//textarea[@name="bio"]]//button[@type="submit"])[1]',
+        }),
       }),
     },
   };
@@ -301,6 +349,7 @@ export function getAngularRealWorldOracle() {
     article: {
       page: oracleTestId(meta('article.page'), 'article-page'),
       title: oracleTestId(meta('article.title'), 'article-title'),
+      titleText: oracleTestId(meta('article.titleText'), 'article-title'),
       favoriteButton: oracleTestId(meta('article.favoriteButton'), 'article-favorite-btn'),
       unfavoriteButton: oracleTestId(meta('article.unfavoriteButton'), 'article-unfavorite-btn'),
     },

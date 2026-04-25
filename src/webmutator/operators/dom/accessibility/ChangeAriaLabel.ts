@@ -1,17 +1,15 @@
 import { Page, Locator } from 'playwright';
 import { AccessibilityOperator } from './AccessibilityOperator';
 import { MutationRecord } from '../../../MutationRecord';
-import { OracleSafety } from '../../../utils/OracleSafety';
 
 export class ChangeAriaLabel extends AccessibilityOperator {
     category: 'accessibility-semantic' = 'accessibility-semantic';
+    oracleAnchorSafe = true;
 
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
         if (!await super.isApplicable(page, target)) return false;
-        if (await OracleSafety.isProtected(target)) return false;
 
         return await target.evaluate((el: HTMLElement) => {
-            if (el.hasAttribute('data-testid')) return false;
             return typeof el.getAttribute('aria-label') === 'string' && el.getAttribute('aria-label') !== '';
         });
     }

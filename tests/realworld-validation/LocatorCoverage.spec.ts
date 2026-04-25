@@ -36,6 +36,36 @@ test('support matrix report is generated and carries source-kind metadata', asyn
   expect(report.some(row => row.family === 'semantic-first' && row.supported)).toBe(true);
 });
 
+test('css/xpath locator audit report captures before/after selector-surface differences', async () => {
+  const reportPath = path.join(process.cwd(), 'reports', 'realworld-css-xpath-locator-audit.json');
+  const report = JSON.parse(fs.readFileSync(reportPath, 'utf8')) as {
+    auditedLogicalKeyCount: number;
+    auditedRowCount: number;
+    overlapAudit: {
+      currentMatchedSurfaceCount: number;
+      refactoredFamilyDistinctCount: number;
+    };
+    rows: Array<{
+      appId: string;
+      logicalKey: string;
+      currentCssLocator: string;
+      refactoredCssLocator: string;
+      currentPairRelationship: string;
+      refactoredPairRelationship: string;
+      cssRationale: string;
+      xpathRationale: string;
+    }>;
+  };
+
+  expect(report.auditedLogicalKeyCount).toBe(getActiveLogicalKeys().length);
+  expect(report.auditedRowCount).toBe(getActiveLogicalKeys().length * REALWORLD_APP_IDS.length);
+  expect(report.overlapAudit.currentMatchedSurfaceCount).toBeGreaterThan(0);
+  expect(report.overlapAudit.refactoredFamilyDistinctCount).toBeGreaterThan(0);
+  expect(report.rows.every(row => row.currentCssLocator.length > 0 && row.refactoredCssLocator.length > 0)).toBe(true);
+  expect(report.rows.every(row => row.cssRationale.length > 0 && row.xpathRationale.length > 0)).toBe(true);
+  expect(report.rows.some(row => row.currentPairRelationship === 'matched-surface' && row.refactoredPairRelationship === 'family-distinct')).toBe(true);
+});
+
 test('semantic css exception report is generated and stays separate from unsupported rows', async () => {
   const exceptionPath = path.join(process.cwd(), 'reports', 'realworld-semantic-css-exceptions.json');
   const unsupportedPath = path.join(process.cwd(), 'reports', 'realworld-locator-unsupported.json');

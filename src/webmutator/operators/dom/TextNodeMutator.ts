@@ -5,6 +5,7 @@ import { RandomUtils } from '../../utils/RandomUtils';
 
 export class TextNodeMutator implements DomOperator {
     category: 'content' = 'content';
+    oracleAnchorSafe = true;
     
     async isApplicable(page: Page, target: Locator): Promise<boolean> { const text = await target.innerText(); return text.trim().length > 0; }
 

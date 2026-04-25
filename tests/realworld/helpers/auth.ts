@@ -1,7 +1,13 @@
 import { Page, expect } from '@playwright/test';
-import { appPaths, pathRegex } from './app';
+import { appPaths, bindAppLocators, pathRegex } from './app';
 
-export async function register(page: Page, locators: any, username: string, email: string, password: string) {
+export async function register(page: Page, username: string, email: string, password: string): Promise<void>;
+export async function register(page: Page, locators: any, username: string, email: string, password: string): Promise<void>;
+export async function register(page: Page, arg2: any, arg3: string, arg4: string, arg5?: string): Promise<void> {
+  const locators = typeof arg2 === 'string' ? bindAppLocators(page) : arg2;
+  const username = typeof arg2 === 'string' ? arg2 : arg3;
+  const email = typeof arg2 === 'string' ? arg3 : arg4;
+  const password = typeof arg2 === 'string' ? arg4 : arg5!;
   await page.goto(appPaths.register(), { waitUntil: 'load' });
   await locators.auth.usernameInput().fill(username);
   await locators.auth.emailInput().fill(email);
@@ -20,7 +26,12 @@ export async function register(page: Page, locators: any, username: string, emai
   }
 }
 
-export async function login(page: Page, locators: any, email: string, password: string) {
+export async function login(page: Page, email: string, password: string): Promise<void>;
+export async function login(page: Page, locators: any, email: string, password: string): Promise<void>;
+export async function login(page: Page, arg2: any, arg3: string, arg4?: string): Promise<void> {
+  const locators = typeof arg2 === 'string' ? bindAppLocators(page) : arg2;
+  const email = typeof arg2 === 'string' ? arg2 : arg3;
+  const password = typeof arg2 === 'string' ? arg3 : arg4!;
   await page.goto(appPaths.login(), { waitUntil: 'load' });
   await locators.auth.emailInput().fill(email);
   await locators.auth.passwordInput().fill(password);
@@ -38,7 +49,9 @@ export async function login(page: Page, locators: any, email: string, password: 
   }
 }
 
-export async function logout(page: Page, locators: any) {
+export async function logout(page: Page): Promise<void>;
+export async function logout(page: Page, locators: any): Promise<void>;
+export async function logout(page: Page, locators: any = bindAppLocators(page)): Promise<void> {
   await locators.nav.settingsLink().click();
   await Promise.all([page.waitForURL(pathRegex(appPaths.home())), locators.settings.logoutButton().click()]);
   await expect(locators.nav.loginLink().raw.first()).toBeVisible();

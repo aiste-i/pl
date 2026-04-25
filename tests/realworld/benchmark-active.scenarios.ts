@@ -1,9 +1,10 @@
 import type { APIRequestContext, Page } from '@playwright/test';
-import { MutantGenerator } from '../../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../../src/benchmark/runner/MutantGenerator';
 import {
   getActiveScenarioEntries,
   type RealWorldScenarioEntry,
 } from '../../src/benchmark/realworld-corpus';
+import type { ScenarioTouchpointInput } from '../../src/benchmark/realworld-touchpoints';
 import { appPaths } from './helpers/app';
 import {
   addCommentToOpenedArticle,
@@ -39,7 +40,7 @@ export interface ActiveScenarioFixtures {
 
 export interface ActiveScenarioCollectContext extends ActiveScenarioFixtures {
   generator: MutantGenerator;
-  collectCheckpoint(viewContext: string): Promise<void>;
+  collectCheckpoint(viewContext: string, touchpoints?: ScenarioTouchpointInput[]): Promise<void>;
 }
 
 export interface ActiveScenarioDefinition extends RealWorldScenarioEntry {
@@ -55,6 +56,14 @@ function ensureScenarioEntry(scenarioId: string): RealWorldScenarioEntry {
   return entry;
 }
 
+function touchpoint(logicalKey: string, role: ScenarioTouchpointInput['role'], locator: ScenarioTouchpointInput['locator']): ScenarioTouchpointInput {
+  return {
+    logicalKey,
+    role,
+    locator,
+  };
+}
+
 export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
   {
     ...ensureScenarioEntry('health.home-load'),
@@ -65,7 +74,10 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
     },
     async collect({ page, oracle, collectCheckpoint }) {
       await visitHome(page, oracle);
-      await collectCheckpoint('home');
+      await collectCheckpoint('home', [
+        touchpoint('nav.brandLink', 'primary-action', oracle.nav.brandLink().raw),
+        touchpoint('nav.navbar', 'context', oracle.nav.navbar().raw),
+      ]);
     },
   },
   {
@@ -81,7 +93,11 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
       const provisioned = await provisionAuthCredentials(request);
       await page.goto(appPaths.login(), { waitUntil: 'load' });
       await oracle.auth.title().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
-      await collectCheckpoint('login-form');
+      await collectCheckpoint('login-form', [
+        touchpoint('auth.emailInput', 'secondary-action', locators.auth.emailInput().raw),
+        touchpoint('auth.passwordInput', 'secondary-action', locators.auth.passwordInput().raw),
+        touchpoint('auth.submitButton', 'primary-action', locators.auth.submitButton().raw),
+      ]);
       await signInWithValidCredentials(page, locators, oracle, provisioned.credentials.email, provisioned.credentials.password);
     },
   },
@@ -95,7 +111,9 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
     },
     async collect({ page, locators, oracle, collectCheckpoint }) {
       await visitHome(page, oracle);
-      await collectCheckpoint('home-before-global-feed');
+      await collectCheckpoint('home-before-global-feed', [
+        touchpoint('nav.globalFeedTab', 'primary-action', locators.nav.globalFeedTab().raw),
+      ]);
     },
   },
   {
@@ -111,7 +129,10 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
     },
     async collect({ page, locators, oracle, collectCheckpoint }) {
       await openGlobalFeed(page, locators, oracle);
-      await collectCheckpoint('global-feed-before-open');
+      await collectCheckpoint('global-feed-before-open', [
+        touchpoint('home.firstReadMoreLink', 'primary-action', locators.home.firstReadMoreLink().raw),
+        touchpoint('nav.globalFeedTab', 'navigation', locators.nav.globalFeedTab().raw),
+      ]);
     },
   },
   {
@@ -130,7 +151,9 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
       const article = await getFirstPublicArticleSummary(request);
       await openArticleBySlug(page, oracle, article.slug);
       await oracle.article.favoriteButton().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
-      await collectCheckpoint('article-detail-before-favorite');
+      await collectCheckpoint('article-detail-before-favorite', [
+        touchpoint('article.favoriteButton', 'primary-action', oracle.article.favoriteButton().raw),
+      ]);
     },
   },
   {
@@ -144,7 +167,9 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
     async collect({ page, locators, oracle, collectCheckpoint }) {
       await openGlobalFeed(page, locators, oracle);
       await oracle.home.firstArticlePreview().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
-      await collectCheckpoint('global-feed-before-preview-description');
+      await collectCheckpoint('global-feed-before-preview-description', [
+        touchpoint('home.previewDescription', 'assertion', oracle.home.previewDescription(oracle.home.firstArticlePreview().raw).raw),
+      ]);
     },
   },
   {
@@ -158,7 +183,10 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
     async collect({ page, locators, oracle, collectCheckpoint }) {
       await openGlobalFeed(page, locators, oracle);
       await oracle.home.paginationButton(2).assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
-      await collectCheckpoint('global-feed-before-pagination');
+      await collectCheckpoint('global-feed-before-pagination', [
+        touchpoint('home.paginationButton', 'primary-action', locators.home.paginationButton(2).raw),
+        touchpoint('home.paginationItem', 'assertion', oracle.home.paginationItem(2).raw),
+      ]);
     },
   },
   {
@@ -177,8 +205,10 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
       const article = await getFirstPublicArticleSummary(request);
       const commentText = `Benchmark delete comment ${Date.now()}`;
       await openArticleBySlug(page, oracle, article.slug);
-      await addCommentToOpenedArticle(locators, oracle, commentText);
-      await collectCheckpoint('article-detail-before-comment-delete');
+      const commentId = await addCommentToOpenedArticle(locators, oracle, commentText);
+      await collectCheckpoint('article-detail-before-comment-delete', [
+        touchpoint('comments.deleteButton', 'primary-action', locators.comments.deleteButton(oracle.comments.cardById(commentId)).raw),
+      ]);
     },
   },
   {
@@ -192,7 +222,10 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
     async collect({ page, request, appAdapter, locators, oracle, collectCheckpoint }) {
       await provisionAuthenticatedUser(page, request, appAdapter);
       await openFirstArticleFromFeed(page, locators, oracle);
-      await collectCheckpoint('article-detail-before-comment');
+      await collectCheckpoint('article-detail-before-comment', [
+        touchpoint('comments.textarea', 'secondary-action', locators.comments.textarea().raw),
+        touchpoint('comments.submitButton', 'primary-action', locators.comments.submitButton().raw),
+      ]);
     },
   },
   {
@@ -206,7 +239,9 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
     async collect({ page, request, oracle, collectCheckpoint }) {
       const article = await getFirstPublicArticleSummary(request);
       await openArticleBySlug(page, oracle, article.slug);
-      await collectCheckpoint('article-detail-before-title-assert');
+      await collectCheckpoint('article-detail-before-title-assert', [
+        touchpoint('article.title', 'assertion', oracle.article.title().raw),
+      ]);
     },
   },
   {
@@ -226,7 +261,9 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
       await page.goto(appPaths.profile(article.authorUsername), { waitUntil: 'load' });
       await oracle.profile.page().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
       await oracle.profile.followButton().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
-      await collectCheckpoint('profile-before-follow-toggle');
+      await collectCheckpoint('profile-before-follow-toggle', [
+        touchpoint('profile.followButton', 'primary-action', oracle.profile.followButton().raw),
+      ]);
     },
   },
   {
@@ -245,7 +282,10 @@ export const ACTIVE_SCENARIOS: ActiveScenarioDefinition[] = [
       await provisionAuthenticatedUser(page, request, appAdapter);
       await page.goto(appPaths.settings(), { waitUntil: 'load' });
       await oracle.settings.page().assertVisible({ timeout: getActiveBenchmarkTimeoutMs() });
-      await collectCheckpoint('settings-form');
+      await collectCheckpoint('settings-form', [
+        touchpoint('settings.bioInput', 'secondary-action', locators.settings.bioInput().raw),
+        touchpoint('settings.submitButton', 'primary-action', locators.settings.submitButton().raw),
+      ]);
     },
   },
 ];

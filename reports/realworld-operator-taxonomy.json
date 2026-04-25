@@ -90,6 +90,46 @@
     "excludedReason": null
   },
   {
+    "operator": "SplitTextNode",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "content",
+    "thesisCategory": "content",
+    "domConditions": "Element with non-empty visible text content.",
+    "safetyGuard": "Targets remain present in the DOM; only textual content is changed.",
+    "excludedReason": null
+  },
+  {
+    "operator": "MergeAdjacentTextNodes",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "content",
+    "thesisCategory": "content",
+    "domConditions": "Element with non-empty visible text content.",
+    "safetyGuard": "Targets remain present in the DOM; only textual content is changed.",
+    "excludedReason": null
+  },
+  {
+    "operator": "DecorativePrefixInsert",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "content",
+    "thesisCategory": "content",
+    "domConditions": "Element with non-empty visible text content.",
+    "safetyGuard": "Targets remain present in the DOM; only textual content is changed.",
+    "excludedReason": null
+  },
+  {
+    "operator": "DecorativeSuffixInsert",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "content",
+    "thesisCategory": "content",
+    "domConditions": "Element with non-empty visible text content.",
+    "safetyGuard": "Targets remain present in the DOM; only textual content is changed.",
+    "excludedReason": null
+  },
+  {
     "operator": "TextInsert",
     "implementationKind": "dom",
     "benchmarkScope": "in-scope",
@@ -127,6 +167,96 @@
     "thesisCategory": "structural",
     "domConditions": "Non-oracle, non-interactive node without interactive or form-critical descendants.",
     "safetyGuard": "Structural operators skip oracle-rooted and interactive/form-critical regions to avoid breaking task completion.",
+    "excludedReason": null
+  },
+  {
+    "operator": "NeutralWrapperInsert",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "domConditions": "Visible, non-oracle descendants with a mutable parent container.",
+    "safetyGuard": "Uses neutral wrappers and preserves target visibility and clickability.",
+    "excludedReason": null
+  },
+  {
+    "operator": "NeutralWrapperRemove",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "domConditions": "Neutral wrapper nodes with one element child and no oracle-facing attributes.",
+    "safetyGuard": "Only removes wrappers that behave like passive containers.",
+    "excludedReason": null
+  },
+  {
+    "operator": "AncestorLift",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "domConditions": "Targets nested under a neutral wrapper that can be safely removed one level upward.",
+    "safetyGuard": "Only lifts through neutral single-child wrappers so the task surface remains present.",
+    "excludedReason": null
+  },
+  {
+    "operator": "AncestorSink",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "domConditions": "Visible targets with a mutable parent where one extra neutral depth level can be inserted.",
+    "safetyGuard": "Wraps the target without deleting it or changing its semantics.",
+    "excludedReason": null
+  },
+  {
+    "operator": "LookalikeSiblingInsertBeforeTarget",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "domConditions": "Visible targets with a mutable parent container.",
+    "safetyGuard": "Inserts a hidden decoy sibling before the target while preserving the original target.",
+    "excludedReason": null
+  },
+  {
+    "operator": "LookalikeCardInsertBeforeTarget",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "domConditions": "Targets inside repeated cards or previews whose container can be cloned safely.",
+    "safetyGuard": "Cloned cards are hidden, de-oracled, and stripped of live navigation targets.",
+    "excludedReason": null
+  },
+  {
+    "operator": "MetadataChildrenShuffle",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "domConditions": "Metadata containers with at least three child elements.",
+    "safetyGuard": "Reorders only low-risk metadata children and leaves the original action surface intact.",
+    "excludedReason": null
+  },
+  {
+    "operator": "LinkTextWrapInSpan",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "domConditions": "Link, button, or label targets with direct text nodes.",
+    "safetyGuard": "Wraps visible text in inline spans without changing rendered wording or accessible name.",
+    "excludedReason": null
+  },
+  {
+    "operator": "LinkTextUnwrap",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "domConditions": "Link, button, or label targets containing inline text-only span wrappers.",
+    "safetyGuard": "Removes redundant wrappers while preserving text and interaction.",
     "excludedReason": null
   },
   {
@@ -210,6 +340,26 @@
     "excludedReason": null
   },
   {
+    "operator": "NonTargetDuplicateControlInsert",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "structural",
+    "thesisCategory": "structural",
+    "domConditions": "Buttons and links with a mutable sibling insertion point.",
+    "safetyGuard": "Inserts a nearby alternate control while preserving the original target and flow.",
+    "excludedReason": null
+  },
+  {
+    "operator": "DuplicateContainerRoleWithoutTargetEquivalence",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "domConditions": "Role-bearing or card-like containers with a mutable sibling insertion point.",
+    "safetyGuard": "Duplicates only the surrounding container shell, not the original task target identity.",
+    "excludedReason": null
+  },
+  {
     "operator": "ToggleCssClass",
     "implementationKind": "dom",
     "benchmarkScope": "in-scope",
@@ -256,6 +406,76 @@
     "runtimeCategory": "accessibility-semantic",
     "thesisCategory": "accessibility-semantic",
     "domConditions": "button elements with a visible or accessible label.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
+    "excludedReason": null
+  },
+  {
+    "operator": "MutateAccessibleNameText",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "domConditions": "Visible non-protected text-bearing descendants that participate in a button, link, label, or heading accessible-name surface.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
+    "excludedReason": null
+  },
+  {
+    "operator": "MutatePlaceholderText",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "domConditions": "Visible text-bearing input or textarea controls with a non-empty placeholder.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
+    "excludedReason": null
+  },
+  {
+    "operator": "LabelMechanismRewrite",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "domConditions": "Labeled form controls whose naming can be shifted to aria-labelledby without changing the final name.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
+    "excludedReason": null
+  },
+  {
+    "operator": "AccessibleNameSourceSwap",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "domConditions": "Controls with a stable visible or aria-label name that can be moved between name sources.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
+    "excludedReason": null
+  },
+  {
+    "operator": "PlaceholderToLabelPromotion",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "domConditions": "Placeholder-only text inputs or textareas without an explicit label.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
+    "excludedReason": null
+  },
+  {
+    "operator": "LabelToPlaceholderFallback",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "domConditions": "Labeled inputs or textareas that remain usable with placeholder fallback.",
+    "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
+    "excludedReason": null
+  },
+  {
+    "operator": "RemovePlaceholderText",
+    "implementationKind": "dom",
+    "benchmarkScope": "in-scope",
+    "runtimeCategory": "accessibility-semantic",
+    "thesisCategory": "accessibility-semantic",
+    "domConditions": "Visible text-bearing input or textarea controls with a non-empty placeholder.",
     "safetyGuard": "Operators stay within their targeted accessibility surface and do not mutate data-testid anchors.",
     "excludedReason": null
   },

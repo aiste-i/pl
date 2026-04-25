@@ -21,7 +21,11 @@ export const vue3RealWorldAdapter: AppAdapter = {
   startCommand: `npm run dev -- --host 127.0.0.1 --port ${VUE3_PORT} --strictPort`,
   baseURL: VUE3_BASE_URL,
   healthUrl: VUE3_BASE_URL,
-  testMatch: ['tests/realworld/**/*.spec.ts', 'tests/realworld-validation/**/*.spec.ts'],
+  testMatch: [
+    'tests/realworld/benchmark-active.spec.ts',
+    'tests/realworld/benchmark-semantic-supplement.spec.ts',
+    'tests/realworld-validation/**/*.spec.ts',
+  ],
   env: {
     VITE_API_HOST: 'https://api.realworld.show',
   },

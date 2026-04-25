@@ -11,6 +11,8 @@ function main() {
 
   const workflowFiles = [
     '.github/workflows/pr-realworld.yml',
+    '.github/workflows/thesis-primary.yml',
+    '.github/workflows/thesis-semantic-supplement.yml',
     '.github/workflows/scheduled-realworld.yml',
   ];
 
@@ -40,6 +42,10 @@ function main() {
       mutationSelected: packageJson.scripts?.['benchmark:mutate:all'] ?? null,
       mutationSample: packageJson.scripts?.['benchmark:mutate:sample:all'] ?? null,
       aggregateAll: packageJson.scripts?.['benchmark:aggregate:all'] ?? null,
+      semanticBaselineApp: packageJson.scripts?.['benchmark:semantic:baseline:app'] ?? null,
+      semanticPrepareApp: packageJson.scripts?.['benchmark:semantic:prepare:app'] ?? null,
+      semanticMutateApp: packageJson.scripts?.['benchmark:semantic:mutate:app'] ?? null,
+      semanticAggregateApp: packageJson.scripts?.['benchmark:semantic:aggregate:app'] ?? null,
     },
     workflows: workflowFiles.map(relativePath => ({
       path: relativePath,
@@ -48,6 +54,7 @@ function main() {
     notes: [
       'Chromium remains the primary benchmark environment unless the thesis methodology is revised in parallel.',
       'Firefox and WebKit runs are tracked as supplementary smoke coverage and do not silently redefine the thesis dataset.',
+      'The supplementary semantic corpus runs in its own workflow so semantic-coverage evidence remains methodologically separate from the primary thesis corpus.',
       'Mutation-sample preparation and collection stay pinned to Chromium so the selected corpus is generated in the primary benchmark environment.',
       'Source-derived report freshness is enforced in PR validation, while run-derived summaries are regenerated from the currently available benchmark artifacts.',
     ],

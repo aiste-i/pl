@@ -1,5 +1,5 @@
 import { test as base, expect, Locator, Page } from '@playwright/test';
-import { MutantGenerator } from '../src/murun/runner/MutantGenerator';
+import { MutantGenerator } from '../src/benchmark/runner/MutantGenerator';
 import { WebMutator } from '../src/webmutator/WebMutator';
 import { MutationCandidate } from '../src/webmutator/MutationCandidate';
 import { MutationRecord } from '../src/webmutator/MutationRecord';
@@ -13,7 +13,7 @@ import * as fs from 'fs';
 import { createHash } from 'crypto';
 import { AppAdapter } from '../src/apps/types';
 import { getAppResultsDir, getSelectedAppAdapter } from '../src/apps';
-import { getBenchmarkCorpusId } from '../src/benchmark/realworld-corpus';
+import { getBenchmarkCorpusId, getBenchmarkCorpusRole, usesDeferredMutation } from '../src/benchmark/realworld-corpus';
 import {
     BENCHMARK_DATASET_VERSION,
     BENCHMARK_SCHEMA_VERSION,
@@ -27,6 +27,7 @@ import {
     shouldWriteDetailedAccessibilityArtifacts,
     shouldWriteMirroredRunArtifacts,
 } from '../src/benchmark/retention';
+import { getCandidateCategory } from '../src/benchmark/runner/sampling';
 
 const BENCHMARK_ACTIVE_MODE = process.env.BENCHMARK_ACTIVE_MODE || 'baseline';
 
@@ -102,10 +103,16 @@ export interface BenchmarkResult {
   browserName: string;
   browserChannel: string | null;
   corpusId?: string;
+  corpusRole?: string;
   scenarioId: string;
   activeScenarioId?: string;
   activeScenarioCategory?: string;
   sourceSpec?: string;
+  intendedSemanticEntryPoint?: string | null;
+  actualSemanticEntryPoint?: string | null;
+  targetLogicalKeys?: string[];
+  semanticScenarioSupportedApps?: string[];
+  semanticScenarioExclusionReason?: string | null;
   locatorFamily: string;
   semanticEntryPoint?: string;
   phase: 'baseline' | 'mutated';
@@ -147,6 +154,8 @@ export interface BenchmarkResult {
     operatorApplicableCount: number | null;
     operatorSkippedOracleCount: number | null;
     operatorNotApplicableCount: number | null;
+    operatorSelectedCount: number | null;
+    operatorSelectedApplicableRatio: number | null;
     operatorCheckDurationMs: number | null;
     applyDurationMs: number | null;
     applyFailureCount: number;
@@ -218,7 +227,16 @@ function classifyMutationOutcome(record: MutationRecord): string {
 export const test = base.extend<TestOptions & { 
     benchmarkResult: BenchmarkResult,
     appAdapter: AppAdapter,
-    setScenarioMetadata: (metadata: { activeScenarioId: string; activeScenarioCategory: string; sourceSpec: string }) => void,
+    setScenarioMetadata: (metadata: {
+      activeScenarioId: string;
+      activeScenarioCategory: string;
+      sourceSpec: string;
+      corpusRole?: string;
+      intendedSemanticEntryPoint?: string | null;
+      targetLogicalKeys?: string[];
+      semanticScenarioSupportedApps?: string[];
+      semanticScenarioExclusionReason?: string | null;
+    }) => void,
     runAction: (action: () => Promise<any>, locator?: Locator) => Promise<any>,
     runAssertion: (assertion: () => Promise<any>) => Promise<any>,
     runOraclePrecheck: (precheck: () => Promise<any>) => Promise<any>,
@@ -238,10 +256,24 @@ export const test = base.extend<TestOptions & {
   },
 
   setScenarioMetadata: async ({ benchmarkResult }, use) => {
-    const setScenarioMetadata = (metadata: { activeScenarioId: string; activeScenarioCategory: string; sourceSpec: string }) => {
+    const setScenarioMetadata = (metadata: {
+      activeScenarioId: string;
+      activeScenarioCategory: string;
+      sourceSpec: string;
+      corpusRole?: string;
+      intendedSemanticEntryPoint?: string | null;
+      targetLogicalKeys?: string[];
+      semanticScenarioSupportedApps?: string[];
+      semanticScenarioExclusionReason?: string | null;
+    }) => {
       benchmarkResult.activeScenarioId = metadata.activeScenarioId;
       benchmarkResult.activeScenarioCategory = metadata.activeScenarioCategory;
       benchmarkResult.sourceSpec = metadata.sourceSpec;
+      benchmarkResult.corpusRole = metadata.corpusRole ?? benchmarkResult.corpusRole;
+      benchmarkResult.intendedSemanticEntryPoint = metadata.intendedSemanticEntryPoint ?? null;
+      benchmarkResult.targetLogicalKeys = metadata.targetLogicalKeys ?? [];
+      benchmarkResult.semanticScenarioSupportedApps = metadata.semanticScenarioSupportedApps ?? [];
+      benchmarkResult.semanticScenarioExclusionReason = metadata.semanticScenarioExclusionReason ?? null;
     };
     await use(setScenarioMetadata);
   },
@@ -268,7 +300,9 @@ export const test = base.extend<TestOptions & {
         benchmarkResult.evidence.actionContextEntered = true;
         if (locator) {
             if ((locator as any).semanticEntryPoint) {
-                benchmarkResult.semanticEntryPoint = (locator as any).semanticEntryPoint;
+                const semanticEntryPoint = (locator as any).semanticEntryPoint;
+                benchmarkResult.semanticEntryPoint = semanticEntryPoint;
+                benchmarkResult.actualSemanticEntryPoint = semanticEntryPoint;
             }
             try {
                 const count = await locator.count();
@@ -350,7 +384,7 @@ export const test = base.extend<TestOptions & {
 
     if (
       mutation &&
-      getBenchmarkCorpusId() === 'realworld-active' &&
+      usesDeferredMutation() &&
       benchmarkResult.activeScenarioId === mutation.scenarioId &&
       !applied &&
       benchmarkResult.runStatus === 'passed'
@@ -418,6 +452,7 @@ export const test = base.extend<TestOptions & {
     const scenarioId = testInfo.titlePath.join(' > ');
     const runId = uuidv4();
     const phase = mutation ? 'mutated' : 'baseline';
+    const mutationCategory = mutation ? getCandidateCategory(mutation) : 'none';
     const generatedAt = new Date().toISOString();
     const startTime = Date.now();
     const mutationBudget = parseOptionalInteger(process.env.BENCHMARK_BUDGET || process.env.npm_config_budget);
@@ -454,16 +489,22 @@ export const test = base.extend<TestOptions & {
         browserName,
         browserChannel,
         corpusId: getBenchmarkCorpusId(),
+        corpusRole: getBenchmarkCorpusRole(),
         scenarioId: scenarioId,
         activeScenarioId: undefined,
         activeScenarioCategory: undefined,
         sourceSpec: undefined,
+        intendedSemanticEntryPoint: null,
+        actualSemanticEntryPoint: null,
+        targetLogicalKeys: [],
+        semanticScenarioSupportedApps: [],
+        semanticScenarioExclusionReason: null,
         locatorFamily: locatorStrategy,
         phase: phase,
         mutation: {
             mutationId: mutation?.candidateId || 'baseline',
             operatorId: mutation ? mutation.operator.constructor.name : 'none',
-            operatorCategory: mutation ? mutation.operator.category : 'none',
+            operatorCategory: mutationCategory,
             candidateId: mutation?.candidateId ?? null,
             seed: mutationSeed,
             phase,
@@ -516,27 +557,29 @@ export const test = base.extend<TestOptions & {
     if (mutation) {
         benchmarkResult.changeId = mutation.candidateId || mutation.selector;
         benchmarkResult.changeOperator = mutation.operator.constructor.name;
-        benchmarkResult.changeCategory = mutation.operator.category;
-        benchmarkResult.quotaBucket = mutation.quotaBucket;
+        benchmarkResult.changeCategory = mutationCategory;
+        benchmarkResult.quotaBucket = mutation.quotaBucket ?? mutationCategory;
         benchmarkResult.comparisonEligible = mutation.aggregateComparisonEligible !== false;
         benchmarkResult.comparisonExclusionReason = mutation.comparisonExclusionReason;
         benchmarkResult.mutationTelemetry = {
             selectedCandidateId: mutation.candidateId ?? null,
             selectedTargetSelector: mutation.selector ?? null,
             selectedTargetTagType: mutation.fingerprint?.tagType ?? null,
-            operatorRuntimeCategory: mutation.operatorRuntimeCategory ?? mutation.operator.category,
+            operatorRuntimeCategory: mutation.operatorRuntimeCategory ?? mutationCategory,
             operatorThesisCategory: mutation.operatorThesisCategory ?? mutation.operator.category,
             operatorConsideredCandidateCount: mutation.operatorCandidateCount ?? null,
             operatorCandidateCount: mutation.operatorCandidateCount ?? null,
             operatorApplicableCount: mutation.operatorApplicableCount ?? null,
             operatorSkippedOracleCount: mutation.operatorSkippedOracleCount ?? null,
             operatorNotApplicableCount: mutation.operatorNotApplicableCount ?? null,
+            operatorSelectedCount: mutation.operatorSelectedCount ?? null,
+            operatorSelectedApplicableRatio: mutation.operatorSelectedApplicableRatio ?? null,
             operatorCheckDurationMs: mutation.operatorTotalCheckDurationMs ?? null,
             applyDurationMs: null,
             applyFailureCount: 0,
             finalMutationOutcomeClass: null,
         };
-        if (getBenchmarkCorpusId() !== 'realworld-active') {
+        if (!usesDeferredMutation()) {
             await page.goto('/'); 
             const mutator = new WebMutator();
             try {
@@ -574,6 +617,8 @@ export const test = base.extend<TestOptions & {
         }
     }
 
+    const benchmarkMutationExecution = BENCHMARK_ACTIVE_MODE === 'mutate' && Boolean(mutation);
+
     try {
         await use(page);
     } catch (error) {
@@ -582,7 +627,10 @@ export const test = base.extend<TestOptions & {
              Object.assign(benchmarkResult, classification);
              benchmarkResult.instrumentationPathUsed = benchmarkResult.instrumentationPathUsed === 'fallback' ? 'fallback' : 'mixed';
         }
-        throw error;
+
+        if (!benchmarkMutationExecution) {
+            throw error;
+        }
     } finally {
         benchmarkResult.durationMs = Date.now() - startTime;
         if (BENCHMARK_ACTIVE_MODE === 'preflight') {

@@ -1,35 +1,37 @@
 import { Locator } from '@playwright/test';
+import { getImmediateElementHandle } from '../../utils/locator-handles';
+
+export type OracleProtectionKind = 'none' | 'direct-anchor' | 'contains-anchor-descendant';
 
 export class OracleSafety {
+    static async getProtectionKind(locator: Locator): Promise<OracleProtectionKind> {
+        const handle = await getImmediateElementHandle(locator);
+        if (!handle) {
+            return 'none';
+        }
+
+        try {
+            return await handle.evaluate((node: HTMLElement) => {
+                const ORACLE_ATTR = 'data-testid';
+
+                if (node.hasAttribute(ORACLE_ATTR)) return 'direct-anchor';
+                if (node.querySelector(`[${ORACLE_ATTR}]`)) return 'contains-anchor-descendant';
+                return 'none';
+            });
+        } catch {
+            return 'none';
+        } finally {
+            await handle.dispose().catch(() => undefined);
+        }
+    }
+
     /**
      * Checks if a target node (represented by a locator) is part of the oracle-grounded context.
      * A node is oracle-protected if it is an oracle node itself OR an ancestor of an oracle node
      * whose mutation would invalidate oracle grounding.
      */
     static async isProtected(locator: Locator): Promise<boolean> {
-        const handle = await locator.elementHandle({ timeout: 0 }).catch(() => null);
-        if (!handle) {
-            return false;
-        }
-
-        try {
-            return await handle.evaluate((node: HTMLElement) => {
-            const ORACLE_ATTR = 'data-testid';
-            
-            // 1. Direct oracle node protection
-            if (node.hasAttribute(ORACLE_ATTR)) return true;
-            
-            // 2. Ancestor protection: If any descendant is an oracle node, this node is part of the oracle context.
-            // Structural changes or visibility changes here would corrupt oracle access.
-            if (node.querySelector(`[${ORACLE_ATTR}]`)) return true;
-
-            return false;
-            });
-        } catch {
-            return false;
-        } finally {
-            await handle.dispose().catch(() => undefined);
-        }
+        return (await this.getProtectionKind(locator)) !== 'none';
     }
 
     /**

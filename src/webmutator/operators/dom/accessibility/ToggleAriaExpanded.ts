@@ -11,7 +11,6 @@ export class ToggleAriaExpanded extends AccessibilityOperator {
         if (await OracleSafety.isProtected(target)) return false;
 
         return await target.evaluate((el: HTMLElement) => {
-            if (el.hasAttribute('data-testid')) return false;
             const current = el.getAttribute('aria-expanded');
             return current === 'true' || current === 'false';
         });

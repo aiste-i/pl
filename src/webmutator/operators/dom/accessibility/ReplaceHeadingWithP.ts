@@ -4,6 +4,7 @@ import { MutationRecord } from '../../../MutationRecord';
 
 export class ReplaceHeadingWithP extends AccessibilityOperator {
     category: 'structural' = 'structural';
+    oracleAnchorSafe = true;
     async isApplicable(page: Page, target: Locator): Promise<boolean> {
         if (!await super.isApplicable(page, target)) return false;
 
@@ -26,9 +27,10 @@ export class ReplaceHeadingWithP extends AccessibilityOperator {
             
             p.innerHTML = el.innerHTML;
             
-            // Copy attributes
-            if (el.id) p.id = el.id;
-            if (el.className) p.className = el.className;
+            for (let i = 0; i < el.attributes.length; i++) {
+                const attr = el.attributes[i];
+                p.setAttribute(attr.name, attr.value);
+            }
             
             if (el.parentNode) {
                 el.parentNode.replaceChild(p, el);
