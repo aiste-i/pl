@@ -5,8 +5,7 @@ import type { StrategyName } from '../locators';
 export type SupportedAppId =
   | 'angular-realworld-example-app'
   | 'realworld'
-  | 'vue3-realworld-example-app'
-  | 'todomvc';
+  | 'vue3-realworld-example-app';
 
 export interface AppPathBuilder {
   home(): string;

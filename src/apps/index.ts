@@ -1,7 +1,6 @@
 import path from 'path';
 import { angularRealWorldAdapter } from './angular-realworld-example-app.adapter';
 import { realworldAdapter } from './realworld.adapter';
-import { todoMvcAdapter } from './todomvc.adapter';
 import { vue3RealWorldAdapter } from './vue3-realworld-example-app.adapter';
 import { AppAdapter, SupportedAppId } from './types';
 import { getBenchmarkCorpusId } from '../benchmark/realworld-corpus';
@@ -10,7 +9,6 @@ export const APP_REGISTRY: Record<SupportedAppId, AppAdapter> = {
   'angular-realworld-example-app': angularRealWorldAdapter,
   realworld: realworldAdapter,
   'vue3-realworld-example-app': vue3RealWorldAdapter,
-  todomvc: todoMvcAdapter,
 };
 
 export const REALWORLD_APP_IDS: SupportedAppId[] = [

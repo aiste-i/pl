@@ -384,10 +384,27 @@
         "browserName": { "$ref": "#/definitions/browserName" },
         "browserChannel": { "$ref": "#/definitions/nullableString" },
         "corpusId": { "$ref": "#/definitions/nullableString" },
+        "corpusRole": {
+          "anyOf": [
+            { "enum": ["primary", "supplementary"] },
+            { "type": "null" }
+          ]
+        },
         "scenarioId": { "$ref": "#/definitions/nonEmptyString" },
         "activeScenarioId": { "$ref": "#/definitions/nullableString" },
         "activeScenarioCategory": { "$ref": "#/definitions/nullableString" },
         "sourceSpec": { "$ref": "#/definitions/nullableString" },
+        "intendedSemanticEntryPoint": { "$ref": "#/definitions/nullableString" },
+        "actualSemanticEntryPoint": { "$ref": "#/definitions/nullableString" },
+        "targetLogicalKeys": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/nonEmptyString" }
+        },
+        "semanticScenarioSupportedApps": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/nonEmptyString" }
+        },
+        "semanticScenarioExclusionReason": { "$ref": "#/definitions/nullableString" },
         "locatorFamily": { "$ref": "#/definitions/locatorFamily" },
         "semanticEntryPoint": { "$ref": "#/definitions/nullableString" },
         "phase": { "$ref": "#/definitions/phase" },

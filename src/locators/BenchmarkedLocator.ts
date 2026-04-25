@@ -72,6 +72,13 @@ export class OracleLocator {
         });
     }
 
+    async assertValue(value: string | RegExp, options?: { timeout?: number }) {
+        return this.context.runAssertion(async () => {
+            const { expect } = await import('@playwright/test');
+            await expect(this.locator).toHaveValue(value as any, options);
+        });
+    }
+
     async assertCount(count: number, options?: { timeout?: number }) {
         return this.context.runAssertion(async () => {
             const { expect } = await import('@playwright/test');

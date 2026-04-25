@@ -13,10 +13,10 @@
     "role": "supplementary-smoke-regression-evidence"
   },
   "commands": {
-    "lint": "npx ts-node --transpile-only scripts/benchmark-lint.ts",
+    "lint": "npx eslint src/locators/apps/**/*.ts src/benchmark/realworld-corpus.ts",
     "typecheck": "npx tsc --noEmit",
     "validation": "cross-env PLAYWRIGHT_BROWSERS=chromium npx playwright test tests/realworld-validation",
-    "reportsGenerateSource": "npm run benchmark:coverage:realworld && npx ts-node --transpile-only scripts/generate-realworld-corpus-report.ts && cross-env REPORT_GENERATION_SCOPE=taxonomy npx ts-node --transpile-only scripts/generate-operator-reports.ts && npx ts-node --transpile-only scripts/generate-pipeline-verification.ts",
+    "reportsGenerateSource": "npm run benchmark:coverage:realworld && npx ts-node --transpile-only scripts/generate-realworld-corpus-report.ts && npm run reports:semantic:generate && cross-env REPORT_GENERATION_SCOPE=taxonomy npx ts-node --transpile-only scripts/generate-operator-reports.ts && npx ts-node --transpile-only scripts/generate-pipeline-verification.ts",
     "reportsGenerateRun": "cross-env REPORT_GENERATION_SCOPE=coverage npx ts-node --transpile-only scripts/generate-operator-reports.ts && npx ts-node --transpile-only scripts/generate-accessibility-summary-reports.ts",
     "reportsGenerate": "npm run reports:generate:source && npm run reports:generate:run",
     "reportsCheckSource": "node scripts/check-source-reports-freshness.js",
@@ -26,11 +26,23 @@
     "mutationPrepareApp": "cross-env BENCHMARK_CORPUS_ID=realworld-active npx ts-node --transpile-only src/benchmark/runner/prepare-scenarios.ts",
     "mutationSelected": "cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=angular-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=realworld BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=vue3-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate npx playwright test tests/realworld/benchmark-active.spec.ts",
     "mutationSample": "cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=angular-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate MUTATION_LIMIT=1 npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=realworld BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate MUTATION_LIMIT=1 npx playwright test tests/realworld/benchmark-active.spec.ts && cross-env PLAYWRIGHT_BROWSERS=chromium APP_ID=vue3-realworld-example-app BENCHMARK_CORPUS_ID=realworld-active BENCHMARK_ACTIVE_MODE=mutate MUTATION_LIMIT=1 npx playwright test tests/realworld/benchmark-active.spec.ts",
-    "aggregateAll": "npx ts-node --transpile-only src/benchmark/runner/aggregate.ts test-results/angular-realworld-example-app/realworld-active/benchmark-runs test-results/angular-realworld-example-app/realworld-active/aggregate && npx ts-node --transpile-only src/benchmark/runner/aggregate.ts test-results/realworld/realworld-active/benchmark-runs test-results/realworld/realworld-active/aggregate && npx ts-node --transpile-only src/benchmark/runner/aggregate.ts test-results/vue3-realworld-example-app/realworld-active/benchmark-runs test-results/vue3-realworld-example-app/realworld-active/aggregate"
+    "aggregateAll": "npx ts-node --transpile-only src/benchmark/runner/aggregate.ts test-results/angular-realworld-example-app/realworld-active/benchmark-runs test-results/angular-realworld-example-app/realworld-active/aggregate && npx ts-node --transpile-only src/benchmark/runner/aggregate.ts test-results/realworld/realworld-active/benchmark-runs test-results/realworld/realworld-active/aggregate && npx ts-node --transpile-only src/benchmark/runner/aggregate.ts test-results/vue3-realworld-example-app/realworld-active/benchmark-runs test-results/vue3-realworld-example-app/realworld-active/aggregate",
+    "semanticBaselineApp": "cross-env PLAYWRIGHT_BROWSERS=chromium BENCHMARK_CORPUS_ID=realworld-semantic-supplement BENCHMARK_ACTIVE_MODE=baseline npx playwright test tests/realworld/benchmark-semantic-supplement.spec.ts",
+    "semanticPrepareApp": "cross-env BENCHMARK_CORPUS_ID=realworld-semantic-supplement npx ts-node --transpile-only src/benchmark/runner/prepare-semantic-supplement-scenarios.ts",
+    "semanticMutateApp": "cross-env PLAYWRIGHT_BROWSERS=chromium BENCHMARK_CORPUS_ID=realworld-semantic-supplement BENCHMARK_ACTIVE_MODE=mutate npx playwright test tests/realworld/benchmark-semantic-supplement.spec.ts",
+    "semanticAggregateApp": "cross-env BENCHMARK_CORPUS_ID=realworld-semantic-supplement npx ts-node --transpile-only src/benchmark/runner/aggregate.ts"
   },
   "workflows": [
     {
       "path": ".github/workflows/pr-realworld.yml",
+      "present": true
+    },
+    {
+      "path": ".github/workflows/thesis-primary.yml",
+      "present": true
+    },
+    {
+      "path": ".github/workflows/thesis-semantic-supplement.yml",
       "present": true
     },
     {
@@ -41,6 +53,7 @@
   "notes": [
     "Chromium remains the primary benchmark environment unless the thesis methodology is revised in parallel.",
     "Firefox and WebKit runs are tracked as supplementary smoke coverage and do not silently redefine the thesis dataset.",
+    "The supplementary semantic corpus runs in its own workflow so semantic-coverage evidence remains methodologically separate from the primary thesis corpus.",
     "Mutation-sample preparation and collection stay pinned to Chromium so the selected corpus is generated in the primary benchmark environment.",
     "Source-derived report freshness is enforced in PR validation, while run-derived summaries are regenerated from the currently available benchmark artifacts."
   ]

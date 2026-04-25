@@ -70,6 +70,14 @@ export function getVue3RealWorldLocators(strategy: StrategyName) {
         css: css({ ...meta('auth.emailInput'), selector: 'form input[type="email"][placeholder="Email"]' }),
         xpath: xpath({ ...meta('auth.emailInput'), selector: '(//div[contains(@class,"auth-page")]//fieldset[.//input[@type="email"]]//input[@type="email"])[1]' }),
       }),
+      emailLabelInput: chooseStrategy(strategy, {
+        'semantic-first': semanticNative(
+          { ...meta('auth.emailLabelInput'), semanticEntryPoint: 'getByLabel' },
+          (page: Page) => markSemantic(page.getByLabel(/^email$/i), 'getByLabel'),
+        ),
+        css: css({ ...meta('auth.emailLabelInput'), selector: 'form input[type="email"][aria-label="Email"]' }),
+        xpath: xpath({ ...meta('auth.emailLabelInput'), selector: '(//div[contains(@class,"auth-page")]//input[@type="email" and @aria-label="Email"])[1]' }),
+      }),
       passwordInput: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('auth.passwordInput'), semanticEntryPoint: 'getByPlaceholder' },
@@ -178,6 +186,18 @@ export function getVue3RealWorldLocators(strategy: StrategyName) {
             '(//div[contains(concat(" ", normalize-space(@class), " "), " article-page ")]//div[contains(concat(" ", normalize-space(@class), " "), " banner ")]/descendant::h1)[1]',
         }),
       }),
+      titleText: chooseStrategy(strategy, {
+        'semantic-first': semanticNative(
+          { ...meta('article.titleText'), semanticEntryPoint: 'getByText' },
+          (page: Page, title: string) => markSemantic(page.getByText(title, { exact: true }).first(), 'getByText'),
+        ),
+        css: css({ ...meta('article.titleText'), selector: '.article-page .banner h1' }),
+        xpath: xpath(
+          { ...meta('article.titleText'), selector: '//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//h1[normalize-space() = "${title}"]' },
+          (page: Page, title: string) =>
+            page.locator(`xpath=//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//h1[normalize-space() = ${JSON.stringify(title)}]`),
+        ),
+      }),
       favoriteButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('article.favoriteButton'), semanticEntryPoint: 'getByRole' },
@@ -248,6 +268,21 @@ export function getVue3RealWorldLocators(strategy: StrategyName) {
       }),
     },
     profile: {
+      avatarImage: chooseStrategy(strategy, {
+        'semantic-first': semanticNative(
+          { ...meta('profile.avatarImage'), semanticEntryPoint: 'getByAltText' },
+          (page: Page, username: string) => markSemantic(page.getByAltText(username).first(), 'getByAltText'),
+        ),
+        css: css(
+          { ...meta('profile.avatarImage'), selector: '.profile-page .user-info img.user-img[alt]' },
+          (page: Page, username: string) => page.locator(`.profile-page .user-info img.user-img[alt="${username}"]`),
+        ),
+        xpath: xpath(
+          { ...meta('profile.avatarImage'), selector: '//div[contains(@class,"profile-page")]//img[contains(@class,"user-img") and @alt="${username}"]' },
+          (page: Page, username: string) =>
+            page.locator(`xpath=//div[contains(@class,"profile-page")]//img[contains(@class,"user-img") and @alt=${JSON.stringify(username)}]`),
+        ),
+      }),
       followButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('profile.followButton'), semanticEntryPoint: 'getByRole' },
@@ -313,6 +348,7 @@ export function getVue3RealWorldOracle() {
     auth: {
       title: oracleTestId(meta('auth.title'), 'auth-title'),
       emailInput: oracleTestId(meta('auth.emailInput'), 'auth-email-input'),
+      emailLabelInput: oracleTestId(meta('auth.emailLabelInput'), 'auth-email-input'),
       usernameInput: oracleTestId(meta('auth.usernameInput'), 'auth-username-input'),
       passwordInput: oracleTestId(meta('auth.passwordInput'), 'auth-password-input'),
       submitButton: oracleTestId(meta('auth.submitButton'), 'auth-submit-button'),
@@ -336,6 +372,7 @@ export function getVue3RealWorldOracle() {
     article: {
       page: oracleTestId(meta('article.page'), 'article-page'),
       title: oracleTestId(meta('article.title'), 'article-title'),
+      titleText: oracleTestId(meta('article.titleText'), 'article-title'),
       favoriteButton: oracle(
         { ...meta('article.favoriteButton'), selector: "getByTestId('article-meta-top').getByTestId('article-favorite-btn')" },
         (page: Page) => page.getByTestId('article-meta-top').getByTestId('article-favorite-btn'),
@@ -369,6 +406,7 @@ export function getVue3RealWorldOracle() {
     },
     profile: {
       page: oracleTestId(meta('profile.page'), 'profile-page'),
+      avatarImage: oracleTestId(meta('profile.avatarImage'), 'profile-user-img'),
       bio: oracleTestId(meta('profile.bio'), 'profile-bio'),
       followButton: oracleTestId(meta('profile.followButton'), 'profile-follow-btn'),
       unfollowButton: oracleTestId(meta('profile.unfollowButton'), 'profile-unfollow-btn'),

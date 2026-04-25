@@ -11,6 +11,10 @@ const trackedSourceReports = [
   'reports/realworld-xpath-cleanup-risk-note.md',
   'reports/realworld-benchmark-corpus.json',
   'reports/realworld-migration-matrix.json',
+  'reports/realworld-semantic-target-audit.json',
+  'reports/realworld-semantic-target-audit.md',
+  'reports/realworld-semantic-supplement-corpus.json',
+  'reports/realworld-semantic-supplement-note.md',
   'reports/realworld-operator-taxonomy.json',
   'reports/realworld-pipeline-verification.json',
 ];

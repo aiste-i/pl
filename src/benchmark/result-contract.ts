@@ -3,7 +3,11 @@ import * as os from 'os';
 import * as path from 'path';
 import { execFileSync } from 'child_process';
 import type { SupportedAppId } from '../apps/types';
-import { getActiveScenarioIds } from './realworld-corpus';
+import {
+  REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+  getActiveScenarioIds,
+  getSemanticSupplementScenarioEntries,
+} from './realworld-corpus';
 
 export const BENCHMARK_SCHEMA_VERSION = '1.0.0';
 export const BENCHMARK_DATASET_VERSION = '2026.04';
@@ -179,6 +183,10 @@ export function inferExecutionMode(phase: 'baseline' | 'mutated'): BenchmarkExec
 
 export function createRunMetadata(input: RunMetadataInput): BenchmarkRunMetadata {
   const staticMetadata = getStaticMetadata();
+  const defaultSelectedScenarios =
+    input.corpusId === REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID
+      ? getSemanticSupplementScenarioEntries().map(entry => entry.scenarioId)
+      : getActiveScenarioIds();
   return {
     ...staticMetadata,
     runId: input.runId,
@@ -187,7 +195,7 @@ export function createRunMetadata(input: RunMetadataInput): BenchmarkRunMetadata
     browserChannel: input.browserChannel ?? null,
     benchmarkScope: input.corpusId ?? null,
     corpusId: input.corpusId ?? null,
-    selectedScenarios: input.selectedScenarios ?? getActiveScenarioIds(),
+    selectedScenarios: input.selectedScenarios ?? defaultSelectedScenarios,
     selectedApps: input.selectedApps ?? [input.applicationId],
     seed: input.seed ?? null,
     mutationBudget: input.mutationBudget ?? null,
@@ -228,8 +236,14 @@ export function flattenResultForCsv(result: any): Record<string, unknown> {
     commitSha: result.commitSha,
     applicationId: result.applicationId,
     corpusId: result.corpusId ?? null,
+    corpusRole: result.corpusRole ?? null,
     scenarioId: result.scenarioId,
     activeScenarioId: result.activeScenarioId ?? null,
+    intendedSemanticEntryPoint: result.intendedSemanticEntryPoint ?? null,
+    actualSemanticEntryPoint: result.actualSemanticEntryPoint ?? null,
+    targetLogicalKeys: result.targetLogicalKeys ?? [],
+    semanticScenarioSupportedApps: result.semanticScenarioSupportedApps ?? [],
+    semanticScenarioExclusionReason: result.semanticScenarioExclusionReason ?? null,
     locatorFamily: result.locatorFamily,
     browserName: result.browserName,
     browserChannel: result.browserChannel ?? null,

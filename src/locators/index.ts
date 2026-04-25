@@ -3,7 +3,6 @@ import type { AppAdapter } from '../apps/types';
 export const STRATEGIES = ['semantic-first', 'css', 'xpath'] as const;
 export type StrategyName = (typeof STRATEGIES)[number];
 
-export { getTodoMVCLocators, getTodoMVCOracle, TodoMVCLocators } from './apps/todomvc.locators';
 export * from './realworld/types';
 export * from './realworld/keys';
 export * from './realworld/coverage';

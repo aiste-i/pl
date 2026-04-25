@@ -3,6 +3,7 @@ import {
   getAppScenariosPath,
   getSelectedAppId,
 } from '../../apps';
+import { REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID } from '../realworld-corpus';
 
 function getNpmCommand(): string {
   return process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -26,18 +27,19 @@ async function main() {
   const sharedEnv = {
     ...process.env,
     APP_ID: String(appName),
+    BENCHMARK_CORPUS_ID: REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
     BENCHMARK_BUDGET: String(budget),
     BENCHMARK_SEED: String(seed),
     PREFLIGHT_TEST_TIMEOUT_MS: String(preflightTimeoutMs),
   };
 
-  runNpmScript('benchmark:collect:app', sharedEnv);
-  runNpmScript('benchmark:generate:app', sharedEnv);
-  runNpmScript('benchmark:preflight:app', sharedEnv);
-  runNpmScript('benchmark:finalize:app', sharedEnv);
+  runNpmScript('benchmark:semantic:collect:app', sharedEnv);
+  runNpmScript('benchmark:semantic:generate:app', sharedEnv);
+  runNpmScript('benchmark:semantic:preflight:app', sharedEnv);
+  runNpmScript('benchmark:semantic:finalize:app', sharedEnv);
 
   const scenarioPath = getAppScenariosPath(appName as any);
-  console.log(`Validated scenario preparation complete for ${appName}. Final scenario file: ${scenarioPath}`);
+  console.log(`Semantic supplement scenario preparation complete for ${appName}. Final scenario file: ${scenarioPath}`);
 }
 
 main().catch(error => {

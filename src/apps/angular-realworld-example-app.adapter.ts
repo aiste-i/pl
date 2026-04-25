@@ -21,7 +21,11 @@ export const angularRealWorldAdapter: AppAdapter = {
   startCommand: `npm run start -- --host 127.0.0.1 --port ${ANGULAR_PORT}`,
   baseURL: ANGULAR_BASE_URL,
   healthUrl: ANGULAR_BASE_URL,
-  testMatch: ['tests/realworld/**/*.spec.ts', 'tests/realworld-validation/**/*.spec.ts'],
+  testMatch: [
+    'tests/realworld/benchmark-active.spec.ts',
+    'tests/realworld/benchmark-semantic-supplement.spec.ts',
+    'tests/realworld-validation/**/*.spec.ts',
+  ],
   paths: angularRealWorldPaths,
   getLocators: getAngularRealWorldLocators,
   getOracle: getAngularRealWorldOracle,

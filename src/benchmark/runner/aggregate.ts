@@ -6,6 +6,10 @@ import { createRunMetadata, writeCsvRows } from '../../benchmark/result-contract
 import { getBenchmarkRetention, pruneCompactBenchmarkArtifacts } from '../../benchmark/retention';
 import { validateBenchmarkPayload } from '../../benchmark/result-schema-validator';
 import { CATEGORY_ORDER } from './sampling';
+import {
+    REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+    getSemanticSupplementExcludedPairs,
+} from '../../benchmark/realworld-corpus';
 
 interface AggregatedRun {
     runId: string;
@@ -16,6 +20,12 @@ interface AggregatedRun {
     activeScenarioId: string;
     activeScenarioCategory: string;
     sourceSpec: string;
+    corpusRole: string;
+    intendedSemanticEntryPoint: string;
+    actualSemanticEntryPoint: string;
+    targetLogicalKeys: string[];
+    semanticScenarioSupportedApps: string[];
+    semanticScenarioExclusionReason: string;
     locatorFamily: string;
     semanticEntryPoint: string;
     phase: 'baseline' | 'mutated';
@@ -212,6 +222,12 @@ function loadResults(inputDir: string): AggregatedRun[] {
                 activeScenarioId: content.activeScenarioId,
                 activeScenarioCategory: content.activeScenarioCategory || 'unknown',
                 sourceSpec: content.sourceSpec || 'unknown',
+                corpusRole: content.corpusRole || 'primary',
+                intendedSemanticEntryPoint: content.intendedSemanticEntryPoint || 'none',
+                actualSemanticEntryPoint: content.actualSemanticEntryPoint || content.semanticEntryPoint || 'none',
+                targetLogicalKeys: content.targetLogicalKeys || [],
+                semanticScenarioSupportedApps: content.semanticScenarioSupportedApps || [],
+                semanticScenarioExclusionReason: content.semanticScenarioExclusionReason || 'none',
                 locatorFamily: content.locatorFamily,
                 semanticEntryPoint: content.semanticEntryPoint || 'none',
                 phase: content.phase,
@@ -491,6 +507,110 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
     });
     writeCsv(path.join(outputDir, 'comparison_denominators.csv'), comparisonDenominators);
 
+    const isSemanticSupplement = corpusIds.includes(REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID);
+    const semanticEntryPoints = ['getByRole', 'getByLabel', 'getByText', 'getByPlaceholder', 'getByAltText', 'getByTitle'];
+    const semanticQueryForRun = (run: AggregatedRun) =>
+        run.actualSemanticEntryPoint !== 'none' ? run.actualSemanticEntryPoint : run.intendedSemanticEntryPoint;
+    const semanticSupplementExclusions = isSemanticSupplement
+        ? getSemanticSupplementExcludedPairs()
+            .filter(pair => appsInRuns.includes(pair.appId))
+            .map(pair => ({
+                corpusId: pair.corpusId,
+                scenarioId: pair.scenarioId,
+                appId: pair.appId,
+                intendedSemanticEntryPoint: pair.intendedSemanticEntryPoint,
+                excluded: true,
+                exclusionReason: pair.reason,
+            }))
+        : [];
+
+    const semanticQueryDistribution = semanticEntryPoints.map(entryPoint => ({
+        semanticEntryPoint: entryPoint,
+        actualSemanticFirstRuns: runs.filter(run => run.locatorFamily === 'semantic-first' && run.actualSemanticEntryPoint === entryPoint).length,
+        intendedRuns: runs.filter(run => run.intendedSemanticEntryPoint === entryPoint).length,
+        baselineRuns: baseline.filter(run => semanticQueryForRun(run) === entryPoint).length,
+        mutatedRuns: mutated.filter(run => semanticQueryForRun(run) === entryPoint).length,
+    }));
+    const semanticScenarioQueryMapping = Array.from(new Set(runs.map(run => `${run.applicationId}::${run.activeScenarioId}`))).map(key => {
+        const [applicationId, activeScenarioId] = key.split('::');
+        const scenarioRuns = runs.filter(run => run.applicationId === applicationId && run.activeScenarioId === activeScenarioId);
+        const first = scenarioRuns[0];
+        return {
+            applicationId,
+            scenarioId: activeScenarioId,
+            intendedSemanticEntryPoint: first?.intendedSemanticEntryPoint ?? 'none',
+            actualSemanticEntryPoints: JSON.stringify(Array.from(new Set(scenarioRuns.map(run => run.actualSemanticEntryPoint))).sort()),
+            targetLogicalKeys: JSON.stringify(first?.targetLogicalKeys ?? []),
+            supportedApps: JSON.stringify(first?.semanticScenarioSupportedApps ?? []),
+            excluded: false,
+            exclusionReason: first?.semanticScenarioExclusionReason ?? null,
+        };
+    }).concat(semanticSupplementExclusions.map(pair => ({
+        applicationId: pair.appId,
+        scenarioId: pair.scenarioId,
+        intendedSemanticEntryPoint: pair.intendedSemanticEntryPoint,
+        actualSemanticEntryPoints: JSON.stringify([]),
+        targetLogicalKeys: JSON.stringify([]),
+        supportedApps: JSON.stringify([]),
+        excluded: true,
+        exclusionReason: pair.exclusionReason,
+    }))).sort((left, right) => `${left.applicationId}:${left.scenarioId}`.localeCompare(`${right.applicationId}:${right.scenarioId}`));
+    const summaryBySemanticQuery = semanticEntryPoints.map(entryPoint => {
+        const queryRuns = runs.filter(run => semanticQueryForRun(run) === entryPoint);
+        const queryBaseline = queryRuns.filter(run => run.phase === 'baseline');
+        const queryMutated = queryRuns.filter(run => run.phase === 'mutated');
+        const comparable = queryMutated.filter(run => run.comparisonEligible);
+        const failedComparable = comparable.filter(run => run.runStatus === 'failed');
+        return {
+            semanticEntryPoint: entryPoint,
+            totalRuns: queryRuns.length,
+            baselineRuns: queryBaseline.length,
+            mutatedRuns: queryMutated.length,
+            comparisonEligibleRuns: comparable.length,
+            failedComparisonEligibleRuns: failedComparable.length,
+            failureRateComparisonEligible: (failedComparable.length / comparable.length || 0).toFixed(4),
+        };
+    }).filter(row => row.totalRuns > 0);
+    const summaryBySemanticQueryCategory = [];
+    for (const entryPoint of semanticEntryPoints) {
+        for (const category of categories) {
+            const cellRuns = mutated.filter(run => semanticQueryForRun(run) === entryPoint && run.changeCategory === category);
+            if (cellRuns.length === 0) continue;
+            const comparable = cellRuns.filter(run => run.comparisonEligible);
+            const failedComparable = comparable.filter(run => run.runStatus === 'failed');
+            summaryBySemanticQueryCategory.push({
+                semanticEntryPoint: entryPoint,
+                category,
+                totalMutated: cellRuns.length,
+                comparisonEligibleRuns: comparable.length,
+                failedComparisonEligibleRuns: failedComparable.length,
+                failureRateComparisonEligible: (failedComparable.length / comparable.length || 0).toFixed(4),
+            });
+        }
+    }
+    const failureDistributionBySemanticQuery = [];
+    for (const entryPoint of semanticEntryPoints) {
+        const failedRuns = mutated.filter(run => semanticQueryForRun(run) === entryPoint && run.runStatus === 'failed');
+        if (failedRuns.length === 0) continue;
+        for (const failureClass of Array.from(new Set(failedRuns.map(run => run.failureClass)))) {
+            const count = failedRuns.filter(run => run.failureClass === failureClass).length;
+            failureDistributionBySemanticQuery.push({
+                semanticEntryPoint: entryPoint,
+                failureClass,
+                count,
+                proportion: (count / failedRuns.length || 0).toFixed(4),
+            });
+        }
+    }
+
+    if (isSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'semantic_query_distribution.csv'), semanticQueryDistribution);
+        writeCsv(path.join(outputDir, 'semantic_scenario_query_mapping.csv'), semanticScenarioQueryMapping);
+        writeCsv(path.join(outputDir, 'summary_by_semantic_query.csv'), summaryBySemanticQuery);
+        writeCsv(path.join(outputDir, 'summary_by_semantic_query_and_category.csv'), summaryBySemanticQueryCategory);
+        writeCsv(path.join(outputDir, 'failure_distribution_by_semantic_query.csv'), failureDistributionBySemanticQuery);
+    }
+
     const accessibilityScanStatusSummary = families.map(family => {
         const familyRuns = runs.filter(run => run.locatorFamily === family);
         return {
@@ -745,6 +865,19 @@ function aggregate(runs: AggregatedRun[], outputDir: string) {
         summaryByFamilyOperator,
         failureDistribution: failureDist,
         comparisonDenominators,
+        semanticSupplement: isSemanticSupplement
+            ? {
+                corpusRole: 'supplementary',
+                notPooledIntoPrimaryDenominators: true,
+                primaryCorpusId: 'realworld-active',
+                queryDistribution: semanticQueryDistribution,
+                scenarioToQueryMapping: semanticScenarioQueryMapping,
+                summaryBySemanticQuery,
+                summaryBySemanticQueryCategory,
+                failureDistributionBySemanticQuery,
+                excludedAppScenarioPairs: semanticSupplementExclusions,
+            }
+            : null,
         exclusions: exclusionSummary,
         accessibility: {
             scanStatusSummary: accessibilityScanStatusSummary,

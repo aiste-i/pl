@@ -21,6 +21,7 @@ export interface RealWorldAuthLocators {
   title(page: Page): SemanticLocator;
   usernameInput(page: Page): SemanticLocator;
   emailInput(page: Page): SemanticLocator;
+  emailLabelInput(page: Page): SemanticLocator;
   passwordInput(page: Page): SemanticLocator;
   submitButton(page: Page): SemanticLocator;
   errorList(page: Page): SemanticLocator;
@@ -60,6 +61,7 @@ export interface RealWorldEditorLocators {
 export interface RealWorldArticleLocators {
   page(page: Page): SemanticLocator;
   title(page: Page): SemanticLocator;
+  titleText(page: Page, title: string): SemanticLocator;
   content(page: Page): SemanticLocator;
   body(page: Page): SemanticLocator;
   tagList(page: Page): SemanticLocator;
@@ -89,6 +91,7 @@ export interface RealWorldCommentLocators {
 export interface RealWorldProfileLocators {
   page(page: Page): SemanticLocator;
   userInfo(page: Page): SemanticLocator;
+  avatarImage(page: Page, username: string): SemanticLocator;
   username(page: Page): SemanticLocator;
   bio(page: Page): SemanticLocator;
   followButton(page: Page): SemanticLocator;

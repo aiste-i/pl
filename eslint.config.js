@@ -1,5 +1,4 @@
 const tsParser = require("@typescript-eslint/parser");
-const tsPlugin = require("@typescript-eslint/eslint-plugin");
 const localRulesPlugin = require("eslint-plugin-local-rules");
 
 module.exports = [
@@ -10,12 +9,23 @@ module.exports = [
       sourceType: "module",
     },
     plugins: {
-      "@typescript-eslint": tsPlugin,
       "local-rules": localRulesPlugin,
     },
     rules: {
-      "local-rules/locator-getByRole-warn": "warn",
-      "local-rules/locator-strategies-error": "error",
+      "local-rules/realworld-locator-purity": "error",
+    },
+  },
+  {
+    files: ["src/benchmark/realworld-corpus.ts"],
+    languageOptions: {
+      parser: tsParser,
+      sourceType: "module",
+    },
+    plugins: {
+      "local-rules": localRulesPlugin,
+    },
+    rules: {
+      "local-rules/realworld-corpus-status": "error",
     },
   },
 ];

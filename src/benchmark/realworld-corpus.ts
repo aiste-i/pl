@@ -1,5 +1,7 @@
 import path from 'path';
 import type { RealWorldLogicalKey } from '../locators';
+import type { SupportedAppId } from '../apps/types';
+import type { SemanticEntryPoint } from '../locators/apps/shared-realworld';
 
 export type RealWorldCorpusStatus =
   | 'active'
@@ -49,6 +51,35 @@ export interface RealWorldCorpusManifest {
 }
 
 export const REALWORLD_ACTIVE_CORPUS_ID = 'realworld-active';
+export const REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID = 'realworld-semantic-supplement';
+
+export type RealWorldCorpusRole = 'primary' | 'supplementary';
+export type SupplementFallbackPolicy = 'exclude-if-intended-query-unavailable';
+
+export interface RealWorldSemanticSupplementScenarioEntry extends RealWorldScenarioEntry {
+  corpusRole: 'supplementary';
+  supportedApps: SupportedAppId[];
+  excludedApps: Array<{
+    appId: SupportedAppId;
+    reason: string;
+  }>;
+  intendedSemanticEntryPoint: SemanticEntryPoint;
+  targetLogicalKeys: RealWorldLogicalKey[];
+  semanticNaturalnessRationale: string;
+  supplementRationale: string;
+  fallbackPolicy: SupplementFallbackPolicy;
+  getByTitleOmissionRationale?: string;
+}
+
+export interface RealWorldSemanticSupplementManifest {
+  corpusId: typeof REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID;
+  displayName: string;
+  corpusRole: 'supplementary';
+  entrySpec: string;
+  validationFiles: string[];
+  interpretationBoundary: string;
+  scenarios: RealWorldSemanticSupplementScenarioEntry[];
+}
 
 export const REALWORLD_CORPUS_MANIFEST: RealWorldCorpusManifest = {
   corpusId: REALWORLD_ACTIVE_CORPUS_ID,
@@ -333,8 +364,142 @@ export const REALWORLD_CORPUS_MANIFEST: RealWorldCorpusManifest = {
   ],
 };
 
+export const REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST: RealWorldSemanticSupplementManifest = {
+  corpusId: REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+  displayName: 'RealWorld Semantic Supplement Corpus',
+  corpusRole: 'supplementary',
+  entrySpec: 'tests/realworld/benchmark-semantic-supplement.spec.ts',
+  validationFiles: [
+    'tests/realworld/benchmark-semantic-supplement.spec.ts',
+    'tests/realworld/benchmark-semantic-supplement.scenarios.ts',
+    'tests/realworld/helpers/benchmark-active.ts',
+  ],
+  interpretationBoundary:
+    'Supplementary semantic-query coverage only; not pooled into the realworld-active thesis denominators.',
+  scenarios: [
+    {
+      scenarioId: 'semantic.auth-email-label',
+      displayName: 'Fill sign-in email by accessible label',
+      sourceSpec: 'tests/realworld/auth.spec.ts',
+      status: 'active',
+      reason: 'Vue exposes the sign-in email control with a stable aria-label, making getByLabel the natural user-facing contract.',
+      category: 'authentication',
+      requiresAuth: false,
+      usesSetupData: true,
+      logicalKeys: ['auth.emailLabelInput'],
+      aggregateComparisonEligible: true,
+      corpusRole: 'supplementary',
+      supportedApps: ['vue3-realworld-example-app'],
+      excludedApps: [
+        {
+          appId: 'angular-realworld-example-app',
+          reason: 'The Angular sign-in email field is placeholder-only and has no genuine label contract.',
+        },
+        {
+          appId: 'realworld',
+          reason: 'The Svelte sign-in email field is placeholder-only and has no genuine label contract.',
+        },
+      ],
+      intendedSemanticEntryPoint: 'getByLabel',
+      targetLogicalKeys: ['auth.emailLabelInput'],
+      semanticNaturalnessRationale:
+        'Accessible labels are the user-facing contract for labeled form controls; Vue provides this via aria-label.',
+      supplementRationale:
+        'The main corpus naturally exercises sign-in through placeholder/role locators, so this scenario isolates label-based semantic behavior.',
+      fallbackPolicy: 'exclude-if-intended-query-unavailable',
+    },
+    {
+      scenarioId: 'semantic.comment-placeholder',
+      displayName: 'Fill article comment by placeholder',
+      sourceSpec: 'tests/realworld/comments.spec.ts',
+      status: 'active',
+      reason: 'The comment textarea is consistently exposed with the visible placeholder "Write a comment..." across the three apps.',
+      category: 'state-change',
+      requiresAuth: true,
+      usesSetupData: true,
+      logicalKeys: ['comments.textarea'],
+      aggregateComparisonEligible: true,
+      corpusRole: 'supplementary',
+      supportedApps: ['angular-realworld-example-app', 'realworld', 'vue3-realworld-example-app'],
+      excludedApps: [],
+      intendedSemanticEntryPoint: 'getByPlaceholder',
+      targetLogicalKeys: ['comments.textarea'],
+      semanticNaturalnessRationale:
+        'The textarea lacks a stronger shared label contract, while the placeholder is stable, visible, and usable as a fallback contract.',
+      supplementRationale:
+        'The main corpus includes comment creation, but this scenario explicitly reports placeholder-query coverage as supplementary evidence.',
+      fallbackPolicy: 'exclude-if-intended-query-unavailable',
+    },
+    {
+      scenarioId: 'semantic.article-title-text',
+      displayName: 'Assert article title by visible text',
+      sourceSpec: 'tests/realworld/articles.spec.ts',
+      status: 'active',
+      reason: 'An API-provisioned article title is visible content whose text is the intended user-facing assertion contract.',
+      category: 'content-access',
+      requiresAuth: false,
+      usesSetupData: true,
+      logicalKeys: ['article.titleText'],
+      aggregateComparisonEligible: true,
+      corpusRole: 'supplementary',
+      supportedApps: ['angular-realworld-example-app', 'realworld', 'vue3-realworld-example-app'],
+      excludedApps: [],
+      intendedSemanticEntryPoint: 'getByText',
+      targetLogicalKeys: ['article.titleText'],
+      semanticNaturalnessRationale:
+        'The scenario asserts content whose visible string is the contract; getByText expresses that directly.',
+      supplementRationale:
+        'The primary title assertion uses the family-standard title locator; this supplementary case isolates text-query evidence.',
+      fallbackPolicy: 'exclude-if-intended-query-unavailable',
+    },
+    {
+      scenarioId: 'semantic.profile-avatar-alt',
+      displayName: 'Assert profile avatar by alternative text',
+      sourceSpec: 'tests/realworld/null-fields.spec.ts',
+      status: 'active',
+      reason: 'Svelte and Vue expose profile avatars with alt text equal to the username, making getByAltText a natural image locator.',
+      category: 'content-access',
+      requiresAuth: false,
+      usesSetupData: true,
+      logicalKeys: ['profile.avatarImage'],
+      aggregateComparisonEligible: true,
+      corpusRole: 'supplementary',
+      supportedApps: ['realworld', 'vue3-realworld-example-app'],
+      excludedApps: [
+        {
+          appId: 'angular-realworld-example-app',
+          reason: 'The Angular profile avatar image has no stable alt text, so getByAltText would be artificial.',
+        },
+      ],
+      intendedSemanticEntryPoint: 'getByAltText',
+      targetLogicalKeys: ['profile.avatarImage'],
+      semanticNaturalnessRationale:
+        'Alternative text is the user-facing contract for meaningful images and is present on the profile avatar in Svelte and Vue.',
+      supplementRationale:
+        'The active corpus does not benchmark image alternative-text queries, so this scenario adds bounded supplementary coverage.',
+      fallbackPolicy: 'exclude-if-intended-query-unavailable',
+      getByTitleOmissionRationale:
+        'No stable title-driven target was found that would be a natural RealWorld benchmark locator.',
+    },
+  ],
+};
+
 export function getBenchmarkCorpusId(): string | undefined {
   return process.env.BENCHMARK_CORPUS_ID || undefined;
+}
+
+export function getBenchmarkCorpusRole(corpusId = getBenchmarkCorpusId()): RealWorldCorpusRole | undefined {
+  if (corpusId === REALWORLD_ACTIVE_CORPUS_ID) {
+    return 'primary';
+  }
+  if (corpusId === REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID) {
+    return 'supplementary';
+  }
+  return undefined;
+}
+
+export function usesDeferredMutation(corpusId = getBenchmarkCorpusId()): boolean {
+  return corpusId === REALWORLD_ACTIVE_CORPUS_ID || corpusId === REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID;
 }
 
 export function getBenchmarkEntrySpecAbsolutePath(): string {
@@ -343,6 +508,32 @@ export function getBenchmarkEntrySpecAbsolutePath(): string {
 
 export function getActiveScenarioEntries(): RealWorldScenarioEntry[] {
   return REALWORLD_CORPUS_MANIFEST.scenarios.filter(entry => entry.status === 'active');
+}
+
+export function getSemanticSupplementScenarioEntries(): RealWorldSemanticSupplementScenarioEntry[] {
+  return REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST.scenarios.filter(entry => entry.status === 'active');
+}
+
+export function getSemanticSupplementScenarioEntriesForApp(appId: SupportedAppId): RealWorldSemanticSupplementScenarioEntry[] {
+  return getSemanticSupplementScenarioEntries().filter(entry => entry.supportedApps.includes(appId));
+}
+
+export function getSemanticSupplementExcludedPairs(): Array<{
+  corpusId: string;
+  scenarioId: string;
+  appId: SupportedAppId;
+  intendedSemanticEntryPoint: SemanticEntryPoint;
+  reason: string;
+}> {
+  return getSemanticSupplementScenarioEntries().flatMap(entry =>
+    entry.excludedApps.map(exclusion => ({
+      corpusId: REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+      scenarioId: entry.scenarioId,
+      appId: exclusion.appId,
+      intendedSemanticEntryPoint: entry.intendedSemanticEntryPoint,
+      reason: exclusion.reason,
+    })),
+  );
 }
 
 export function getExcludedScenarioEntries(): RealWorldScenarioEntry[] {
@@ -363,4 +554,8 @@ export function getActiveSourceSpecs(): string[] {
 
 export function getActiveLogicalKeys(): RealWorldLogicalKey[] {
   return [...new Set(getActiveScenarioEntries().flatMap(entry => entry.logicalKeys))] as RealWorldLogicalKey[];
+}
+
+export function getSemanticSupplementLogicalKeys(): RealWorldLogicalKey[] {
+  return [...new Set(getSemanticSupplementScenarioEntries().flatMap(entry => entry.logicalKeys))] as RealWorldLogicalKey[];
 }

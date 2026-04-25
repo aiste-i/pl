@@ -175,6 +175,18 @@ export function getAngularRealWorldLocators(strategy: StrategyName) {
             '(//div[contains(concat(" ", normalize-space(@class), " "), " article-page ")]//div[contains(concat(" ", normalize-space(@class), " "), " banner ")]/descendant::h1)[1]',
         }),
       }),
+      titleText: chooseStrategy(strategy, {
+        'semantic-first': semanticNative(
+          { ...meta('article.titleText'), semanticEntryPoint: 'getByText' },
+          (page: Page, title: string) => markSemantic(page.getByText(title, { exact: true }).first(), 'getByText'),
+        ),
+        css: css({ ...meta('article.titleText'), selector: '.article-page .banner h1' }),
+        xpath: xpath(
+          { ...meta('article.titleText'), selector: '//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//h1[normalize-space() = "${title}"]' },
+          (page: Page, title: string) =>
+            page.locator(`xpath=//div[contains(@class,"article-page")]//div[contains(@class,"banner")]//h1[normalize-space() = ${JSON.stringify(title)}]`),
+        ),
+      }),
       favoriteButton: chooseStrategy(strategy, {
         'semantic-first': semanticNative(
           { ...meta('article.favoriteButton'), semanticEntryPoint: 'getByRole' },
@@ -337,6 +349,7 @@ export function getAngularRealWorldOracle() {
     article: {
       page: oracleTestId(meta('article.page'), 'article-page'),
       title: oracleTestId(meta('article.title'), 'article-title'),
+      titleText: oracleTestId(meta('article.titleText'), 'article-title'),
       favoriteButton: oracleTestId(meta('article.favoriteButton'), 'article-favorite-btn'),
       unfavoriteButton: oracleTestId(meta('article.unfavoriteButton'), 'article-unfavorite-btn'),
     },
