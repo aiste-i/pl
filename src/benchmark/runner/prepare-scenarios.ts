@@ -8,12 +8,19 @@ function getNpmCommand(): string {
   return process.platform === 'win32' ? 'npm.cmd' : 'npm';
 }
 
+function getShellCommand(): string | undefined {
+  if (process.platform === 'win32') {
+    return process.env.ComSpec || 'cmd.exe';
+  }
+  return undefined;
+}
+
 function runNpmScript(script: string, env: NodeJS.ProcessEnv): void {
   execSync(`${getNpmCommand()} run ${script}`, {
     cwd: process.cwd(),
     stdio: 'inherit',
     env,
-    shell: true,
+    shell: getShellCommand(),
   });
 }
 
