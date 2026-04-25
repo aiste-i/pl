@@ -7,6 +7,7 @@ import {
   getAppScenariosPath,
   getSelectedAppId,
 } from '../../apps';
+import { requiresMandatoryCategoryCoverage } from '../realworld-corpus';
 
 interface PreflightResultRow {
   candidateId: string;
@@ -89,8 +90,9 @@ async function main() {
   const selected = generator.sampleScenarios(validatedCandidates, budget, seed);
   const validatedCountsByCategory = countByCategory(validatedCandidates);
   const validatedCountsByOperator = countByOperator(validatedCandidates);
+  const enforceMandatoryCoverage = requiresMandatoryCategoryCoverage();
   const missingMandatoryCategories =
-    budget >= CATEGORY_ORDER.length
+    enforceMandatoryCoverage && budget >= CATEGORY_ORDER.length
       ? CATEGORY_ORDER.filter(category => (validatedCountsByCategory[category] || 0) === 0)
       : [];
 

@@ -3,7 +3,10 @@ import {
   getAppScenariosPath,
   getSelectedAppId,
 } from '../../apps';
-import { REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID } from '../realworld-corpus';
+import {
+  REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+  getSemanticSupplementScenarioEntries,
+} from '../realworld-corpus';
 
 function getNpmCommand(): string {
   return process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -27,9 +30,17 @@ function runNpmScript(script: string, env: NodeJS.ProcessEnv): void {
 
 async function main() {
   const appName = (process.argv[2] || process.env.APP_ID || process.env.npm_config_appid || getSelectedAppId()) as any;
-  const budget = parseInt(process.argv[3] || process.env.BENCHMARK_BUDGET || process.env.npm_config_budget || '20', 10);
+  const requestedBudget = parseInt(process.argv[3] || process.env.BENCHMARK_BUDGET || process.env.npm_config_budget || '20', 10);
   const seed = parseInt(process.argv[4] || process.env.BENCHMARK_SEED || process.env.npm_config_seed || '12345', 10);
   const preflightTimeoutMs = parseInt(process.argv[5] || process.env.PREFLIGHT_TEST_TIMEOUT_MS || '60000', 10);
+  const maxSupplementBudget = getSemanticSupplementScenarioEntries().length;
+  const budget = Math.min(requestedBudget, maxSupplementBudget);
+
+  if (budget !== requestedBudget) {
+    console.log(
+      `Requested supplementary budget ${requestedBudget} exceeds the corpus size ${maxSupplementBudget}; capping to ${budget}.`,
+    );
+  }
 
   const sharedEnv = {
     ...process.env,

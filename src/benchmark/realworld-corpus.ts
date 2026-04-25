@@ -502,6 +502,10 @@ export function usesDeferredMutation(corpusId = getBenchmarkCorpusId()): boolean
   return corpusId === REALWORLD_ACTIVE_CORPUS_ID || corpusId === REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID;
 }
 
+export function requiresMandatoryCategoryCoverage(corpusId = getBenchmarkCorpusId()): boolean {
+  return corpusId === REALWORLD_ACTIVE_CORPUS_ID;
+}
+
 export function getBenchmarkEntrySpecAbsolutePath(): string {
   return path.join(process.cwd(), REALWORLD_CORPUS_MANIFEST.entrySpec);
 }
