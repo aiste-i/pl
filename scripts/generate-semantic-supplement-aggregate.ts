@@ -30,6 +30,10 @@ interface GenerateOptions {
   outputDir?: string;
 }
 
+const CANONICAL_SUPPLEMENT_AGGREGATE_DIR = 'thesis-facing-aggregate';
+const LEGACY_SUPPLEMENT_AGGREGATE_DIR = 'combined-aggregate';
+const DEPRECATED_SUPPLEMENT_AGGREGATE_DIR = path.join('debug', 'deprecated-combined-aggregate');
+
 function readJson<T>(filePath: string): T {
   return JSON.parse(fs.readFileSync(filePath, 'utf8')) as T;
 }
@@ -56,12 +60,59 @@ function failIfAny(errors: string[]): void {
   }
 }
 
+function demoteLegacyCombinedAggregate(resultsRoot: string, outputDir: string): void {
+  const legacyOutputDir = path.join(
+    resultsRoot,
+    REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+    LEGACY_SUPPLEMENT_AGGREGATE_DIR,
+  );
+  const deprecatedOutputDir = path.join(
+    resultsRoot,
+    REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+    DEPRECATED_SUPPLEMENT_AGGREGATE_DIR,
+  );
+  if (path.resolve(outputDir) === path.resolve(legacyOutputDir) || !fs.existsSync(legacyOutputDir)) {
+    return;
+  }
+
+  fs.rmSync(deprecatedOutputDir, { recursive: true, force: true });
+  fs.mkdirSync(path.dirname(deprecatedOutputDir), { recursive: true });
+  fs.renameSync(legacyOutputDir, deprecatedOutputDir);
+  fs.writeFileSync(
+    path.join(deprecatedOutputDir, 'NONCANONICAL_DEPRECATED_SUPPLEMENT_AGGREGATE.md'),
+    [
+      '# Deprecated Supplement Aggregate',
+      '',
+      'This directory was moved out of the thesis-facing supplement artifact path.',
+      'Do not cite this aggregate in the thesis.',
+      `Use ../../${CANONICAL_SUPPLEMENT_AGGREGATE_DIR}/ for the canonical semantic supplement aggregate.`,
+      '',
+    ].join('\n'),
+  );
+}
+
+function writeCanonicalMarker(outputDir: string): void {
+  fs.writeFileSync(
+    path.join(outputDir, 'CANONICAL_THESIS_SUPPLEMENT_AGGREGATE.md'),
+    [
+      '# Canonical Thesis Supplement Aggregate',
+      '',
+      'This directory is the only thesis-facing aggregate for the supplementary semantic corpus.',
+      'It contains supplementary semantic-first coverage evidence only.',
+      'It is not pooled into the main RealWorld benchmark denominator and is not a second primary benchmark.',
+      '',
+      `Corpus: ${REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID}`,
+      '',
+    ].join('\n'),
+  );
+}
+
 export function generateSemanticSupplementAggregate(options: GenerateOptions = {}): string {
   const resultsRoot = options.resultsRoot ?? path.join(process.cwd(), 'test-results');
   const outputDir = options.outputDir ?? path.join(
     resultsRoot,
     REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
-    'combined-aggregate',
+    CANONICAL_SUPPLEMENT_AGGREGATE_DIR,
   );
   const expectedApps = expectedSupplementApps();
   const validSupplementScenarioIds = new Set(REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST.scenarios.map(scenario => scenario.scenarioId));
@@ -186,10 +237,19 @@ export function generateSemanticSupplementAggregate(options: GenerateOptions = {
 
   failIfAny(errors);
 
-  aggregate(runs, outputDir, {
+  demoteLegacyCombinedAggregate(resultsRoot, outputDir);
+  fs.rmSync(outputDir, { recursive: true, force: true });
+
+  aggregate(semanticFirstRows, outputDir, {
     supplementResultsRoot: resultsRoot,
     supplementExpectedApps: expectedApps,
+    thesisFacingSemanticSupplement: true,
+    supplementDiagnosticRowCounts: {
+      nonSemanticSupplementRowsExcluded: runs.length - semanticFirstRows.length,
+      nonSupplementRowsExcluded: 0,
+    },
   });
+  writeCanonicalMarker(outputDir);
   console.log(`Combined semantic supplement aggregate written to ${outputDir}`);
   return outputDir;
 }

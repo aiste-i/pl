@@ -144,7 +144,7 @@ The selection-quality files are emitted when `scenarios.json` or `scenario-prefl
 
 ### Supplementary Semantic Outputs
 
-These files are emitted only for `realworld-semantic-supplement` aggregate directories:
+These files are emitted for `realworld-semantic-supplement` semantic aggregate directories:
 
 - `semantic_query_distribution.csv`
 - `semantic_scenario_query_mapping.csv`
@@ -161,7 +161,11 @@ A thesis-facing combined supplement aggregate can be generated with:
 npm run benchmark:semantic:aggregate:combined
 ```
 
-It writes to `test-results/realworld-semantic-supplement/combined-aggregate/` and includes only supplementary semantic-corpus data across supported apps. This thesis-facing command is strict: every app that supports at least one supplement scenario must have supplement benchmark runs and `scenarios.json` coverage metadata, and mixed-corpus or non-supplement scenario rows fail the command before output is written.
+It writes to `test-results/realworld-semantic-supplement/thesis-facing-aggregate/`. This is the only canonical thesis-facing aggregate for the supplementary semantic corpus.
+
+The canonical supplement aggregate is strict and semantic-first-facing: every app that supports at least one supplement scenario must have supplement benchmark runs and `scenarios.json` coverage metadata, and mixed-corpus or non-supplement scenario rows fail the command before output is written. The thesis-facing folder contains supplement identity/scope, support matrix, baseline-vs-mutated semantic query distributions, semantic-query summaries, mutation-category breakdowns by query, failure-class breakdowns by query, transparency notes, and `CANONICAL_THESIS_SUPPLEMENT_AGGREGATE.md`.
+
+Generic mixed-family aggregate files such as `benchmark_runs.csv`, family summaries, CSS/XPath discordance reports, operator-diversity summaries, and comparison-denominator CSVs are suppressed from the canonical supplement folder. App-level supplement aggregates are debug/noncanonical outputs under `test-results/<app>/realworld-semantic-supplement/debug/app-aggregate/`. If stale legacy supplement aggregate folders exist, generation moves them to explicit `debug/deprecated-*` locations.
 
 ## Denominator Rules
 
@@ -222,8 +226,10 @@ npm run benchmark:aggregate:app -- test-results/angular-realworld-example-app/re
 Aggregate one supplementary app:
 
 ```bash
-npm run benchmark:semantic:aggregate:app -- test-results/vue3-realworld-example-app/realworld-semantic-supplement/benchmark-runs test-results/vue3-realworld-example-app/realworld-semantic-supplement/aggregate
+npm run benchmark:semantic:aggregate:app
 ```
+
+By default this writes debug/noncanonical app-level output to `test-results/<app>/realworld-semantic-supplement/debug/app-aggregate/`. The thesis-facing supplement aggregate is always the combined output at `test-results/realworld-semantic-supplement/thesis-facing-aggregate/`.
 
 Aggregate all RealWorld apps:
 

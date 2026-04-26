@@ -8,6 +8,10 @@ import {
     REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST,
 } from '../../src/benchmark/realworld-corpus';
 import { generateSemanticSupplementAggregate } from '../../scripts/generate-semantic-supplement-aggregate';
+import {
+    demoteLegacySupplementAppAggregate,
+    getDefaultAggregateOutputDir,
+} from '../../src/benchmark/runner/aggregate';
 
 function makeMutationTelemetry(overrides: Record<string, unknown> = {}) {
     return {
@@ -449,28 +453,95 @@ test.describe('Aggregation Script Validation', () => {
         expect(mapping).toContain('semantic.article-title-text,getByText');
     });
 
-    test('strict combined supplement aggregate includes every supported app and scenario pair', async () => {
+    test('strict combined supplement aggregate writes the canonical thesis-facing artifact only', async () => {
         const resultsRoot = path.join(process.cwd(), 'test-results', 'strict-combined-complete');
         if (fs.existsSync(resultsRoot)) fs.rmSync(resultsRoot, { recursive: true });
         writeCompleteSupplementFixture(resultsRoot);
 
-        const outputDir = generateSemanticSupplementAggregate({
-            resultsRoot,
-            outputDir: path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'combined-aggregate'),
-        });
+        const outputDir = generateSemanticSupplementAggregate({ resultsRoot });
         const report = JSON.parse(fs.readFileSync(path.join(outputDir, 'aggregate_report.json'), 'utf8'));
 
+        expect(outputDir).toBe(path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'thesis-facing-aggregate'));
         expect(report.corpusId).toBe(REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID);
+        expect(report.reportRole).toBe('canonical-thesis-facing-semantic-supplement');
         expect(report.semanticSupplement.appsIncluded.sort()).toEqual(getExpectedSupplementApps());
         expect(report.semanticSupplement.scenarioToQueryMapping).toHaveLength(
             REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST.scenarios.length * getExpectedSupplementApps().length,
         );
+        expect(new Set(report.semanticSupplement.scenarioToQueryMapping.map((row: any) => row.baselineSupportStatus))).toEqual(
+            new Set(['baseline-supported', 'unsupported']),
+        );
+        const mutationCoverageStatuses = new Set(report.semanticSupplement.scenarioToQueryMapping.map((row: any) => row.mutationCoverageStatus));
+        expect(mutationCoverageStatuses.has('mutated-covered')).toBe(true);
+        expect(mutationCoverageStatuses.has('unsupported')).toBe(true);
+        expect(Array.from(mutationCoverageStatuses).every(status => [
+            'mutated-covered',
+            'no-valid-mutated-candidate',
+            'mutated-coverage-missing',
+            'unsupported',
+        ].includes(status as string))).toBe(true);
         expect(report.semanticSupplement.validation.nonSupplementRowsExcluded).toBe(0);
+        expect(report.semanticSupplement.validation.nonSemanticSupplementRowsExcluded).toBeGreaterThan(0);
         expect(report.semanticSupplement.transparency.baselineOnlySupportIsNotMutationEvidence).toBe(true);
+        expect(report.semanticSupplement.transparency.notASecondPrimaryBenchmark).toBe(true);
+        expect(fs.existsSync(path.join(outputDir, 'CANONICAL_THESIS_SUPPLEMENT_AGGREGATE.md'))).toBe(true);
+        expect(fs.existsSync(path.join(outputDir, 'benchmark_runs.csv'))).toBe(false);
+        expect(fs.existsSync(path.join(outputDir, 'summary_by_family.csv'))).toBe(false);
+        expect(fs.existsSync(path.join(outputDir, 'css_xpath_discordance.csv'))).toBe(false);
+        expect(fs.existsSync(path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'combined-aggregate'))).toBe(false);
 
         const summaryBySemanticQuery = fs.readFileSync(path.join(outputDir, 'summary_by_semantic_query.csv'), 'utf8');
         expect(summaryBySemanticQuery).toContain('getByLabel');
         expect(summaryBySemanticQuery).toContain('getByAltText');
+    });
+
+    test('strict combined supplement aggregate demotes stale legacy combined output', async () => {
+        const resultsRoot = path.join(process.cwd(), 'test-results', 'strict-combined-demotes-legacy');
+        if (fs.existsSync(resultsRoot)) fs.rmSync(resultsRoot, { recursive: true });
+        writeCompleteSupplementFixture(resultsRoot);
+        const legacyDir = path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'combined-aggregate');
+        fs.mkdirSync(legacyDir, { recursive: true });
+        fs.writeFileSync(path.join(legacyDir, 'aggregate_report.json'), '{}');
+
+        generateSemanticSupplementAggregate({ resultsRoot });
+
+        expect(fs.existsSync(legacyDir)).toBe(false);
+        expect(fs.existsSync(path.join(
+            resultsRoot,
+            REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+            'debug',
+            'deprecated-combined-aggregate',
+            'NONCANONICAL_DEPRECATED_SUPPLEMENT_AGGREGATE.md',
+        ))).toBe(true);
+    });
+
+    test('supplement app aggregate default path is debug-only while main stays unchanged', async () => {
+        const appResultsDir = path.join(process.cwd(), 'test-results', 'aggregate-default-path-check');
+
+        expect(getDefaultAggregateOutputDir(appResultsDir, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID)).toBe(
+            path.join(appResultsDir, 'debug', 'app-aggregate'),
+        );
+        expect(getDefaultAggregateOutputDir(appResultsDir, 'realworld-active')).toBe(
+            path.join(appResultsDir, 'aggregate'),
+        );
+    });
+
+    test('supplement app aggregate demotes stale default aggregate output', async () => {
+        const appResultsDir = path.join(process.cwd(), 'test-results', 'aggregate-default-demotion-check');
+        if (fs.existsSync(appResultsDir)) fs.rmSync(appResultsDir, { recursive: true });
+        const legacyDir = path.join(appResultsDir, 'aggregate');
+        fs.mkdirSync(legacyDir, { recursive: true });
+        fs.writeFileSync(path.join(legacyDir, 'aggregate_report.json'), '{}');
+
+        demoteLegacySupplementAppAggregate(appResultsDir, path.join(appResultsDir, 'debug', 'app-aggregate'));
+
+        expect(fs.existsSync(legacyDir)).toBe(false);
+        expect(fs.existsSync(path.join(
+            appResultsDir,
+            'debug',
+            'deprecated-app-aggregate',
+            'NONCANONICAL_DEPRECATED_SUPPLEMENT_APP_AGGREGATE.md',
+        ))).toBe(true);
     });
 
     test('strict combined supplement aggregate fails when an expected supplement app is missing', async () => {
@@ -480,7 +551,7 @@ test.describe('Aggregation Script Validation', () => {
 
         expect(() => generateSemanticSupplementAggregate({
             resultsRoot,
-            outputDir: path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'combined-aggregate'),
+            outputDir: path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'thesis-facing-aggregate'),
         })).toThrow(/missing supplement benchmark runs/);
     });
 
@@ -491,8 +562,24 @@ test.describe('Aggregation Script Validation', () => {
 
         expect(() => generateSemanticSupplementAggregate({
             resultsRoot,
-            outputDir: path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'combined-aggregate'),
+            outputDir: path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'thesis-facing-aggregate'),
         })).toThrow(/non-supplement corpus realworld-active/);
+    });
+
+    test('main aggregate reports do not expose supplement sections', async () => {
+        const inputDir = path.join(process.cwd(), 'test-results', 'agg-main-no-supplement-test');
+        const mainOutputDir = path.join(process.cwd(), 'test-results', 'agg-main-no-supplement-output');
+        if (fs.existsSync(inputDir)) fs.rmSync(inputDir, { recursive: true });
+        if (fs.existsSync(mainOutputDir)) fs.rmSync(mainOutputDir, { recursive: true });
+        fs.mkdirSync(inputDir, { recursive: true });
+        fs.writeFileSync(path.join(inputDir, 'main.json'), JSON.stringify(makeBenchmarkRun()));
+
+        const { execSync } = require('child_process');
+        execSync(`npx ts-node src/benchmark/runner/aggregate.ts ${inputDir} ${mainOutputDir}`);
+
+        const report = JSON.parse(fs.readFileSync(path.join(mainOutputDir, 'aggregate_report.json'), 'utf8'));
+        expect(report.corpusId).toBe('realworld-active');
+        expect(Object.prototype.hasOwnProperty.call(report, 'semanticSupplement')).toBe(false);
     });
 
     test('should fail loudly on empty input', async () => {

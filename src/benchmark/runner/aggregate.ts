@@ -145,6 +145,11 @@ interface PreflightPayload {
 interface AggregateOptions {
     supplementResultsRoot?: string;
     supplementExpectedApps?: string[];
+    thesisFacingSemanticSupplement?: boolean;
+    supplementDiagnosticRowCounts?: {
+        nonSemanticSupplementRowsExcluded: number;
+        nonSupplementRowsExcluded: number;
+    };
 }
 
 const CATEGORY_MAPPING: Record<string, string> = Object.fromEntries(
@@ -317,12 +322,15 @@ function isCssOrXpathFamily(family: string): family is 'css' | 'xpath' {
 
 export function aggregate(runs: AggregatedRun[], outputDir: string, options: AggregateOptions = {}) {
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+    const thesisFacingSemanticSupplement = options.thesisFacingSemanticSupplement === true;
     const appRootDir = path.dirname(outputDir);
     const scenarioPayload = readJsonIfPresent<ScenarioFilePayload>(path.join(appRootDir, 'scenarios.json'));
     const preflightPayload = readJsonIfPresent<PreflightPayload>(path.join(appRootDir, 'scenario-preflight-results.json'));
     const reachableTargetsPayload = readJsonIfPresent<ReachableTargetsPayload>(path.join(appRootDir, 'reachable-targets.json'));
 
-    writeCsv(path.join(outputDir, 'benchmark_runs.csv'), runs);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'benchmark_runs.csv'), runs);
+    }
 
     const mutated = runs.filter(r => r.phase === 'mutated');
     const baseline = runs.filter(r => r.phase === 'baseline');
@@ -337,7 +345,7 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
         unsupportedRows = JSON.parse(fs.readFileSync(unsupportedPath, 'utf8')).filter((row: UnsupportedRow) => appsInRuns.includes(row.app));
     }
 
-    if (unsupportedRows.length > 0) {
+    if (!thesisFacingSemanticSupplement && unsupportedRows.length > 0) {
         writeCsv(path.join(outputDir, 'excluded_unsupported.csv'), unsupportedRows);
         fs.writeFileSync(path.join(outputDir, 'excluded_unsupported.json'), JSON.stringify(unsupportedRows, null, 2));
     }
@@ -363,7 +371,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             medianDurationMs: (durations[Math.floor(durations.length / 2)] || 0).toFixed(2),
         };
     });
-    writeCsv(path.join(outputDir, 'summary_by_family.csv'), summaryByFamily);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'summary_by_family.csv'), summaryByFamily);
+    }
 
     const categories = Array.from(new Set(mutated.map(r => r.changeCategory)));
     const summaryByFamilyCategory = [];
@@ -385,7 +395,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             });
         }
     }
-    writeCsv(path.join(outputDir, 'summary_by_family_and_category.csv'), summaryByFamilyCategory);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'summary_by_family_and_category.csv'), summaryByFamilyCategory);
+    }
 
     const operators = Array.from(new Set(mutated.map(r => r.changeOperator)));
     const summaryByFamilyOperator = [];
@@ -404,7 +416,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             });
         }
     }
-    writeCsv(path.join(outputDir, 'summary_by_family_and_operator.csv'), summaryByFamilyOperator);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'summary_by_family_and_operator.csv'), summaryByFamilyOperator);
+    }
 
     const failureClasses = Array.from(new Set(mutated.filter(r => r.runStatus === 'failed').map(r => r.failureClass)));
     const failureDist = [];
@@ -421,7 +435,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             });
         }
     }
-    writeCsv(path.join(outputDir, 'failure_distribution.csv'), failureDist);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'failure_distribution.csv'), failureDist);
+    }
 
     const appSummary = appsInRuns.map(app => {
         const appRuns = runs.filter(run => run.applicationId === app);
@@ -470,7 +486,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             });
         }
     }
-    writeCsv(path.join(outputDir, 'summary_by_browser_and_family.csv'), summaryByBrowserFamily);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'summary_by_browser_and_family.csv'), summaryByBrowserFamily);
+    }
 
     const summaryByBrowserFamilyCategory = [];
     for (const browserName of browserNames) {
@@ -491,7 +509,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             }
         }
     }
-    writeCsv(path.join(outputDir, 'summary_by_browser_family_and_category.csv'), summaryByBrowserFamilyCategory);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'summary_by_browser_family_and_category.csv'), summaryByBrowserFamilyCategory);
+    }
 
     const exclusionSummary = [
         ...unsupportedRows.map(row => ({
@@ -513,7 +533,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
                 activeInCorpus: true,
             })),
     ];
-    writeCsv(path.join(outputDir, 'exclusion_summary.csv'), exclusionSummary);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'exclusion_summary.csv'), exclusionSummary);
+    }
 
     const comparisonDenominators = families.map(family => {
         const familyMutated = mutated.filter(run => run.locatorFamily === family);
@@ -526,7 +548,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             invalidMutatedRuns: familyMutated.filter(run => run.runStatus === 'invalid').length,
         };
     });
-    writeCsv(path.join(outputDir, 'comparison_denominators.csv'), comparisonDenominators);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'comparison_denominators.csv'), comparisonDenominators);
+    }
 
     const isSemanticSupplement = corpusIds.includes(REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID);
     const supplementScenarioEntries = REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST.scenarios;
@@ -643,6 +667,18 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
                     : coverageStatus === 'baseline-supported-mutated-coverage-missing'
                         ? 'supported baseline scenario has no comparison-eligible mutated semantic-first evidence'
                         : null;
+            const baselineSupportStatus = !supported
+                ? 'unsupported'
+                : baselineSupported
+                    ? 'baseline-supported'
+                    : 'baseline-support-missing';
+            const mutationCoverageStatus = !supported
+                ? 'unsupported'
+                : scenarioEligibleMutated.length > 0
+                    ? 'mutated-covered'
+                    : coverageStatus === 'baseline-supported-no-valid-mutated-candidate'
+                        ? 'no-valid-mutated-candidate'
+                        : 'mutated-coverage-missing';
 
             return {
                 applicationId,
@@ -651,6 +687,8 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
                 actualBaselineSemanticEntryPoints: JSON.stringify(Array.from(new Set(scenarioBaseline.map(queryForSemanticRun))).sort()),
                 actualMutatedSemanticEntryPoints: JSON.stringify(Array.from(new Set(scenarioMutated.map(queryForSemanticRun))).sort()),
                 supportStatus: coverageStatus,
+                baselineSupportStatus,
+                mutationCoverageStatus,
                 baselineSemanticSupportRuns: scenarioBaseline.filter(run => run.runStatus === 'passed').length,
                 mutatedSemanticRuns: scenarioMutated.length,
                 comparisonEligibleMutatedSemanticRuns: scenarioEligibleMutated.length,
@@ -814,7 +852,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             skippedScans: familyRuns.filter(run => run.accessibilityScanStatus === 'skipped').length,
         };
     });
-    writeCsv(path.join(outputDir, 'accessibility_scan_status_summary.csv'), accessibilityScanStatusSummary);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'accessibility_scan_status_summary.csv'), accessibilityScanStatusSummary);
+    }
 
     const accessibilitySummaryCompletedOnly = families.map(family => {
         const completedBaseline = baseline.filter(run => run.locatorFamily === family && run.runStatus !== 'invalid' && run.accessibilityScanStatus === 'completed');
@@ -829,7 +869,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             meanImpactedNodesMutatedCompletedOnly: mean(completedMutated.map(run => run.impactedNodes)).toFixed(2),
         };
     });
-    writeCsv(path.join(outputDir, 'accessibility_summary_completed_only.csv'), accessibilitySummaryCompletedOnly);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'accessibility_summary_completed_only.csv'), accessibilitySummaryCompletedOnly);
+    }
 
     const accessibilitySummaryAllValidRuns = families.map(family => {
         const familyBaseline = baseline.filter(run => run.locatorFamily === family && run.runStatus !== 'invalid');
@@ -848,7 +890,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             mutatedCompletedScanRate: (familyMutated.filter(run => run.accessibilityScanStatus === 'completed').length / familyMutated.length || 0).toFixed(4),
         };
     });
-    writeCsv(path.join(outputDir, 'accessibility_summary_all_valid_runs.csv'), accessibilitySummaryAllValidRuns);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'accessibility_summary_all_valid_runs.csv'), accessibilitySummaryAllValidRuns);
+    }
 
     const mutationRunTelemetry = mutated.map(run => ({
         runId: run.runId,
@@ -876,7 +920,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
         applyFailureCount: run.mutationTelemetry?.applyFailureCount ?? 0,
         finalMutationOutcomeClass: run.mutationTelemetry?.finalMutationOutcomeClass ?? null,
     }));
-    writeCsv(path.join(outputDir, 'mutation_run_telemetry.csv'), mutationRunTelemetry);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'mutation_run_telemetry.csv'), mutationRunTelemetry);
+    }
 
     const operatorCoverageRows = reachableTargetsPayload?.metadata?.operatorCoverage ?? [];
     const operatorCoverageByName = new Map(operatorCoverageRows.map(row => [row.operator, row]));
@@ -912,7 +958,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             ),
         };
     });
-    writeCsv(path.join(outputDir, 'operator_telemetry_summary.csv'), operatorTelemetrySummary);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'operator_telemetry_summary.csv'), operatorTelemetrySummary);
+    }
 
     const cssXpathPairs = [...mutated.reduce((acc, run) => {
         if (!run.comparisonEligible || !isCssOrXpathFamily(run.locatorFamily)) {
@@ -942,7 +990,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
             discordant: cssOutcome !== xpathOutcome,
         };
     });
-    writeCsv(path.join(outputDir, 'css_xpath_discordance.csv'), cssXpathDiscordanceRows);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'css_xpath_discordance.csv'), cssXpathDiscordanceRows);
+    }
 
     const summarizeDiscordance = (rows: typeof cssXpathDiscordanceRows, dimension: 'overall' | 'changeCategory' | 'changeOperator') => {
         const groups = new Map<string, typeof cssXpathDiscordanceRows>();
@@ -960,9 +1010,11 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
         }));
     };
 
-    writeCsv(path.join(outputDir, 'css_xpath_discordance_summary.csv'), summarizeDiscordance(cssXpathDiscordanceRows, 'overall'));
-    writeCsv(path.join(outputDir, 'css_xpath_discordance_by_category.csv'), summarizeDiscordance(cssXpathDiscordanceRows, 'changeCategory'));
-    writeCsv(path.join(outputDir, 'css_xpath_discordance_by_operator.csv'), summarizeDiscordance(cssXpathDiscordanceRows, 'changeOperator'));
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'css_xpath_discordance_summary.csv'), summarizeDiscordance(cssXpathDiscordanceRows, 'overall'));
+        writeCsv(path.join(outputDir, 'css_xpath_discordance_by_category.csv'), summarizeDiscordance(cssXpathDiscordanceRows, 'changeCategory'));
+        writeCsv(path.join(outputDir, 'css_xpath_discordance_by_operator.csv'), summarizeDiscordance(cssXpathDiscordanceRows, 'changeOperator'));
+    }
 
     const operatorDiversitySummary = [...new Set([...operators, ...Object.keys(scenarioPayload?.metadata?.availableCountsByOperator ?? {})])]
         .sort()
@@ -997,7 +1049,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
                 discordanceRate: (discordantPairs / pairedRuns || 0).toFixed(4),
             };
         });
-    writeCsv(path.join(outputDir, 'operator_diversity_summary.csv'), operatorDiversitySummary);
+    if (!thesisFacingSemanticSupplement) {
+        writeCsv(path.join(outputDir, 'operator_diversity_summary.csv'), operatorDiversitySummary);
+    }
 
     const selectedScenarios = scenarioPayload?.scenarios ?? [];
     if (selectedScenarios.length > 0) {
@@ -1015,7 +1069,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
                 ).length,
             }));
         }).filter(row => row.selectedCount > 0);
-        writeCsv(path.join(outputDir, 'selection_summary_by_category_and_relevance.csv'), selectionSummaryByCategoryAndRelevance);
+        if (!thesisFacingSemanticSupplement) {
+            writeCsv(path.join(outputDir, 'selection_summary_by_category_and_relevance.csv'), selectionSummaryByCategoryAndRelevance);
+        }
 
         const selectionTouchpointSummary = [
             {
@@ -1025,7 +1081,9 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
                 mandatoryCoverageSatisfied: scenarioPayload?.metadata?.mandatoryCoverageSatisfied ?? false,
             },
         ];
-        writeCsv(path.join(outputDir, 'selection_touchpoint_summary.csv'), selectionTouchpointSummary);
+        if (!thesisFacingSemanticSupplement) {
+            writeCsv(path.join(outputDir, 'selection_touchpoint_summary.csv'), selectionTouchpointSummary);
+        }
     }
 
     const preflightResults = preflightPayload?.results ?? [];
@@ -1043,10 +1101,84 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
                 ).length,
             }));
         }).filter(row => row.validatedCount > 0);
-        writeCsv(path.join(outputDir, 'preflight_validated_summary_by_category_and_relevance.csv'), preflightValidatedSummary);
+        if (!thesisFacingSemanticSupplement) {
+            writeCsv(path.join(outputDir, 'preflight_validated_summary_by_category_and_relevance.csv'), preflightValidatedSummary);
+        }
     }
 
-    const report = {
+    const nonSemanticSupplementRowsExcluded =
+        options.supplementDiagnosticRowCounts?.nonSemanticSupplementRowsExcluded ??
+        (supplementRows.length - semanticSupplementRows.length);
+    const nonSupplementRowsExcluded =
+        options.supplementDiagnosticRowCounts?.nonSupplementRowsExcluded ??
+        (runs.length - supplementRows.length);
+    const semanticSupplementReport = isSemanticSupplement
+        ? {
+            corpusId: REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+            corpusRole: 'supplementary',
+            reportRole: thesisFacingSemanticSupplement ? 'canonical-thesis-facing-semantic-supplement' : 'debug-supplement-aggregate',
+            notPooledIntoPrimaryDenominators: true,
+            primaryCorpusId: 'realworld-active',
+            interpretationBoundary: thesisFacingSemanticSupplement
+                ? 'Canonical thesis-facing supplement aggregate: supplementary semantic-first coverage evidence only; not a second primary benchmark and not pooled into the main thesis benchmark denominator.'
+                : 'Supplementary semantic-coverage evidence only; app-level supplement aggregates are debug outputs and are not pooled into the main thesis benchmark denominator.',
+            appsIncluded: semanticSupplementAppsForReporting,
+            scenariosIncluded: supplementScenarioEntries.map(entry => entry.scenarioId),
+            familiesIncluded: families,
+            seeds: Array.from(new Set([...scenarioPayloadsByApp.values()].map(payload => payload.metadata?.seed).filter(value => value !== undefined))),
+            budgets: Array.from(new Set([...scenarioPayloadsByApp.values()].map(payload => payload.metadata?.budget).filter(value => value !== undefined))),
+            supportedAppScenarioMatrix: semanticScenarioQueryMapping,
+            queryDistribution: {
+                baselineSemanticSupportDistribution,
+                mutatedSemanticEvidenceDistribution,
+                rows: semanticQueryDistribution,
+            },
+            scenarioToQueryMapping: semanticScenarioQueryMapping,
+            summaryBySemanticQuery,
+            summaryBySemanticQueryCategory,
+            failureDistributionBySemanticQuery,
+            mutationCategoryBreakdownByQuery: summaryBySemanticQueryCategory,
+            failureClassBreakdownByQuery: failureDistributionBySemanticQuery,
+            excludedAppScenarioPairs: semanticSupplementExclusions,
+            semanticFirstSummary: {
+                baselineRuns: semanticSupplementBaseline.length,
+                mutatedRuns: semanticSupplementMutated.length,
+                comparisonEligibleMutatedRuns: semanticSupplementEligibleMutated.length,
+                failures: semanticSupplementEligibleMutated.filter(run => run.runStatus === 'failed').length,
+                failureRate: (
+                    semanticSupplementEligibleMutated.filter(run => run.runStatus === 'failed').length /
+                    semanticSupplementEligibleMutated.length || 0
+                ).toFixed(4),
+            },
+            validation: {
+                warnings: semanticValidationWarnings,
+                nonSemanticSupplementRowsExcluded,
+                nonSupplementRowsExcluded,
+                eligibleMutatedSemanticFirstRows: semanticSupplementEligibleMutated.length,
+            },
+            transparency: {
+                notPooledIntoPrimaryThesisDenominator: true,
+                supplementarySemanticCoverageEvidenceOnly: true,
+                canonicalThesisFacingAggregate: thesisFacingSemanticSupplement,
+                notASecondPrimaryBenchmark: true,
+                baselineOnlySupportIsNotMutationEvidence: true,
+                baselineOnlyNote: 'Queries with baseline support and zero eligible mutated runs are reported as baseline-only support, not mutated semantic evidence.',
+                mainCorpusId: 'realworld-active',
+            },
+        }
+        : null;
+
+    const report = thesisFacingSemanticSupplement
+        ? {
+            generatedAt: new Date().toISOString(),
+            corpusId: REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+            reportRole: 'canonical-thesis-facing-semantic-supplement',
+            activeScenarioIds,
+            applications: appSummary,
+            browsers: browserSummary,
+            semanticSupplement: semanticSupplementReport,
+        }
+        : {
         generatedAt: new Date().toISOString(),
         corpusId: corpusIds.length === 1 ? corpusIds[0] : corpusIds,
         activeScenarioIds,
@@ -1059,46 +1191,7 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
         summaryByFamilyOperator,
         failureDistribution: failureDist,
         comparisonDenominators,
-        ...(isSemanticSupplement
-            ? { semanticSupplement: {
-                corpusId: REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
-                corpusRole: 'supplementary',
-                notPooledIntoPrimaryDenominators: true,
-                primaryCorpusId: 'realworld-active',
-                interpretationBoundary: 'Supplementary semantic-coverage evidence only; not pooled into the main thesis benchmark denominator.',
-                appsIncluded: semanticSupplementAppsForReporting,
-                scenariosIncluded: supplementScenarioEntries.map(entry => entry.scenarioId),
-                familiesIncluded: families,
-                seeds: Array.from(new Set([...scenarioPayloadsByApp.values()].map(payload => payload.metadata?.seed).filter(value => value !== undefined))),
-                budgets: Array.from(new Set([...scenarioPayloadsByApp.values()].map(payload => payload.metadata?.budget).filter(value => value !== undefined))),
-                supportedAppScenarioMatrix: semanticScenarioQueryMapping,
-                queryDistribution: {
-                    baselineSemanticSupportDistribution,
-                    mutatedSemanticEvidenceDistribution,
-                    rows: semanticQueryDistribution,
-                },
-                scenarioToQueryMapping: semanticScenarioQueryMapping,
-                summaryBySemanticQuery,
-                summaryBySemanticQueryCategory,
-                failureDistributionBySemanticQuery,
-                mutationCategoryBreakdownByQuery: summaryBySemanticQueryCategory,
-                failureClassBreakdownByQuery: failureDistributionBySemanticQuery,
-                excludedAppScenarioPairs: semanticSupplementExclusions,
-                validation: {
-                    warnings: semanticValidationWarnings,
-                    nonSemanticSupplementRowsExcluded: supplementRows.length - semanticSupplementRows.length,
-                    nonSupplementRowsExcluded: runs.length - supplementRows.length,
-                    eligibleMutatedSemanticFirstRows: semanticSupplementEligibleMutated.length,
-                },
-                transparency: {
-                    notPooledIntoPrimaryThesisDenominator: true,
-                    supplementarySemanticCoverageEvidenceOnly: true,
-                    baselineOnlySupportIsNotMutationEvidence: true,
-                    baselineOnlyNote: 'Queries with baseline support and zero eligible mutated runs are reported as baseline-only support, not mutated semantic evidence.',
-                    mainCorpusId: 'realworld-active',
-                },
-            } }
-            : {}),
+        ...(semanticSupplementReport ? { semanticSupplement: semanticSupplementReport } : {}),
         exclusions: exclusionSummary,
         accessibility: {
             scanStatusSummary: accessibilityScanStatusSummary,
@@ -1158,12 +1251,43 @@ export function aggregate(runs: AggregatedRun[], outputDir: string, options: Agg
     console.log(`Aggregation complete. Results written to ${outputDir}`);
 }
 
+export function getDefaultAggregateOutputDir(appResultsDir: string, corpusId = process.env.BENCHMARK_CORPUS_ID): string {
+    return corpusId === REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID
+        ? path.join(appResultsDir, 'debug', 'app-aggregate')
+        : path.join(appResultsDir, 'aggregate');
+}
+
+export function demoteLegacySupplementAppAggregate(appResultsDir: string, outputDir: string): void {
+    const legacyOutputDir = path.join(appResultsDir, 'aggregate');
+    const deprecatedOutputDir = path.join(appResultsDir, 'debug', 'deprecated-app-aggregate');
+    if (path.resolve(outputDir) === path.resolve(legacyOutputDir) || !fs.existsSync(legacyOutputDir)) {
+        return;
+    }
+
+    fs.rmSync(deprecatedOutputDir, { recursive: true, force: true });
+    fs.mkdirSync(path.dirname(deprecatedOutputDir), { recursive: true });
+    fs.renameSync(legacyOutputDir, deprecatedOutputDir);
+    fs.writeFileSync(
+        path.join(deprecatedOutputDir, 'NONCANONICAL_DEPRECATED_SUPPLEMENT_APP_AGGREGATE.md'),
+        [
+            '# Deprecated Supplement App Aggregate',
+            '',
+            'This app-level supplement aggregate was moved out of the default supplement artifact path.',
+            'It is retained only as engineering/debug output and must not be cited as the thesis-facing semantic supplement aggregate.',
+            'Use the combined canonical supplement aggregate at test-results/realworld-semantic-supplement/thesis-facing-aggregate/.',
+            '',
+        ].join('\n'),
+    );
+}
+
 function main() {
     const args = process.argv.slice(2);
     const selectedAppId = getSelectedAppId();
     const defaultAppResultsDir = getAppResultsDir(selectedAppId);
     const inputDir = path.resolve(args[0] || path.join(defaultAppResultsDir, 'benchmark-runs'));
-    const outputDir = path.resolve(args[1] || path.join(defaultAppResultsDir, 'aggregate'));
+    const isSupplementAppAggregate = process.env.BENCHMARK_CORPUS_ID === REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID;
+    const defaultOutputDir = getDefaultAggregateOutputDir(defaultAppResultsDir);
+    const outputDir = path.resolve(args[1] || defaultOutputDir);
 
     if (!fs.existsSync(inputDir)) {
         console.error(`Input directory does not exist: ${inputDir}`);
@@ -1174,6 +1298,10 @@ function main() {
     if (runs.length === 0) {
         console.error('No valid results found to aggregate.');
         process.exit(1);
+    }
+
+    if (isSupplementAppAggregate && args[1] === undefined) {
+        demoteLegacySupplementAppAggregate(defaultAppResultsDir, outputDir);
     }
 
     aggregate(runs, outputDir);
