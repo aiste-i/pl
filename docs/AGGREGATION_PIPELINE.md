@@ -161,7 +161,7 @@ A thesis-facing combined supplement aggregate can be generated with:
 npm run benchmark:semantic:aggregate:combined
 ```
 
-It writes to `test-results/realworld-semantic-supplement/combined-aggregate/` and includes only supplementary semantic-corpus data across supported apps.
+It writes to `test-results/realworld-semantic-supplement/combined-aggregate/` and includes only supplementary semantic-corpus data across supported apps. This thesis-facing command is strict: every app that supports at least one supplement scenario must have supplement benchmark runs and `scenarios.json` coverage metadata, and mixed-corpus or non-supplement scenario rows fail the command before output is written.
 
 ## Denominator Rules
 

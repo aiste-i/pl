@@ -142,6 +142,11 @@ interface PreflightPayload {
     }>;
 }
 
+interface AggregateOptions {
+    supplementResultsRoot?: string;
+    supplementExpectedApps?: string[];
+}
+
 const CATEGORY_MAPPING: Record<string, string> = Object.fromEntries(
     getOperatorCatalog().map(entry => [entry.type, entry.runtimeCategory]),
 );
@@ -310,7 +315,7 @@ function isCssOrXpathFamily(family: string): family is 'css' | 'xpath' {
     return family === 'css' || family === 'xpath';
 }
 
-export function aggregate(runs: AggregatedRun[], outputDir: string) {
+export function aggregate(runs: AggregatedRun[], outputDir: string, options: AggregateOptions = {}) {
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
     const appRootDir = path.dirname(outputDir);
     const scenarioPayload = readJsonIfPresent<ScenarioFilePayload>(path.join(appRootDir, 'scenarios.json'));
@@ -540,10 +545,11 @@ export function aggregate(runs: AggregatedRun[], outputDir: string) {
             ? run.actualSemanticEntryPoint
             : 'none';
     const scenarioPayloadsByApp = new Map<string, ScenarioFilePayload>();
-    for (const app of appsInRuns) {
+    const semanticSupplementAppsForReporting = options.supplementExpectedApps ?? appsInRuns;
+    const semanticSupplementResultsRoot = options.supplementResultsRoot ?? path.join(process.cwd(), 'test-results');
+    for (const app of semanticSupplementAppsForReporting) {
         const conventionalScenarioPath = path.join(
-            process.cwd(),
-            'test-results',
+            semanticSupplementResultsRoot,
             app,
             REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
             'scenarios.json',
@@ -567,7 +573,7 @@ export function aggregate(runs: AggregatedRun[], outputDir: string) {
     }
     const semanticSupplementExclusions = isSemanticSupplement
         ? getSemanticSupplementExcludedPairs()
-            .filter(pair => appsInRuns.includes(pair.appId))
+            .filter(pair => semanticSupplementAppsForReporting.includes(pair.appId))
             .map(pair => ({
                 corpusId: pair.corpusId,
                 scenarioId: pair.scenarioId,
@@ -607,7 +613,7 @@ export function aggregate(runs: AggregatedRun[], outputDir: string) {
     ];
 
     const semanticScenarioQueryMapping = supplementScenarioEntries
-        .flatMap(scenario => appsInRuns.map(applicationId => {
+        .flatMap(scenario => semanticSupplementAppsForReporting.map(applicationId => {
             const supported = scenario.supportedApps.includes(applicationId as any);
             const exclusion = scenario.excludedApps.find(item => item.appId === applicationId);
             const scenarioBaseline = semanticSupplementBaseline.filter(run =>
@@ -1053,14 +1059,14 @@ export function aggregate(runs: AggregatedRun[], outputDir: string) {
         summaryByFamilyOperator,
         failureDistribution: failureDist,
         comparisonDenominators,
-        semanticSupplement: isSemanticSupplement
-            ? {
+        ...(isSemanticSupplement
+            ? { semanticSupplement: {
                 corpusId: REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
                 corpusRole: 'supplementary',
                 notPooledIntoPrimaryDenominators: true,
                 primaryCorpusId: 'realworld-active',
                 interpretationBoundary: 'Supplementary semantic-coverage evidence only; not pooled into the main thesis benchmark denominator.',
-                appsIncluded: appsInRuns,
+                appsIncluded: semanticSupplementAppsForReporting,
                 scenariosIncluded: supplementScenarioEntries.map(entry => entry.scenarioId),
                 familiesIncluded: families,
                 seeds: Array.from(new Set([...scenarioPayloadsByApp.values()].map(payload => payload.metadata?.seed).filter(value => value !== undefined))),
@@ -1087,10 +1093,12 @@ export function aggregate(runs: AggregatedRun[], outputDir: string) {
                 transparency: {
                     notPooledIntoPrimaryThesisDenominator: true,
                     supplementarySemanticCoverageEvidenceOnly: true,
+                    baselineOnlySupportIsNotMutationEvidence: true,
+                    baselineOnlyNote: 'Queries with baseline support and zero eligible mutated runs are reported as baseline-only support, not mutated semantic evidence.',
                     mainCorpusId: 'realworld-active',
                 },
-            }
-            : null,
+            } }
+            : {}),
         exclusions: exclusionSummary,
         accessibility: {
             scanStatusSummary: accessibilityScanStatusSummary,

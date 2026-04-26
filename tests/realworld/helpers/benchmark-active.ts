@@ -8,6 +8,10 @@ export function getActiveBenchmarkTimeoutMs(): number {
 }
 
 export function getActiveBenchmarkTestTimeoutMs(): number {
+  const overrideMs = Number(process.env.ACTIVE_BENCHMARK_TEST_TIMEOUT_MS || process.env.BENCHMARK_TEST_TIMEOUT_MS || 0);
+  if (Number.isFinite(overrideMs) && overrideMs > 0) {
+    return overrideMs;
+  }
   return Math.max(getActiveBenchmarkTimeoutMs() + 15000, 30000);
 }
 

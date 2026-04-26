@@ -101,6 +101,7 @@ if (MODE === 'collect') {
   test.describe(`RealWorld Semantic Supplement Collection @app:${APP_ID}`, () => {
     for (const scenario of SEMANTIC_SUPPLEMENT_SCENARIOS) {
       test(`collect reachable targets: ${scenario.displayName}`, async ({ page, request, locators, oracle, appAdapter, setScenarioMetadata }) => {
+        test.setTimeout(getActiveBenchmarkTestTimeoutMs());
         setScenarioMetadata(scenarioMetadata(scenario));
 
         const generator = new MutantGenerator(page, APP_ID);

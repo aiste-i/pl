@@ -7,6 +7,7 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   reporter: 'list',
+  outputDir: 'artifacts/playwright-unit',
   use: {
     ...devices['Desktop Chrome'],
     browserName: 'chromium',

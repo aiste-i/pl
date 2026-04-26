@@ -3,6 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { BENCHMARK_DATASET_VERSION, BENCHMARK_SCHEMA_VERSION } from '../../src/benchmark/result-contract';
+import {
+    REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+    REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST,
+} from '../../src/benchmark/realworld-corpus';
+import { generateSemanticSupplementAggregate } from '../../scripts/generate-semantic-supplement-aggregate';
 
 function makeMutationTelemetry(overrides: Record<string, unknown> = {}) {
     return {
@@ -195,6 +200,96 @@ function makeBenchmarkRun(overrides: Record<string, unknown> = {}) {
     return record;
 }
 
+function getExpectedSupplementApps(): string[] {
+    return Array.from(new Set(
+        REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST.scenarios.flatMap(scenario => scenario.supportedApps),
+    )).sort();
+}
+
+function writeCompleteSupplementFixture(resultsRoot: string, overrides: {
+    omitApps?: string[];
+    corruptFirstRunCorpus?: boolean;
+} = {}) {
+    const omittedApps = new Set(overrides.omitApps ?? []);
+
+    for (const appId of getExpectedSupplementApps()) {
+        if (omittedApps.has(appId)) continue;
+
+        const appRoot = path.join(resultsRoot, appId, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID);
+        const runsDir = path.join(appRoot, 'benchmark-runs');
+        fs.mkdirSync(runsDir, { recursive: true });
+
+        const supportedScenarios = REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST.scenarios.filter(scenario =>
+            scenario.supportedApps.includes(appId as any),
+        );
+        const coverage = supportedScenarios.map(scenario => ({
+            scenarioId: scenario.scenarioId,
+            status: 'mutated-covered',
+            selectedCandidateId: `${appId}-${scenario.scenarioId}-candidate`,
+            reason: null,
+        }));
+
+        fs.writeFileSync(path.join(appRoot, 'scenarios.json'), JSON.stringify({
+            metadata: {
+                applicationId: appId,
+                corpusId: REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+                seed: 12345,
+                budget: supportedScenarios.length,
+                semanticScenarioCoverage: coverage,
+            },
+            scenarios: [],
+        }, null, 2));
+
+        supportedScenarios.forEach((scenario, scenarioIndex) => {
+            const runBase = {
+                applicationId: appId,
+                browserName: 'chromium',
+                corpusId: REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+                corpusRole: 'supplementary',
+                activeScenarioId: scenario.scenarioId,
+                scenarioId: `${scenario.scenarioId} [semantic-first]`,
+                activeScenarioCategory: scenario.category,
+                sourceSpec: scenario.sourceSpec,
+                intendedSemanticEntryPoint: scenario.intendedSemanticEntryPoint,
+                actualSemanticEntryPoint: scenario.intendedSemanticEntryPoint,
+                targetLogicalKeys: scenario.targetLogicalKeys,
+                semanticScenarioSupportedApps: scenario.supportedApps,
+            };
+            const baseline = makeBenchmarkRun({
+                ...runBase,
+                locatorFamily: 'semantic-first',
+                phase: 'baseline',
+                runStatus: 'passed',
+                corpusId: overrides.corruptFirstRunCorpus && appId === getExpectedSupplementApps()[0] && scenarioIndex === 0
+                    ? 'realworld-active'
+                    : REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID,
+            });
+            const mutated = makeBenchmarkRun({
+                ...runBase,
+                locatorFamily: 'semantic-first',
+                phase: 'mutated',
+                runStatus: 'passed',
+                changeId: `${appId}-${scenario.scenarioId}-candidate`,
+                changeOperator: 'TextReplace',
+                changeCategory: 'content',
+                quotaBucket: 'content',
+                mutationTelemetry: { selectedCandidateId: `${appId}-${scenario.scenarioId}-candidate` },
+            });
+            const cssBaseline = makeBenchmarkRun({
+                ...runBase,
+                locatorFamily: 'css',
+                actualSemanticEntryPoint: null,
+                phase: 'baseline',
+                runStatus: 'passed',
+            });
+
+            fs.writeFileSync(path.join(runsDir, `${scenario.scenarioId.replace(/\./g, '_')}_baseline.json`), JSON.stringify(baseline));
+            fs.writeFileSync(path.join(runsDir, `${scenario.scenarioId.replace(/\./g, '_')}_mutated.json`), JSON.stringify(mutated));
+            fs.writeFileSync(path.join(runsDir, `${scenario.scenarioId.replace(/\./g, '_')}_css.json`), JSON.stringify(cssBaseline));
+        });
+    }
+}
+
 test.describe('Aggregation Script Validation', () => {
     const testDataDir = path.join(process.cwd(), 'test-results', 'agg-test');
     const outputDir = path.join(process.cwd(), 'test-results', 'agg-output');
@@ -352,6 +447,52 @@ test.describe('Aggregation Script Validation', () => {
 
         const mapping = fs.readFileSync(path.join(supplementOutputDir, 'semantic_scenario_query_mapping.csv'), 'utf8');
         expect(mapping).toContain('semantic.article-title-text,getByText');
+    });
+
+    test('strict combined supplement aggregate includes every supported app and scenario pair', async () => {
+        const resultsRoot = path.join(process.cwd(), 'test-results', 'strict-combined-complete');
+        if (fs.existsSync(resultsRoot)) fs.rmSync(resultsRoot, { recursive: true });
+        writeCompleteSupplementFixture(resultsRoot);
+
+        const outputDir = generateSemanticSupplementAggregate({
+            resultsRoot,
+            outputDir: path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'combined-aggregate'),
+        });
+        const report = JSON.parse(fs.readFileSync(path.join(outputDir, 'aggregate_report.json'), 'utf8'));
+
+        expect(report.corpusId).toBe(REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID);
+        expect(report.semanticSupplement.appsIncluded.sort()).toEqual(getExpectedSupplementApps());
+        expect(report.semanticSupplement.scenarioToQueryMapping).toHaveLength(
+            REALWORLD_SEMANTIC_SUPPLEMENT_MANIFEST.scenarios.length * getExpectedSupplementApps().length,
+        );
+        expect(report.semanticSupplement.validation.nonSupplementRowsExcluded).toBe(0);
+        expect(report.semanticSupplement.transparency.baselineOnlySupportIsNotMutationEvidence).toBe(true);
+
+        const summaryBySemanticQuery = fs.readFileSync(path.join(outputDir, 'summary_by_semantic_query.csv'), 'utf8');
+        expect(summaryBySemanticQuery).toContain('getByLabel');
+        expect(summaryBySemanticQuery).toContain('getByAltText');
+    });
+
+    test('strict combined supplement aggregate fails when an expected supplement app is missing', async () => {
+        const resultsRoot = path.join(process.cwd(), 'test-results', 'strict-combined-missing-app');
+        if (fs.existsSync(resultsRoot)) fs.rmSync(resultsRoot, { recursive: true });
+        writeCompleteSupplementFixture(resultsRoot, { omitApps: [getExpectedSupplementApps()[0]] });
+
+        expect(() => generateSemanticSupplementAggregate({
+            resultsRoot,
+            outputDir: path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'combined-aggregate'),
+        })).toThrow(/missing supplement benchmark runs/);
+    });
+
+    test('strict combined supplement aggregate rejects mixed-corpus pollution', async () => {
+        const resultsRoot = path.join(process.cwd(), 'test-results', 'strict-combined-mixed-corpus');
+        if (fs.existsSync(resultsRoot)) fs.rmSync(resultsRoot, { recursive: true });
+        writeCompleteSupplementFixture(resultsRoot, { corruptFirstRunCorpus: true });
+
+        expect(() => generateSemanticSupplementAggregate({
+            resultsRoot,
+            outputDir: path.join(resultsRoot, REALWORLD_SEMANTIC_SUPPLEMENT_CORPUS_ID, 'combined-aggregate'),
+        })).toThrow(/non-supplement corpus realworld-active/);
     });
 
     test('should fail loudly on empty input', async () => {
